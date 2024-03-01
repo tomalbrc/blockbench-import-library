@@ -11,8 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface AjEntity extends PolymerEntity {
-    AjEntityHolder getHolder();
+public interface AnimatedEntity extends PolymerEntity {
+    AnimatedEntityHolder getHolder();
 
     default float getShadowRadius() {
         if (this instanceof Entity entity) {
@@ -46,7 +46,7 @@ public interface AjEntity extends PolymerEntity {
     }
 
     @Nullable
-    static AjEntityHolder getHolder(Object obj) {
-        return obj instanceof AjEntity ajEntity ? ajEntity.getHolder() : null;
+    static AnimatedEntityHolder getHolder(Object obj) {
+        return obj instanceof AnimatedEntity animatedEntity ? animatedEntity.getHolder() : null;
     }
 }

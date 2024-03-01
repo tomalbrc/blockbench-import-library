@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.holder.base;
 
-import de.tomalbrc.bil.api.AjHolder;
+import de.tomalbrc.bil.api.AnimatedHolder;
 import de.tomalbrc.bil.component.AnimationComponent;
 import de.tomalbrc.bil.component.VariantComponent;
 import de.tomalbrc.bil.holder.wrapper.Bone;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class AbstractAnimationHolder extends BaseElementHolder implements AjHolder {
+public abstract class AbstractAnimationHolder extends BaseElementHolder implements AnimatedHolder {
 
     protected final Model model;
     protected final AnimationComponent animation;

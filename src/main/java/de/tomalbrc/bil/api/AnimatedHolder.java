@@ -4,7 +4,7 @@ import de.tomalbrc.bil.holder.wrapper.Locator;
 import de.tomalbrc.bil.model.Model;
 
 @SuppressWarnings("unused")
-public interface AjHolder {
+public interface AnimatedHolder {
     /**
      * Returns the intermediate of this holder.
      */

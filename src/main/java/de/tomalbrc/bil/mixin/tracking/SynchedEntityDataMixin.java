@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.mixin.tracking;
 
-import de.tomalbrc.bil.api.AjEntity;
-import de.tomalbrc.bil.api.AjEntityHolder;
+import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
@@ -27,7 +27,7 @@ public class SynchedEntityDataMixin {
             )
     )
     private <T> void resin$onSetEntityData(EntityDataAccessor<T> key, T value, boolean force, CallbackInfo ci) {
-        AjEntityHolder holder = AjEntity.getHolder(this.entity);
+        AnimatedEntityHolder holder = AnimatedEntity.getHolder(this.entity);
         if (holder != null) {
             holder.onSyncedDataUpdated(key, value);
         }

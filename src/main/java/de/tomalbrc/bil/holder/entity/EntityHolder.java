@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.holder.entity;
 
-import de.tomalbrc.bil.api.AjEntity;
-import de.tomalbrc.bil.api.AjEntityHolder;
+import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import de.tomalbrc.bil.holder.base.AbstractAnimationHolder;
 import de.tomalbrc.bil.holder.wrapper.Bone;
 import de.tomalbrc.bil.model.Model;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public abstract class EntityHolder<T extends Entity & AjEntity> extends AbstractAnimationHolder implements AjEntityHolder {
+public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends AbstractAnimationHolder implements AnimatedEntityHolder {
     protected final ObjectOpenHashSet<DisplayElement> additionalDisplays;
     protected final T parent;
     protected EntityDimensions dimensions;

@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.mixin.packet;
 
-import de.tomalbrc.bil.api.AjEntity;
-import de.tomalbrc.bil.api.AjEntityHolder;
+import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
@@ -27,7 +27,7 @@ public class ClientboundSetPassengersPacketMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
     private void resin$modifyRidePacket(Entity entity, CallbackInfo ci) {
-        AjEntityHolder holder = AjEntity.getHolder(entity);
+        AnimatedEntityHolder holder = AnimatedEntity.getHolder(entity);
         if (holder != null) {
             this.vehicle = holder.getVehicleId();
 

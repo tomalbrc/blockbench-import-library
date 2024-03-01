@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.extra;
 
-import de.tomalbrc.bil.api.AjEntity;
-import de.tomalbrc.bil.api.AjEntityHolder;
+import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import de.tomalbrc.bil.holder.entity.EntityHolder;
 import de.tomalbrc.bil.holder.entity.simple.SimpleEntityHolder;
 import de.tomalbrc.bil.holder.wrapper.DisplayWrapper;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ModelEntity extends Interaction implements AjEntity {
+public class ModelEntity extends Interaction implements AnimatedEntity {
     private final EntityHolder<?> holder;
 
     public ModelEntity(Level level, Model model) {
@@ -46,7 +46,7 @@ public class ModelEntity extends Interaction implements AjEntity {
     }
 
     @Override
-    public AjEntityHolder getHolder() {
+    public AnimatedEntityHolder getHolder() {
         return this.holder;
     }
 

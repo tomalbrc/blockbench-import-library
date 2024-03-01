@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.holder.entity.living;
 
-import de.tomalbrc.bil.api.AjEntity;
+import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.model.Model;
 import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  * It works by adding an extra zero bounding boxed {@link InteractionElement} to the parent entity,
  * which is used as the vehicle. This will add a very minor overhead on the client.
  */
-public class LivingEntityHolderWithRideOffset<T extends LivingEntity & AjEntity> extends LivingEntityHolder<T> {
+public class LivingEntityHolderWithRideOffset<T extends LivingEntity & AnimatedEntity> extends LivingEntityHolder<T> {
     private static final EntityDimensions ZERO = EntityDimensions.fixed(0, 0);
     protected final InteractionElement rideInteraction;
 

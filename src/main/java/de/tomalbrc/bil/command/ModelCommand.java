@@ -10,8 +10,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import de.tomalbrc.bil.BIL;
-import de.tomalbrc.bil.api.AjEntity;
-import de.tomalbrc.bil.api.AjEntityHolder;
+import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import de.tomalbrc.bil.api.VariantController;
 import de.tomalbrc.bil.file.loader.AjLoader;
 import de.tomalbrc.bil.extra.ModelEntity;
@@ -56,10 +56,10 @@ public class ModelCommand {
         return builder;
     }
 
-    private static int manipulateModels(CommandSourceStack source, Collection<? extends Entity> targets, Consumer<AjEntityHolder> consumer) {
+    private static int manipulateModels(CommandSourceStack source, Collection<? extends Entity> targets, Consumer<AnimatedEntityHolder> consumer) {
         int count = 0;
         for (Entity target : targets) {
-            AjEntityHolder holder = AjEntity.getHolder(target);
+            AnimatedEntityHolder holder = AnimatedEntity.getHolder(target);
             if (holder != null) {
                 consumer.accept(holder);
                 count++;
@@ -286,7 +286,7 @@ public class ModelCommand {
     private static void forEachModel(CommandContext<CommandSourceStack> ctx, Consumer<Model> consumer) throws CommandSyntaxException {
         // Make sure to only call this when we have the target context already.
         for (Entity entity : EntityArgument.getEntities(ctx, TARGETS)) {
-            AjEntityHolder holder = AjEntity.getHolder(entity);
+            AnimatedEntityHolder holder = AnimatedEntity.getHolder(entity);
             if (holder != null) {
                 consumer.accept(holder.getModel());
             }

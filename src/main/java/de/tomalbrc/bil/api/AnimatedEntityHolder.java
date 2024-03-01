@@ -7,7 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 
 @SuppressWarnings("unused")
-public interface AjEntityHolder extends AjHolder {
+public interface AnimatedEntityHolder extends AnimatedHolder {
     /**
      * Notifies the holder that the synchronized data has been updated.
      * <p>

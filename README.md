@@ -9,6 +9,6 @@ Models can be loaded using `BBModelLoader`
 
 ---
 
-This project uses code from the [nylon](https://github.com/Provim-Gaming/nylon) library for the animated java 0.4 json exporter
+This project is the continuation / uses code from the [nylon](https://github.com/Provim-Gaming/nylon) library for the animated java 0.4 json exporter
 
 You can find the original license in LICENSE.nylon

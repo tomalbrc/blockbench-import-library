@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.mixin.tracking;
 
-import de.tomalbrc.bil.api.AjEntity;
-import de.tomalbrc.bil.api.AjEntityHolder;
+import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +17,7 @@ public class EntityMixin {
 
     @Inject(method = "refreshDimensions", at = @At("RETURN"))
     private void resin$onRefreshedDimensions(CallbackInfo ci) {
-        AjEntityHolder holder = AjEntity.getHolder(this);
+        AnimatedEntityHolder holder = AnimatedEntity.getHolder(this);
         if (holder != null) {
             holder.onDimensionsUpdated(this.dimensions);
         }

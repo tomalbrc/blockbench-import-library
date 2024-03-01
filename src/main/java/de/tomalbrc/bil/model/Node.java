@@ -9,7 +9,7 @@ public record Node(
         String name,
         UUID uuid,
 
-        Variant.ModelInfo modelInfo,
+        RPModelInfo modelInfo,
         ResourceLocation entityType
 ) {
     public enum NodeType {

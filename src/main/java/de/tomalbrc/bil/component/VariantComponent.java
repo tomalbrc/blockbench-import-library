@@ -4,6 +4,7 @@ import de.tomalbrc.bil.api.VariantController;
 import de.tomalbrc.bil.holder.base.AbstractAnimationHolder;
 import de.tomalbrc.bil.holder.wrapper.Bone;
 import de.tomalbrc.bil.model.Model;
+import de.tomalbrc.bil.model.RPModelInfo;
 import de.tomalbrc.bil.model.Variant;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +71,7 @@ public class VariantComponent extends ComponentBase implements VariantController
     private void applyVariantToBones(Variant variant) {
         for (Bone bone : this.holder.getBones()) {
             UUID uuid = bone.node().uuid();
-            Variant.ModelInfo modelInfo = variant.models().get(uuid);
+            RPModelInfo modelInfo = variant.models().get(uuid);
             if (modelInfo != null && variant.isAffected(uuid)) {
                 bone.updateModelData(modelInfo.customModelData());
             }

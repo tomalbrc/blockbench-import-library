@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.holder.entity.living;
 
-import de.tomalbrc.bil.api.AjEntity;
+import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.element.CollisionElement;
 import de.tomalbrc.bil.holder.entity.EntityHolder;
 import de.tomalbrc.bil.holder.wrapper.Bone;
@@ -33,7 +33,7 @@ import org.joml.Vector3f;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class LivingEntityHolder<T extends LivingEntity & AjEntity> extends EntityHolder<T> {
+public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends EntityHolder<T> {
     protected final InteractionElement hitboxInteraction;
     protected final CollisionElement collisionElement;
     protected float deathAngle;

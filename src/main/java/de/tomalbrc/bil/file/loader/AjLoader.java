@@ -3,6 +3,7 @@ package de.tomalbrc.bil.file.loader;
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.json.*;
 import de.tomalbrc.bil.model.Model;
+import de.tomalbrc.bil.model.RPModelInfo;
 import de.tomalbrc.bil.model.Node;
 import de.tomalbrc.bil.model.Variant;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -16,7 +17,7 @@ import java.util.UUID;
 public class AjLoader implements ModelLoader {
     public Model load(String path, InputStream input, boolean replaceModelData) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
-            Model model = JSON.GSON.fromJson(reader, Model.class);
+            Model model = JSON.BUILDER.create().fromJson(reader, Model.class);
             if (replaceModelData) {
                 this.replaceModelData(model);
             }
@@ -36,7 +37,7 @@ public class AjLoader implements ModelLoader {
                         node.type(),
                         node.name(),
                         node.uuid(),
-                        new Variant.ModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, node.modelInfo().resourceLocation()).value(), node.modelInfo().resourceLocation()),
+                        new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, node.modelInfo().resourceLocation()).value(), node.modelInfo().resourceLocation()),
                         node.entityType()
                 )));
             }
@@ -44,9 +45,9 @@ public class AjLoader implements ModelLoader {
 
         // Variant intermediate data
         for (Variant variant : model.variants().values()) {
-            Object2ObjectOpenHashMap<UUID, Variant.ModelInfo> models = variant.models();
+            Object2ObjectOpenHashMap<UUID, RPModelInfo> models = variant.models();
             for (UUID uuid : models.keySet()) {
-                models.computeIfPresent(uuid, ((id, modelInfo) -> new Variant.ModelInfo(
+                models.computeIfPresent(uuid, ((id, modelInfo) -> new RPModelInfo(
                         PolymerResourcePackUtils.requestModel(Items.PAPER, modelInfo.resourceLocation()).value(),
                         modelInfo.resourceLocation()
                 )));

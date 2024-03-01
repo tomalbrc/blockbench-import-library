@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.holder.entity.simple;
 
-import de.tomalbrc.bil.api.AjEntity;
+import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.holder.entity.EntityHolder;
 import de.tomalbrc.bil.holder.wrapper.Bone;
 import de.tomalbrc.bil.holder.wrapper.DisplayWrapper;
@@ -21,7 +21,7 @@ import org.joml.Vector3f;
 
 import java.util.function.Consumer;
 
-public class InteractableEntityHolder<T extends Entity & AjEntity> extends EntityHolder<T> {
+public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends EntityHolder<T> {
     protected final InteractionElement hitboxInteraction;
 
     public InteractableEntityHolder(T parent, Model model) {

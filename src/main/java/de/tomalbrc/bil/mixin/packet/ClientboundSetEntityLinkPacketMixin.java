@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.mixin.packet;
 
-import de.tomalbrc.bil.api.AjEntity;
-import de.tomalbrc.bil.api.AjEntityHolder;
+import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ public class ClientboundSetEntityLinkPacketMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
     private void resin$modifyLeashPacket(Entity leashed, @Nullable Entity leashHolder, CallbackInfo ci) {
-        AjEntityHolder holder = AjEntity.getHolder(leashed);
+        AnimatedEntityHolder holder = AnimatedEntity.getHolder(leashed);
         if (holder != null) {
             this.sourceId = holder.getLeashedId();
         }

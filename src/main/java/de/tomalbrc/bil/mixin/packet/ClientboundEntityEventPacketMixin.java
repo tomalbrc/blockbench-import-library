@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.mixin.packet;
 
-import de.tomalbrc.bil.api.AjEntity;
-import de.tomalbrc.bil.api.AjEntityHolder;
+import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
@@ -21,7 +21,7 @@ public class ClientboundEntityEventPacketMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;B)V", at = @At("RETURN"))
     private void resin$modifyEventPacket(Entity entity, byte b, CallbackInfo ci) {
-        AjEntityHolder holder = AjEntity.getHolder(entity);
+        AnimatedEntityHolder holder = AnimatedEntity.getHolder(entity);
         if (holder != null) {
             this.entityId = holder.getEntityEventId();
         }

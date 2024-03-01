@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "bil",
+  "version": "${version}",
+  "name": "blockbench-import-lib",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/tomalbrc/blockbench-import-lib"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/bil/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "de.tomalbrc.bil.BIL"
+    ]
+  },
+  "mixins": [
+    "bil.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

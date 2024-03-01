@@ -6,22 +6,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-class Keyframe {
-    private String channel;
+public class Keyframe {
+    public Channel channel;
     @SerializedName("data_points")
-    private List<Map<String, String>> dataPoints;
-    private UUID uuid;
-    private int time;
-    private int color;
-    private String interpolation;
+    public List<Map<String, Float>> dataPoints;
+
+    public UUID uuid;
+    public int time;
+    public int color;
+    public String interpolation;
     @SerializedName("bezier_linked")
-    private boolean bezierLinked;
+    public boolean bezierLinked;
     @SerializedName("bezier_left_time")
-    private List<Double> bezierLeftTime;
+    public List<Double> bezierLeftTime;
     @SerializedName("bezier_left_value")
-    private List<Double> bezierLeftValue;
+    public List<Double> bezierLeftValue;
     @SerializedName("bezier_right_time")
-    private List<Double> bezierRightTime;
+    public List<Double> bezierRightTime;
     @SerializedName("bezier_right_value")
-    private List<Double> bezierRightValue;
+    public List<Double> bezierRightValue;
+
+    public enum Channel {
+        position,
+        rotation
+    }
 }

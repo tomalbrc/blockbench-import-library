@@ -6,18 +6,18 @@ import java.util.List;
 import java.util.UUID;
 
 public class Outliner {
-    private String name;
-    private List<Integer> origin;
-    private int color;
-    private String nbt;
-    private UUID uuid;
-    private boolean export;
+    public String name;
+    public List<Integer> origin;
+    public int color;
+    public String nbt;
+    public UUID uuid;
+    public boolean export;
     @SerializedName("mirror_uv")
-    private boolean mirrorUv;
+    public boolean mirrorUv;
     @SerializedName("is_open")
-    private boolean isOpen;
-    private boolean locked;
-    private boolean visibility;
-    private int autouv;
-    private List<UUID> children;
+    public boolean isOpen;
+    public boolean locked;
+    public boolean visibility;
+    public int autouv;
+    public List<UUID> children;
 }

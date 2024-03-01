@@ -2,10 +2,10 @@ package de.tomalbrc.bil.file.loader;
 
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.json.*;
-import de.tomalbrc.bil.model.Model;
-import de.tomalbrc.bil.model.RPModelInfo;
-import de.tomalbrc.bil.model.Node;
-import de.tomalbrc.bil.model.Variant;
+import de.tomalbrc.bil.core.model.Model;
+import de.tomalbrc.bil.core.model.RPModelInfo;
+import de.tomalbrc.bil.core.model.Node;
+import de.tomalbrc.bil.core.model.Variant;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
@@ -32,13 +32,12 @@ public class AjLoader implements ModelLoader {
         // Node intermediate data
         Object2ObjectOpenHashMap<UUID, Node> nodeMap = model.nodeMap();
         for (Node entry : nodeMap.values()) {
-            if (entry.type().hasModelData()) {
+            if (entry.type() == Node.NodeType.bone) {
                 nodeMap.computeIfPresent(entry.uuid(), ((id, node) -> new Node(
                         node.type(),
                         node.name(),
                         node.uuid(),
-                        new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, node.modelInfo().resourceLocation()).value(), node.modelInfo().resourceLocation()),
-                        node.entityType()
+                        new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, node.modelInfo().resourceLocation()).value(), node.modelInfo().resourceLocation())
                 )));
             }
         }

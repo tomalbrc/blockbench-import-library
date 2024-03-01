@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.api;
 
-import de.tomalbrc.bil.model.Variant;
+import de.tomalbrc.bil.core.model.Variant;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;

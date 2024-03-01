@@ -13,18 +13,15 @@ import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import de.tomalbrc.bil.api.VariantController;
-import de.tomalbrc.bil.file.loader.AjLoader;
-import de.tomalbrc.bil.extra.ModelEntity;
-import de.tomalbrc.bil.model.Model;
-import de.tomalbrc.bil.model.Variant;
+import de.tomalbrc.bil.core.extra.ModelEntity;
+import de.tomalbrc.bil.file.loader.BBModelLoader;
+import de.tomalbrc.bil.core.model.Model;
+import de.tomalbrc.bil.core.model.Variant;
 import de.tomalbrc.bil.util.Utils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec2;
@@ -40,12 +37,12 @@ public class ModelCommand {
     private static final String ANIMATION = "animation";
 
     public static ArgumentBuilder<CommandSourceStack, ?> register() {
-        var builder = Commands.literal("intermediate").requires(source -> source.hasPermission(2));
+        var builder = Commands.literal("model").requires(source -> source.hasPermission(2));
 
-        // Create intermediate command
+        // Create model command
         builder.then(modelCreator());
 
-        // Manipulate intermediate command
+        // Manipulate model command
         builder.then(Commands.argument(TARGETS, EntityArgument.entities())
                 .then(scaleManipulator())
                 .then(colorManipulator())
@@ -73,12 +70,8 @@ public class ModelCommand {
         return count;
     }
 
-    private static int spawnModel(CommandSourceStack source, ResourceLocation id) throws CommandSyntaxException {
-        return spawnModel(source, () -> new AjLoader().load(id), id.toString());
-    }
-
     private static int spawnModel(CommandSourceStack source, String path) throws CommandSyntaxException {
-        return spawnModel(source, () -> new AjLoader().load(path), path);
+        return spawnModel(source, () -> new BBModelLoader().load(path), path);
     }
 
     private static int spawnModel(CommandSourceStack source, Supplier<Model> supplier, String path) throws CommandSyntaxException {
@@ -92,12 +85,12 @@ public class ModelCommand {
             entity.moveTo(pos.x, pos.y, pos.z, rot.y, 0F);
 
             level.addFreshEntity(entity);
-            source.sendSuccess(() -> Component.literal("Successfully spawned intermediate!"), false);
+            source.sendSuccess(() -> Component.literal("Successfully spawned model!"), false);
         } catch (JsonParseException ex) {
-            BIL.LOGGER.error("{} is not a valid intermediate file!", path, ex);
+            BIL.LOGGER.error("{} is not a valid model file!", path, ex);
             throw Utils.buildCommandException(ex.getMessage() + "\nCheck the server console for more information.");
         } catch (Throwable throwable) {
-            throw Utils.buildCommandException("Failed to load intermediate!\n" + throwable.getMessage());
+            throw Utils.buildCommandException("Failed to load model!\n" + throwable.getMessage());
         }
 
         return Command.SINGLE_SUCCESS;
@@ -106,24 +99,11 @@ public class ModelCommand {
     private static ArgumentBuilder<CommandSourceStack, ?> modelCreator() {
         var builder = Commands.literal("create");
 
-        // Create intermediate command
-        builder.then(Commands.literal("id")
-                .then(Commands.argument("intermediate", ResourceLocationArgument.id())
-                        .suggests(SuggestionProviders.SUMMONABLE_ENTITIES)
-                        .executes(context -> spawnModel(
-                                context.getSource(),
-                                ResourceLocationArgument.getId(context, "intermediate")
-                        ))
-                )
-        );
-
-        builder.then(Commands.literal("filepath")
-                .then(Commands.argument("intermediate", StringArgumentType.greedyString())
-                        .executes(context -> spawnModel(
-                                context.getSource(),
-                                StringArgumentType.getString(context, "intermediate")
-                        ))
-                )
+        builder.then(Commands.argument("model", StringArgumentType.greedyString())
+                .executes(context -> spawnModel(
+                        context.getSource(),
+                        StringArgumentType.getString(context, "model")
+                ))
         );
 
         return builder;

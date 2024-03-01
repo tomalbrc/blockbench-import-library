@@ -1,27 +1,28 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
-import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class Element {
-    private String name;
+    public String name;
     @SerializedName("box_uv")
-    private boolean boxUv;
-    private boolean rescale;
-    private boolean locked;
+    public boolean boxUv;
+    public boolean rescale;
+    public boolean locked;
     @SerializedName("render_order")
-    private String renderOrder;
+    public String renderOrder;
     @SerializedName("allow_mirror_modeling")
-    private boolean allowMirrorModeling;
-    private Vec3 from;
-    private Vec3 to;
-    private int autouv;
-    private int color;
-    private Vec3 origin;
-    private Map<String, Face> faces;
-    private String type;
-    private UUID uuid;
+    public boolean allowMirrorModeling;
+    public List<Double> from;
+    public List<Double> to;
+    public int autouv;
+    public int color;
+    public Vector3f origin;
+    public Map<String, Face> faces;
+    public String type;
+    public UUID uuid;
 }

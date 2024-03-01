@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.api;
 
-import de.tomalbrc.bil.holder.wrapper.Locator;
-import de.tomalbrc.bil.model.Model;
+import de.tomalbrc.bil.core.holder.wrapper.Locator;
+import de.tomalbrc.bil.core.model.Model;
 
 @SuppressWarnings("unused")
 public interface AnimatedHolder {

@@ -2,7 +2,7 @@ package de.tomalbrc.bil.file.bbmodel;
 
 import java.util.List;
 
-class Face {
+public class Face {
     public List<Double> uv;
-    private int texture;
+    public int texture;
 }

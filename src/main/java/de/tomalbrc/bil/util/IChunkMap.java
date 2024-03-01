@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.util;
 
-import de.tomalbrc.bil.holder.base.BaseElementHolder;
+import de.tomalbrc.bil.core.holder.base.BaseElementHolder;
 import net.minecraft.server.level.ChunkMap;
 
 public interface IChunkMap {

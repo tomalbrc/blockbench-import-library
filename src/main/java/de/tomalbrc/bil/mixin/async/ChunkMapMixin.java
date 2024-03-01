@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.mixin.async;
 
-import de.tomalbrc.bil.holder.base.BaseElementHolder;
+import de.tomalbrc.bil.core.holder.base.BaseElementHolder;
 import de.tomalbrc.bil.util.IChunkMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.server.level.ChunkMap;

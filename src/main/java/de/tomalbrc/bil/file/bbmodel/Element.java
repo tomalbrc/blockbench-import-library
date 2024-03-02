@@ -19,6 +19,8 @@ public class Element {
     public boolean allowMirrorModeling;
     public Vector3f from;
     public Vector3f to;
+
+    public Vector3f rotation;
     public int autouv;
     public int color;
     public float inflate;

@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.joml.Vector2i;
 
 import java.util.List;
@@ -37,17 +38,79 @@ public class BbModel {
     }
 
     public Outliner getOutliner(UUID uuid) {
-        for (Outliner outliner1: this.outliner) {
-            if (outliner1.uuid.equals(uuid))
-                return outliner1;
+        for (Outliner outliner: this.outliner) {
+            Outliner res = findNode(outliner, uuid);
+            if (res != null) {
+                return res;
+            }
+        }
+        return null;
+    }
+
+    public List<Outliner> modelOutliner() {
+        List<Outliner> list = new ObjectArrayList<>();
+
+        for (Outliner outliner: this.outliner) {
+            if (outliner.hasModel()) {
+                list.add(outliner);
+            }
+
+            findModelOutlinerChildren(list, outliner);
+        }
+
+        return list;
+    }
+
+    private void findModelOutlinerChildren(List<Outliner> list, Outliner x) {
+        for (Outliner.ChildEntry child: x.children) {
+            if (child.isNode()) {
+                if (child.outliner.hasModel())
+                    list.add(child.outliner);
+
+                findModelOutlinerChildren(list, child.outliner);
+            }
+        }
+    }
+
+
+    private Outliner findNode(Outliner x, UUID uuid) {
+        if (x.uuid.equals(uuid)) {
+            return x;
+        }
+        for (Outliner.ChildEntry child: x.children) {
+            if (child.isNode() && child.outliner.uuid.equals(uuid)) {
+                return child.outliner;
+            } else if (child.isNode()) {
+                return findNode(child.outliner, uuid);
+            }
         }
         return null;
     }
 
     public Outliner getParent(Element element) {
         for (Outliner outliner: this.outliner) {
-            if (outliner.children.contains(element.uuid))
-                return outliner;
+
+
+            Outliner res = findParent(outliner, element);
+            if (res != null)
+                return res;
+        }
+        System.out.println("dsdshduhduasdi hsiduihsduih " + element.uuid.toString());
+        return null;
+    }
+
+    private Outliner findParent(Outliner x, Element element) {
+        if (x.hasUuidChild(element.uuid))
+            return x;
+
+        for (Outliner.ChildEntry child: x.children) {
+            if (child.isNode() && child.outliner.hasUuidChild(element.uuid)) {
+                return child.outliner;
+            } else if (child.isNode()) {
+                var res = findParent(child.outliner, element);
+                if (res != null)
+                    return res;
+            }
         }
         return null;
     }

@@ -20,5 +20,30 @@ public class Outliner {
     public boolean locked;
     public boolean visibility;
     public int autouv;
-    public List<UUID> children;
+
+    public List<ChildEntry> children;
+
+    static public class ChildEntry {
+        public UUID uuid;
+        public Outliner outliner;
+        public boolean isNode() {
+            return this.outliner != null;
+        }
+    }
+
+    public boolean hasModel() {
+        for (ChildEntry childEntry: this.children) {
+            if (!childEntry.isNode())
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasUuidChild(UUID uuid) {
+        for (ChildEntry childEntry: this.children) {
+            if (!childEntry.isNode() && childEntry.uuid.equals(uuid))
+                return true;
+        }
+        return false;
+    }
 }

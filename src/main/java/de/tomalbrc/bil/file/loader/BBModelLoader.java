@@ -7,6 +7,7 @@ import de.tomalbrc.bil.file.bbmodel.Element;
 import de.tomalbrc.bil.file.bbmodel.Face;
 import de.tomalbrc.bil.file.bbmodel.Outliner;
 import de.tomalbrc.bil.file.importer.BBModelImporter;
+import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.core.model.Model;
 import org.joml.Vector3f;
@@ -20,7 +21,11 @@ public class BBModelLoader implements ModelLoader {
     @Override
     public Model load(String name, InputStream input) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
-            BbModel model = JSON.BUILDER.create().fromJson(reader, BbModel.class);
+            BbModel model = JSON.BUILDER
+                    .registerTypeAdapter(Outliner.ChildEntry.class, new ChildEntryDeserializer())
+                    .create()
+                    .fromJson(reader, BbModel.class);
+
             if (model.modelIdentifier == null) {
                 model.modelIdentifier = name;
             }

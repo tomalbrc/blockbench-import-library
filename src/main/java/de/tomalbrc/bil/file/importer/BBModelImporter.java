@@ -27,11 +27,11 @@ public class BBModelImporter implements ModelImporter<BbModel> {
     private Object2ObjectOpenHashMap<UUID, Node> nodeMap(BbModel model) {
         Object2ObjectOpenHashMap<UUID, Node> res = new Object2ObjectOpenHashMap<>();
 
-        for (Outliner outliner: model.outliner) {
+        for (Outliner outliner: model.modelOutliner()) {
             if (outliner.export) {
                 List<Element> elements = new ObjectArrayList<>();
                 for (Element element: model.elements) {
-                    if (outliner.children.contains(element.uuid)) {
+                    if (outliner.hasUuidChild(element.uuid)) {
                         elements.add(element);
                     }
                 }
@@ -66,7 +66,8 @@ public class BBModelImporter implements ModelImporter<BbModel> {
     private Reference2ObjectOpenHashMap<UUID, Pose> defaultPose(BbModel model) {
         Reference2ObjectOpenHashMap<UUID, Pose> res = new Reference2ObjectOpenHashMap<>();
 
-        for (Outliner outliner: model.outliner) {
+        var list = model.modelOutliner();
+        for (Outliner outliner: list) {
             Matrix4f matrix4f = new Matrix4f();
             Vector3f off = outliner.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI);
             matrix4f.translate(off);

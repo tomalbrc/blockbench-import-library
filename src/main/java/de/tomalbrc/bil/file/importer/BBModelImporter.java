@@ -9,6 +9,7 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Items;
@@ -57,7 +58,7 @@ public class BBModelImporter implements ModelImporter<BbModel> {
 
         var triple = MatrixUtil.svdDecompose(matrix3f);
         Vector3f scale = triple.getMiddle();
-        Quaternionf leftRotation = triple.getLeft().rotateY(Mth.DEG_TO_RAD * 180F);
+        Quaternionf leftRotation = triple.getLeft();
         Quaternionf rightRotation = triple.getRight();
         return new Pose(UUID.randomUUID(), translation, scale, leftRotation, rightRotation);
     }
@@ -67,6 +68,8 @@ public class BBModelImporter implements ModelImporter<BbModel> {
 
         for (Outliner outliner: model.outliner) {
             Matrix4f matrix4f = new Matrix4f();
+            Vector3f off = outliner.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI);
+            matrix4f.translate(off);
             res.put(outliner.uuid, this.toPose(matrix4f));
         }
 
@@ -85,25 +88,18 @@ public class BBModelImporter implements ModelImporter<BbModel> {
             List<Frame> frames = new ObjectArrayList<>();
             float step = 0.05f;
             int frameCount = Math.round(anim.length / step);
-            for (int i = 0; i < frameCount; i++) {
+            for (int i = 0; i <= frameCount; i++) {
                 Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
 
-                for (var ttt: anim.animators.entrySet()) {
-                    Matrix4f matrix4f = new Matrix4f();
+                for (var nodeAnimatorEntry: anim.animators.entrySet()) {
+                    Outliner bone = model.getOutliner(nodeAnimatorEntry.getKey());
 
-                    // apply values of keyframes for current pose
-                    for (Keyframe kf: ttt.getValue().keyframes) {
-                        switch (kf.channel) {
-                            case position -> {
-                                matrix4f.setTranslation(kf.dataPoints.get(0).get("x"), kf.dataPoints.get(0).get("y"), kf.dataPoints.get(0).get("z"));
-                            }
-                            case rotation -> {
-                                matrix4f.setRotationXYZ(kf.dataPoints.get(0).get("x"), kf.dataPoints.get(0).get("y"), kf.dataPoints.get(0).get("z"));
-                            }
+                    if (bone != null) {
+                        Matrix4f matrix4f = Sampler.sample(bone, nodeAnimatorEntry.getValue().keyframes, i * step);
+                        if (matrix4f != null) {
+                            poses.put(nodeAnimatorEntry.getKey(), this.toPose(matrix4f));
                         }
                     }
-
-                    poses.put(ttt.getKey(), this.toPose(matrix4f));
                 }
 
                 frames.add(new Frame(step * i, poses, null, null, null, false));
@@ -111,8 +107,8 @@ public class BBModelImporter implements ModelImporter<BbModel> {
 
             int startDelay = 0;
             int loopDelay = 0;
-            int duration = 0;
-            Animation animation = new Animation((Frame[]) frames.toArray(new Frame[frames.size()]), startDelay, loopDelay, duration, Animation.LoopMode.once, null, false);
+            int duration = Math.round(anim.length / step);
+            Animation animation = new Animation(frames.toArray(new Frame[frames.size()]), startDelay, loopDelay, duration, anim.loop, new ReferenceOpenHashSet<>(), false);
 
             res.put(anim.name, animation);
         }

@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import org.joml.Matrix4f;
 
 import java.util.List;
 import java.util.Map;
@@ -12,22 +13,23 @@ public class Keyframe {
     public List<Map<String, Float>> dataPoints;
 
     public UUID uuid;
-    public int time;
+    public float time;
     public int color;
     public String interpolation;
     @SerializedName("bezier_linked")
     public boolean bezierLinked;
     @SerializedName("bezier_left_time")
-    public List<Double> bezierLeftTime;
+    public List<Float> bezierLeftTime;
     @SerializedName("bezier_left_value")
-    public List<Double> bezierLeftValue;
+    public List<Float> bezierLeftValue;
     @SerializedName("bezier_right_time")
-    public List<Double> bezierRightTime;
+    public List<Float> bezierRightTime;
     @SerializedName("bezier_right_value")
-    public List<Double> bezierRightValue;
+    public List<Float> bezierRightValue;
 
     public enum Channel {
         position,
-        rotation
+        rotation,
+        scale
     }
 }

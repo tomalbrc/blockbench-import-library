@@ -22,7 +22,7 @@ public class BIL implements ModInitializer {
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(RPUtil::addAdditional);
 
         Model m = new BBModelLoader().load("generic_test");
-
+        Model m2 = new BBModelLoader().load("chest-example");
         LOGGER.info("done");
     }
 }

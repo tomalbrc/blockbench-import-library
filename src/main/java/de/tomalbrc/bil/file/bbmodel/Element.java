@@ -17,10 +17,11 @@ public class Element {
     public String renderOrder;
     @SerializedName("allow_mirror_modeling")
     public boolean allowMirrorModeling;
-    public List<Double> from;
-    public List<Double> to;
+    public Vector3f from;
+    public Vector3f to;
     public int autouv;
     public int color;
+    public float inflate;
     public Vector3f origin;
     public Map<String, Face> faces;
     public String type;

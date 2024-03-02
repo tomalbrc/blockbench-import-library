@@ -8,9 +8,9 @@ import java.util.UUID;
 public class Animation {
     public UUID uuid;
     public String name;
-    public String loop;
+    public de.tomalbrc.bil.core.model.Animation.LoopMode loop;
     public boolean override;
-    public int length;
+    public float length;
     public int snapping;
     public boolean selected;
     @SerializedName("anim_time_update")

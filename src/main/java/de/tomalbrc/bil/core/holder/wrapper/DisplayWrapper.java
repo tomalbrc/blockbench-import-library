@@ -38,7 +38,7 @@ public class DisplayWrapper<T extends DisplayElement> extends AbstractWrapper {
      */
     public void startInterpolation() {
         if (this.trackedData.isDirty()) {
-            this.element.startInterpolation();
+            this.element.startInterpolationIfDirty();
             this.trackedData.setDirty(false);
         }
     }

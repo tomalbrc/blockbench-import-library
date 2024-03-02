@@ -1,5 +1,5 @@
-[23:33:20] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.20.4 with Fabric Loader 0.15.7
-[23:33:20] [main/INFO] (FabricLoader) Loading 52 mods:
+[16:15:14] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.20.4 with Fabric Loader 0.15.7
+[16:15:14] [main/INFO] (FabricLoader) Loading 52 mods:
 	- bil 1.0
 	- fabric-api 0.96.3+1.20.4
 	- fabric-api-base 0.4.36+78d798af4f
@@ -52,20 +52,37 @@
 	- polymer-registry-sync-manipulator 0.7.5+1.20.4
 	- polymer-resource-pack 0.7.5+1.20.4
 	- polymer-virtual-entity 0.7.5+1.20.4
-[23:33:20] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.5 Source=file:/Users/tomalbrecht/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.12.5+mixin.0.8.5/8d31fb97c3e0cd7c8dad3441851c523bcfae6d8e/sponge-mixin-0.12.5+mixin.0.8.5.jar Service=Knot/Fabric Env=SERVER
-[23:33:21] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
-[23:33:21] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_17
-[23:33:21] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.3.5).
-[23:33:26] [main/INFO] (fabric-networking-api-v1) Force Packet Serialization is enabled to mimic remote connection on single player, this is the default behaviour on dev env. Add -Dfabric-api.networking.force-packet-serialization=false JVM arg to disable it.
-[23:33:29] [main/INFO] (BIL) done
-[23:33:29] [main/INFO] (Minecraft) Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
-[23:33:31] [main/INFO] (Minecraft) Loaded 7 recipes
-[23:33:31] [main/INFO] (Minecraft) Loaded 1271 advancements
-[23:33:31] [main/INFO] (BiomeModificationImpl) Applied 0 biome modifications to 0 of 64 new biomes in 914.0 μs
-[23:33:31] [Server thread/INFO] (Minecraft) Starting minecraft server version 1.20.4
-[23:33:31] [Server thread/INFO] (Minecraft) Loading properties
-[23:33:31] [Server thread/INFO] (Minecraft) Default game type: SURVIVAL
-[23:33:31] [Server thread/INFO] (Minecraft) Generating keypair
-[23:33:31] [Server thread/INFO] (Minecraft) Starting Minecraft server on *:25565
-[23:33:32] [Server thread/INFO] (Minecraft) Using default channel type
-[23:33:32] [Server thread/INFO] (Minecraft) Preparing level "world"
+[16:15:14] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.5 Source=file:/Users/tomalbrecht/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.12.5+mixin.0.8.5/8d31fb97c3e0cd7c8dad3441851c523bcfae6d8e/sponge-mixin-0.12.5+mixin.0.8.5.jar Service=Knot/Fabric Env=SERVER
+[16:15:14] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
+[16:15:14] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_17
+[16:15:15] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.3.5).
+[16:15:20] [main/INFO] (BIL) done
+[16:15:20] [main/INFO] (fabric-networking-api-v1) Force Packet Serialization is enabled to mimic remote connection on single player, this is the default behaviour on dev env. Add -Dfabric-api.networking.force-packet-serialization=false JVM arg to disable it.
+[16:15:20] [main/INFO] (Minecraft) Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[16:15:22] [main/INFO] (Minecraft) Loaded 7 recipes
+[16:15:22] [main/INFO] (Minecraft) Loaded 1271 advancements
+[16:15:22] [main/INFO] (BiomeModificationImpl) Applied 0 biome modifications to 0 of 64 new biomes in 1.146 ms
+[16:15:22] [Server thread/INFO] (Minecraft) Starting minecraft server version 1.20.4
+[16:15:22] [Server thread/INFO] (Minecraft) Loading properties
+[16:15:22] [Server thread/INFO] (Minecraft) Default game type: SURVIVAL
+[16:15:22] [Server thread/INFO] (Minecraft) Generating keypair
+[16:15:22] [Server thread/INFO] (Minecraft) Starting Minecraft server on *:25565
+[16:15:23] [Server thread/INFO] (Minecraft) Using default channel type
+[16:15:23] [Server thread/INFO] (Minecraft) Preparing level "world"
+[16:15:24] [Server thread/INFO] (Minecraft) Preparing start region for dimension minecraft:overworld
+[16:15:25] [User Authenticator #1/INFO] (Minecraft) UUID of player Pinnit is ad061742-c7cd-40bf-b50f-6124ff51ecc8
+[16:15:27] [Worker-Main-5/INFO] (Minecraft) Preparing spawn area: 0%
+[16:15:27] [Worker-Main-6/INFO] (Minecraft) Preparing spawn area: 0%
+[16:15:27] [Worker-Main-6/INFO] (Minecraft) Preparing spawn area: 0%
+[16:15:27] [Worker-Main-6/INFO] (Minecraft) Preparing spawn area: 0%
+[16:15:27] [Worker-Main-6/INFO] (Minecraft) Preparing spawn area: 0%
+[16:15:27] [Worker-Main-6/INFO] (Minecraft) Preparing spawn area: 0%
+[16:15:27] [Worker-Main-5/INFO] (Minecraft) Preparing spawn area: 0%
+[16:15:28] [Worker-Main-5/INFO] (Minecraft) Preparing spawn area: 32%
+[16:15:28] [Server thread/INFO] (Minecraft) Time elapsed: 3822 ms
+[16:15:28] [Server thread/INFO] (Minecraft) Done (5.298s)! For help, type "help"
+[16:15:28] [IO-Worker-1/INFO] (Minecraft) Starting resource pack generation...
+[16:15:28] [Server thread/INFO] (Minecraft) Resource pack created successfully!
+[16:15:30] [Server thread/INFO] (Minecraft) Pinnit[/127.0.0.1:56954] logged in with entity id 127 at (-4.056594765718112, 173.88525734493243, 87.54229109551684)
+[16:15:30] [Server thread/INFO] (Polymer) Full sync for Pinnit took 37.79 ms
+[16:15:30] [Server thread/INFO] (Minecraft) Pinnit joined the game

@@ -1,13 +1,14 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.UUID;
 
 public class Outliner {
     public String name;
-    public List<Integer> origin;
+    public Vector3f origin;
     public int color;
     public String nbt;
     public UUID uuid;

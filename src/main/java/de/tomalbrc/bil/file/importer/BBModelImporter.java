@@ -96,7 +96,7 @@ public class BBModelImporter implements ModelImporter<BbModel> {
                     Outliner bone = model.getOutliner(nodeAnimatorEntry.getKey());
 
                     if (bone != null) {
-                        Matrix4f matrix4f = Sampler.sample(bone, nodeAnimatorEntry.getValue().keyframes, i * step);
+                        Matrix4f matrix4f = Sampler.sample(bone, nodeAnimatorEntry.getValue().keyframes, model.animationVariablePlaceholders, i * step);
                         if (matrix4f != null) {
                             poses.put(nodeAnimatorEntry.getKey(), this.toPose(matrix4f));
                         }

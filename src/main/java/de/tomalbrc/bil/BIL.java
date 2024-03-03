@@ -20,11 +20,5 @@ public class BIL implements ModInitializer {
         });
 
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(RPUtil::addAdditional);
-
-        Model m = new BBModelLoader().load("generic_test");
-        Model m2 = new BBModelLoader().load("chest-example");
-        Model m3 = new BBModelLoader().load("armor_stand");
-        Model m4 = new BBModelLoader().load("bonnie");
-        LOGGER.info("done");
     }
 }

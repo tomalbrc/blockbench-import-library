@@ -2,15 +2,13 @@ package de.tomalbrc.bil.file.loader;
 
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.datagen.RPDataGenerator;
-import de.tomalbrc.bil.file.bbmodel.BbModel;
-import de.tomalbrc.bil.file.bbmodel.Element;
-import de.tomalbrc.bil.file.bbmodel.Face;
-import de.tomalbrc.bil.file.bbmodel.Outliner;
+import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.importer.BBModelImporter;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
+import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.core.model.Model;
-import org.joml.Vector3f;
+import de.tomalbrc.bil.json.VariablePlaceholdersDeserializer;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,6 +21,8 @@ public class BBModelLoader implements ModelLoader {
         try (Reader reader = new InputStreamReader(input)) {
             BbModel model = JSON.BUILDER
                     .registerTypeAdapter(Outliner.ChildEntry.class, new ChildEntryDeserializer())
+                    .registerTypeAdapter(Keyframe.DataPointValue.class, new DataPointValueDeserializer())
+                    .registerTypeAdapter(VariablePlaceholders.class, new VariablePlaceholdersDeserializer())
                     .create()
                     .fromJson(reader, BbModel.class);
 

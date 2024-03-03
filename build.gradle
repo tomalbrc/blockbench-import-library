@@ -11,6 +11,7 @@ base {
 }
 
 repositories {
+    maven { url = 'https://maven.draylar.dev/releases' }
     maven { url 'https://maven.nucleoid.xyz' }
     mavenLocal()
 }
@@ -29,6 +30,9 @@ dependencies {
     modImplementation("eu.pb4:polymer-resource-pack:${project.polymer_version}")
     modImplementation("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
     modRuntimeOnly("eu.pb4:polymer-autohost:${project.polymer_version}")
+
+    // Molang
+    modImplementation('dev.omega:arcane:0.1.3')
 }
 
 processResources {

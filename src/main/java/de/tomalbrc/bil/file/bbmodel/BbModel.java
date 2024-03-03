@@ -13,14 +13,7 @@ public class BbModel {
     public String name;
     @SerializedName("model_identifier")
     public String modelIdentifier;
-    @SerializedName("visible_box")
-    public List<Integer> visibleBox;
-    @SerializedName("variable_placeholders")
-    public String variablePlaceholders;
-    @SerializedName("variable_placeholder_buttons")
-    public List<String> variablePlaceholderButtons;
-    @SerializedName("timeline_setups")
-    public List<String> timelineSetups;
+
     @SerializedName("unhandled_root_fields")
     public Map<String, Object> unhandledRootFields;
     public Vector2i resolution;
@@ -28,6 +21,9 @@ public class BbModel {
     public List<Outliner> outliner;
     public List<Texture> textures;
     public List<Animation> animations;
+
+    @SerializedName("animation_variable_placeholders")
+    public VariablePlaceholders animationVariablePlaceholders;
 
     public Element getElement(UUID uuid) {
         for (Element element: this.elements) {

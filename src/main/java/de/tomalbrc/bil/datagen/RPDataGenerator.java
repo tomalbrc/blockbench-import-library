@@ -25,28 +25,17 @@ public class RPDataGenerator {
     }
 
 
-    public static ResourceLocation locationOf(BbModel model, Outliner outliner) {
-        String id = model.modelIdentifier != null && !model.modelIdentifier.isEmpty() ? model.modelIdentifier : model.name.trim().replace(" ", "_");
-        id = id.trim().replace(" ", "_");
-        id = id.replace("-", "_");
-
-        return new ResourceLocation("bil:item/generated/" + id + "/" + outliner.name);
+    public static ResourceLocation locationOf(BbModel model, String outliner) {
+        String id = RPDataGenerator.normalizedModelId(model);
+        return new ResourceLocation("bil:item/" + id + "/" + outliner);
     }
 
     public static void makePart(BbModel model, String partName, List<Element> elements, List<Texture> textures) {
-        String id;
-        if (model.name == null && model.modelIdentifier == null) {
-            id = UUID.randomUUID().toString();
-        } else {
-            id = model.modelIdentifier != null && !model.modelIdentifier.isEmpty() ? model.modelIdentifier : model.name;
-        }
-
-        id = id.trim().replace(" ", "_");
-        id = id.replace("-", "_");
+        String id = RPDataGenerator.normalizedModelId(model);
 
         Map<String, ResourceLocation> textureMap = new Object2ObjectLinkedOpenHashMap<>();
         for (Texture texture: model.textures) {
-            textureMap.put(texture.id, new ResourceLocation("bil:item/generated/" + id + "/" + texture.name));
+            textureMap.put(texture.id, new ResourceLocation("bil:item/" + id + "/" + texture.name));
         }
 
         GeneratedModel generatedModel = new GeneratedModel(textureMap, elements);
@@ -54,17 +43,22 @@ public class RPDataGenerator {
                 .registerTypeAdapter(Face.class, new FaceSerializer())
                 .registerTypeAdapter(Element.class, new ElementSerializer())
                 .create();
-        RPUtil.add(new ResourceLocation(":assets/bil/models/item/generated/" + id + "/" + partName + ".json"), gson.toJson(generatedModel).getBytes());
+        RPUtil.add(new ResourceLocation(":assets/bil/models/item/" + id + "/" + partName + ".json"), gson.toJson(generatedModel).getBytes());
     }
 
-    public static void makeTextures(BbModel model) {
+    public static void makeTextures(BbModel model, List<Texture> textures) {
+        String id = RPDataGenerator.normalizedModelId(model);
+
+        for (Texture texture: textures) {
+            byte[] texData = Base64.getDecoder().decode(texture.source.replace("data:image/png;base64,", ""));
+            RPUtil.add(new ResourceLocation(":assets/bil/textures/item/" + id + "/" + texture.name + ".png"), texData);
+        }
+    }
+
+    static private String normalizedModelId(BbModel model) {
         String id = model.modelIdentifier != null && !model.modelIdentifier.isEmpty() ? model.modelIdentifier : model.name.trim().replace(" ", "_");
         id = id.trim().replace(" ", "_");
         id = id.replace("-", "_");
-
-        for (Texture texture: model.textures) {
-            byte[] texData = Base64.getDecoder().decode(texture.source.replace("data:image/png;base64,", ""));
-            RPUtil.add(new ResourceLocation(":assets/bil/textures/item/generated/" + id + "/" + texture.name + ".png"), texData);
-        }
+        return id;
     }
 }

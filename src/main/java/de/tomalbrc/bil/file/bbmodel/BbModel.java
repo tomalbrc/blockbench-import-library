@@ -3,6 +3,7 @@ package de.tomalbrc.bil.file.bbmodel;
 import com.google.gson.annotations.SerializedName;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.joml.Vector2i;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,17 @@ public class BbModel {
 
     @SerializedName("animation_variable_placeholders")
     public VariablePlaceholders animationVariablePlaceholders;
+
+    public Vector3f getGlobalOrigin(Outliner x) {
+        Vector3f origin = new Vector3f();
+        origin.add(x.origin);
+        Outliner parent = this.getParent(x);
+        while (parent != null) {
+            origin.sub(parent.origin);
+            parent = this.getParent(parent);
+        }
+        return origin;
+    }
 
     public Element getElement(UUID uuid) {
         for (Element element: this.elements) {
@@ -85,13 +97,10 @@ public class BbModel {
 
     public Outliner getParent(Element element) {
         for (Outliner outliner: this.outliner) {
-
-
             Outliner res = findParent(outliner, element);
             if (res != null)
                 return res;
         }
-        System.out.println("dsdshduhduasdi hsiduihsduih " + element.uuid.toString());
         return null;
     }
 
@@ -104,6 +113,31 @@ public class BbModel {
                 return child.outliner;
             } else if (child.isNode()) {
                 var res = findParent(child.outliner, element);
+                if (res != null)
+                    return res;
+            }
+        }
+        return null;
+    }
+
+    public Outliner getParent(Outliner x) {
+        for (Outliner outliner: this.outliner) {
+            Outliner res = findParent(outliner, x);
+            if (res != null)
+                return res;
+        }
+        return null;
+    }
+
+    private Outliner findParent(Outliner x, Outliner childOutliner) {
+        if (x.hasChildOutliner(childOutliner))
+            return x;
+
+        for (Outliner.ChildEntry child: x.children) {
+            if (child.isNode() && child.outliner.hasChildOutliner(childOutliner)) {
+                return child.outliner;
+            } else if (child.isNode()) {
+                var res = findParent(child.outliner, childOutliner);
                 if (res != null)
                     return res;
             }

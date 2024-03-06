@@ -1,5 +1,6 @@
 package de.tomalbrc.bil.file.importer;
 
+import com.mojang.math.Axis;
 import com.mojang.math.MatrixUtil;
 import de.tomalbrc.bil.datagen.RPDataGenerator;
 import de.tomalbrc.bil.file.bbmodel.*;
@@ -14,18 +15,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.joml.*;
 
+import java.lang.Math;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class BBModelImporter implements ModelImporter<BbModel> {
 
     private Object2ObjectOpenHashMap<UUID, Node> nodeMap(BbModel model) {
-        Object2ObjectOpenHashMap<UUID, Node> res = new Object2ObjectOpenHashMap<>();
+        Object2ObjectOpenHashMap<UUID, Node> nodeMap = new Object2ObjectOpenHashMap<>();
+        List<Texture> textures = new ObjectArrayList<>();
 
         for (Outliner outliner: model.modelOutliner()) {
             if (outliner.export) {
@@ -36,14 +37,19 @@ public class BBModelImporter implements ModelImporter<BbModel> {
                     }
                 }
 
-                RPDataGenerator.makePart(model, outliner.name, elements, model.textures);
+                String modelName = outliner.name;
 
-                ResourceLocation location = RPDataGenerator.locationOf(model, outliner);
-                res.put(outliner.uuid, new Node(Node.NodeType.bone, outliner.name, outliner.uuid, new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, location).value(), location)));
+                RPDataGenerator.makePart(model, modelName, elements, model.textures);
+                textures.addAll(model.textures);
+
+                ResourceLocation location = RPDataGenerator.locationOf(model, modelName);
+                nodeMap.put(outliner.uuid, new Node(Node.NodeType.bone, outliner.name, outliner.uuid, new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, location).value(), location)));
             }
         }
 
-        return res;
+        RPDataGenerator.makeTextures(model, textures);
+
+        return nodeMap;
     }
 
     private Pose toPose(Matrix4f matrix4f) {
@@ -69,8 +75,35 @@ public class BBModelImporter implements ModelImporter<BbModel> {
         var list = model.modelOutliner();
         for (Outliner outliner: list) {
             Matrix4f matrix4f = new Matrix4f();
-            Vector3f off = outliner.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI);
-            matrix4f.translate(off);
+            Outliner xp = model.getParent(outliner);
+
+            List<Outliner> nodePath = new ObjectArrayList<>();
+            Outliner parent = outliner;
+            while (parent != null) {
+                nodePath.add(0, parent);
+                parent = model.getParent(parent);
+            }
+
+            Vector3f prev = null;
+            for (Outliner node: nodePath) {
+                if (prev == null) {
+                    var p = node.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI);
+                    matrix4f.translate(p);
+                } else {
+                    // relative position to parent bone, for correct rotation in default pose
+                    Vector3f relativePos = node.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI).sub(prev);
+                    matrix4f.translate(relativePos);
+                }
+
+                if (node.rotation != null)
+                    matrix4f.rotateXYZ(node.rotation.mul(Mth.DEG_TO_RAD, new Vector3f()).rotateY(Mth.PI));
+
+                prev = node.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI);
+            }
+
+            // Animated-java compat for larger models
+            matrix4f.scale(outliner.scale);
+
             res.put(outliner.uuid, this.toPose(matrix4f));
         }
 

@@ -9,6 +9,7 @@ import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.json.VariablePlaceholdersDeserializer;
+import org.joml.Vector3f;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,23 +40,46 @@ public class BBModelLoader implements ModelLoader {
                     }
                 }
 
-                Outliner parent = model.getParent(element);
-                element.from.add(8,8,8).sub(element.inflate, element.inflate, element.inflate);
-                element.to.add(8,8,8).add(element.inflate, element.inflate, element.inflate);
+                var parent = model.getParent(element);
 
-                if (parent != null && parent.origin != null) {
-                    element.from.sub(parent.origin);
-                    element.to.sub(parent.origin);
+                element.from.sub(element.inflate, element.inflate, element.inflate);
+                element.to.add(element.inflate, element.inflate, element.inflate);
 
-                    element.origin.add(8,8,8).sub(parent.origin);
+                element.from.sub(parent.origin);
+                element.to.sub(parent.origin);
+            }
+
+            for (Outliner parent: model.modelOutliner()) {
+                Vector3f min = new Vector3f(), max = new Vector3f();
+                // find max for scale (aj compat)
+                for (var childEntry: parent.children) {
+                    if (!childEntry.isNode()) {
+                        Element element = model.getElement(childEntry.uuid);
+                        min.min(element.from);
+                        max.max(element.to);
+                    }
                 }
 
+                for (var childEntry: parent.children) {
+                    if (!childEntry.isNode()) {
+                        Element element = model.getElement(childEntry.uuid);
+
+                        var diff = min.sub(max, new Vector3f()).absolute();
+                        float m = diff.get(diff.maxComponent());
+                        float scale = Math.min(1.f, 24.f / m);
+
+                        // for animation + default pose later
+                        parent.scale = 1.f / scale;
+
+                        element.from.mul(scale).add(8,8,8);
+                        element.to.mul(scale).add(8,8,8);
+
+                        element.origin.sub(parent.origin).mul(scale).add(8,8,8);
+                    }
+                }
             }
 
             Model newModel = new BBModelImporter().importModel(model);
-
-            RPDataGenerator.makeTextures(model);
-
             return newModel;
         } catch (Throwable throwable) {
             throw new JsonParseException("Failed to parse: " + name, throwable);
@@ -64,7 +88,7 @@ public class BBModelLoader implements ModelLoader {
 
     public Model load(String name) throws IllegalArgumentException, JsonParseException {
         String path = String.format("/bbmodel/%s.bbmodel", name);
-        InputStream input = AjLoader.class.getResourceAsStream(path);
+        InputStream input = BBModelImporter.class.getResourceAsStream(path);
         if (input == null) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }

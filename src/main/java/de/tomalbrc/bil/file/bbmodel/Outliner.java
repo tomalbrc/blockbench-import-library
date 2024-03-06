@@ -9,6 +9,7 @@ import java.util.UUID;
 public class Outliner {
     public String name;
     public Vector3f origin;
+    public Vector3f rotation;
     public int color;
     public String nbt;
     public UUID uuid;
@@ -20,6 +21,9 @@ public class Outliner {
     public boolean locked;
     public boolean visibility;
     public int autouv;
+
+    // AnimatedJava compat hack, not part of file format
+    public float scale = 1.f;
 
     public List<ChildEntry> children;
 
@@ -42,6 +46,14 @@ public class Outliner {
     public boolean hasUuidChild(UUID uuid) {
         for (ChildEntry childEntry: this.children) {
             if (!childEntry.isNode() && childEntry.uuid.equals(uuid))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasChildOutliner(Outliner outliner) {
+        for (ChildEntry childEntry: this.children) {
+            if (childEntry.isNode() && childEntry.outliner.uuid.equals(outliner.uuid))
                 return true;
         }
         return false;

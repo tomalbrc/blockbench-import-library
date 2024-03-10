@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
+import org.apache.commons.lang3.tuple.Triple;
 import org.joml.*;
 
 import java.lang.Math;
@@ -52,30 +53,12 @@ public class BBModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
-    private Pose toPose(Matrix4f matrix4f) {
-        Matrix3f matrix3f = new Matrix3f(matrix4f);
-        Vector3f translation = matrix4f.getTranslation(new Vector3f());
-
-        float multiplier = 1.0F / matrix4f.m33();
-        if (multiplier != 1.0F) {
-            matrix3f.scale(multiplier);
-            translation.mul(multiplier);
-        }
-
-        var triple = MatrixUtil.svdDecompose(matrix3f);
-        Vector3f scale = triple.getMiddle();
-        Quaternionf leftRotation = triple.getLeft();
-        Quaternionf rightRotation = triple.getRight();
-        return new Pose(UUID.randomUUID(), translation, scale, leftRotation, rightRotation);
-    }
-
     private Reference2ObjectOpenHashMap<UUID, Pose> defaultPose(BbModel model) {
         Reference2ObjectOpenHashMap<UUID, Pose> res = new Reference2ObjectOpenHashMap<>();
 
         var list = model.modelOutliner();
         for (Outliner outliner: list) {
             Matrix4f matrix4f = new Matrix4f();
-            Outliner xp = model.getParent(outliner);
 
             List<Outliner> nodePath = new ObjectArrayList<>();
             Outliner parent = outliner;
@@ -87,24 +70,24 @@ public class BBModelImporter implements ModelImporter<BbModel> {
             Vector3f prev = null;
             for (Outliner node: nodePath) {
                 if (prev == null) {
-                    var p = node.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI);
+                    var p = node.origin.mul(1 / 16.f, new Vector3f());
                     matrix4f.translate(p);
                 } else {
                     // relative position to parent bone, for correct rotation in default pose
-                    Vector3f relativePos = node.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI).sub(prev);
+                    Vector3f relativePos = node.origin.mul(1 / 16.f, new Vector3f()).sub(prev);
                     matrix4f.translate(relativePos);
                 }
 
                 if (node.rotation != null)
-                    matrix4f.rotateXYZ(node.rotation.mul(Mth.DEG_TO_RAD, new Vector3f()).rotateY(Mth.PI));
+                    matrix4f.rotateXYZ(node.rotation.mul(Mth.DEG_TO_RAD, new Vector3f()));
 
-                prev = node.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI);
+                prev = node.origin.mul(1 / 16.f, new Vector3f());
             }
 
             // Animated-java compat for larger models
             matrix4f.scale(outliner.scale);
 
-            res.put(outliner.uuid, this.toPose(matrix4f));
+            res.put(outliner.uuid, Pose.of(matrix4f));
         }
 
         return res;
@@ -118,22 +101,54 @@ public class BBModelImporter implements ModelImporter<BbModel> {
     private Object2ObjectOpenHashMap<String, Animation> animations(BbModel model) {
         Object2ObjectOpenHashMap<String, Animation> res = new Object2ObjectOpenHashMap<>();
 
+        float step = 0.05f;
+
         for (de.tomalbrc.bil.file.bbmodel.Animation anim: model.animations) {
             List<Frame> frames = new ObjectArrayList<>();
-            float step = 0.05f;
             int frameCount = Math.round(anim.length / step);
             for (int i = 0; i <= frameCount; i++) {
+                // pose for bone in list of frames for an animation
                 Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
 
-                for (var nodeAnimatorEntry: anim.animators.entrySet()) {
-                    Outliner bone = model.getOutliner(nodeAnimatorEntry.getKey());
-
-                    if (bone != null) {
-                        Matrix4f matrix4f = Sampler.sample(bone, nodeAnimatorEntry.getValue().keyframes, model.animationVariablePlaceholders, i * step);
-                        if (matrix4f != null) {
-                            poses.put(nodeAnimatorEntry.getKey(), this.toPose(matrix4f));
-                        }
+                for (Outliner bone: model.modelOutliner()) {
+                    List<Outliner> nodePath = new ObjectArrayList<>();
+                    Outliner parent = bone;
+                    while (parent != null) {
+                        nodePath.add(0, parent);
+                        parent = model.getParent(parent);
                     }
+
+                    parent = null;
+
+                    Vector3f parentPos = new Vector3f();
+                    Quaternionf parentRot = new Quaternionf();
+                    Vector3f parentScale = new Vector3f(1.f/16.f);
+                    // sample from root to bone
+                    boolean requiresFrame = false;
+                    for (var node: nodePath) {
+                        Animator a = anim.animators.get(node.uuid);
+                        requiresFrame |= a != null;
+
+                        Vector3f origin;
+                        if (parent != null)
+                            origin = node.origin.sub(parent.origin, new Vector3f());
+                        else {
+                            origin = new Vector3f(node.origin);
+                        }
+
+                        var triple = a == null ? Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) : Sampler.sample(node, a.keyframes, model.animationVariablePlaceholders, i * step);
+                        var localRot = node.rotation.add(triple.getMiddle(), new Vector3f()).mul(Mth.DEG_TO_RAD);
+                        var localPos = origin.add(triple.getLeft());
+
+                        parentScale.mul(triple.getRight().mul(localRot));
+                        parentPos = localPos.mul(1/16.f).rotate(parentRot).add(parentPos);
+                        parentRot.mul(new Quaternionf().rotateXYZ(-localRot.x, -localRot.y, localRot.z));
+
+                        parent = node;
+                    }
+
+                    if (requiresFrame)
+                        poses.put(bone.uuid, Pose.of(new Matrix4f().rotateY(Mth.PI).translate(parentPos).rotate(parentRot).scale(parentScale)));
                 }
 
                 frames.add(new Frame(step * i, poses, null, null, null, false));
@@ -141,8 +156,7 @@ public class BBModelImporter implements ModelImporter<BbModel> {
 
             int startDelay = 0;
             int loopDelay = 0;
-            int duration = Math.round(anim.length / step);
-            Animation animation = new Animation(frames.toArray(new Frame[frames.size()]), startDelay, loopDelay, duration, anim.loop, new ReferenceOpenHashSet<>(), false);
+            Animation animation = new Animation(frames.toArray(new Frame[frames.size()]), startDelay, loopDelay, frameCount, anim.loop, new ReferenceOpenHashSet<>(), false);
 
             res.put(anim.name, animation);
         }
@@ -151,6 +165,7 @@ public class BBModelImporter implements ModelImporter<BbModel> {
     }
 
     private Vec2 size(BbModel model) {
+        // TODO: read from element or outliner
         return new Vec2(0.5f,1.f);
     }
 

@@ -9,18 +9,25 @@ import de.tomalbrc.bil.util.RPUtil;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class RPDataGenerator {
     static class GeneratedModel {
+        record Display(DisplayTransform head) {
+            record DisplayTransform(Vector3f rotation){}
+        };
         private final Map<String, ResourceLocation> textures;
         private final List<Element> elements;
+
+        private final Display display;
 
         GeneratedModel(Map<String, ResourceLocation> textures, List<Element> elements) {
             this.textures = textures;
             this.elements = elements;
+            this.display = new Display(new Display.DisplayTransform(new Vector3f(0,180,0)));
         }
     }
 

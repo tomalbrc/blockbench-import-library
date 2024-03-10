@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public class Outliner {
     public String name;
-    public Vector3f origin;
-    public Vector3f rotation;
+    public Vector3f origin = new Vector3f();
+    public Vector3f rotation = new Vector3f();
     public int color;
     public String nbt;
     public UUID uuid;

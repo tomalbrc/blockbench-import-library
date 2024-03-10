@@ -5,9 +5,13 @@ import de.tomalbrc.bil.file.bbmodel.Outliner;
 import de.tomalbrc.bil.file.bbmodel.VariablePlaceholders;
 import dev.omega.arcane.ast.MolangExpression;
 import dev.omega.arcane.ast.ObjectAwareExpression;
+import dev.omega.arcane.exception.MolangLexException;
+import dev.omega.arcane.exception.MolangParseException;
+import dev.omega.arcane.parser.MolangParser;
 import dev.omega.arcane.reference.ExpressionBindingContext;
 import dev.omega.arcane.reference.ReferenceType;
 import net.minecraft.util.Mth;
+import org.apache.commons.lang3.tuple.Triple;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -75,20 +79,15 @@ class Sampler {
         return beforeValue.lerp(afterValue, t);
     }
 
-    public static Matrix4f sample(Outliner bone, List<Keyframe> keyframes, VariablePlaceholders placeholders, float time) {
-        Matrix4f matrix4f = new Matrix4f().identity();
-
-        Vector3f off = bone.origin.mul(1 / 16.f, new Vector3f()).rotateY(Mth.PI);
-        matrix4f.translate(off);
-
+    public static Triple<Vector3f, Vector3f, Vector3f> sample(Outliner bone, List<Keyframe> keyframes, VariablePlaceholders placeholders, float time) {
         Vector3f pos = interpolateKeyframeChannelAt(keyframes, Keyframe.Channel.position, placeholders, time);
         Vector3f rot = interpolateKeyframeChannelAt(keyframes, Keyframe.Channel.rotation, placeholders, time);
         Vector3f scale = interpolateKeyframeChannelAt(keyframes, Keyframe.Channel.scale, placeholders, time);
 
-        if (pos != null) matrix4f.translate(pos.rotateY(Mth.PI).mul(1 / 16.f));
-        if (rot != null) matrix4f.rotateXYZ(rot.mul(Mth.DEG_TO_RAD));
-        if (scale != null) matrix4f.scale(scale);
+        if (pos == null) pos = new Vector3f();
+        if (rot == null) rot = new Vector3f();
+        if (scale == null) scale = new Vector3f(1, 1, 1);
 
-        return matrix4f;
+        return Triple.of(pos, rot, scale);
     }
 }

@@ -1,7 +1,10 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import de.tomalbrc.bil.core.model.Frame;
+import de.tomalbrc.bil.core.model.Pose;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
@@ -26,16 +29,6 @@ public class BbModel {
     @SerializedName("animation_variable_placeholders")
     public VariablePlaceholders animationVariablePlaceholders;
 
-    public Vector3f getGlobalOrigin(Outliner x) {
-        Vector3f origin = new Vector3f();
-        origin.add(x.origin);
-        Outliner parent = this.getParent(x);
-        while (parent != null) {
-            origin.sub(parent.origin);
-            parent = this.getParent(parent);
-        }
-        return origin;
-    }
 
     public Element getElement(UUID uuid) {
         for (Element element: this.elements) {
@@ -89,7 +82,9 @@ public class BbModel {
             if (child.isNode() && child.outliner.uuid.equals(uuid)) {
                 return child.outliner;
             } else if (child.isNode()) {
-                return findNode(child.outliner, uuid);
+                var res = findNode(child.outliner, uuid);
+                if (res != null)
+                    return res;
             }
         }
         return null;

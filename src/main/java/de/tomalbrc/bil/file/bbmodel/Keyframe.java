@@ -2,6 +2,7 @@ package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
 import dev.omega.arcane.ast.MolangExpression;
+import dev.omega.arcane.ast.ObjectAwareExpression;
 import dev.omega.arcane.exception.MolangLexException;
 import dev.omega.arcane.exception.MolangParseException;
 import dev.omega.arcane.parser.MolangParser;
@@ -40,33 +41,40 @@ public class Keyframe {
         scale
     }
 
+    static class Suu {
+        final public float time;
+
+        Suu(float time) {
+            this.time = time;
+        }
+    }
+
     static public class DataPointValue {
         public float value;
         public String expression;
 
         public float getValue(VariablePlaceholders placeholders, float time) {
-            if (expression == null || placeholders == null)
+            if (expression == null)
                 return value;
 
-            ExpressionBindingContext context = ExpressionBindingContext.create();
+            String modifiedExpression = expression;
+            if (placeholders != null)
+                modifiedExpression = placeholders.substituteVariables(expression).replace("\n", " ").trim();
 
-            context.registerDirectReferenceResolver(ReferenceType.QUERY, "life_time", () -> time);
-            context.registerDirectReferenceResolver(ReferenceType.QUERY, "anim_time", () -> time);
-
-            String modifiedExpression = placeholders.substituteVariables(expression).replace("\n", "");
-
-            MolangExpression e = null;
+            MolangExpression molangExpression = null;
             try {
-                e = MolangParser.parse(modifiedExpression);
+                molangExpression = MolangParser.parse(modifiedExpression);
             } catch (MolangLexException ex) {
                 throw new RuntimeException(ex);
             } catch (MolangParseException ex) {
                 throw new RuntimeException(ex);
             }
 
-            e.bind(context, time);
-
-            return e.evaluate();
+            return molangExpression.bind(ExpressionBindingContext
+                    .create()
+                    .registerDirectReferenceResolver(ReferenceType.QUERY, "anim_time", () -> time)
+                    .registerDirectReferenceResolver(ReferenceType.QUERY, "life_time", () -> time)
+            ).evaluate();
         }
     }
 }

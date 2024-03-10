@@ -79,7 +79,7 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
     @Nullable
     protected ItemDisplayElement createBone(Node node, Item rigItem) {
         ItemDisplayElement element = new ItemDisplayElement();
-        element.setModelTransformation(ItemDisplayContext.FIXED);
+        element.setModelTransformation(ItemDisplayContext.HEAD);
         element.setInvisible(true);
         element.setInterpolationDuration(2);
         element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);

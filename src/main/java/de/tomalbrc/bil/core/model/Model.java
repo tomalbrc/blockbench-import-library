@@ -8,10 +8,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 /**
- * Intermediate/interal model representation
+ * Intermediate/internal model representation
  */
-public record Model(Object2ObjectOpenHashMap<UUID, Node> nodeMap, Reference2ObjectOpenHashMap<UUID, Pose> defaultPose,
+public record Model(Object2ObjectOpenHashMap<UUID, Node> nodeMap,
+                    Reference2ObjectOpenHashMap<UUID, Pose> defaultPose,
 
                     Reference2ObjectOpenHashMap<UUID, Variant> variants,
-                    Object2ObjectOpenHashMap<String, Animation> animations, @Nullable Vec2 size) {
+                    Object2ObjectOpenHashMap<String, Animation> animations,
+                    @Nullable Vec2 size) {
 }

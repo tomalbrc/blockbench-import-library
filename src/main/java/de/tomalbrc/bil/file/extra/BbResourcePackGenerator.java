@@ -1,4 +1,4 @@
-package de.tomalbrc.bil.datagen;
+package de.tomalbrc.bil.file.extra;
 
 import com.google.gson.Gson;
 import de.tomalbrc.bil.file.bbmodel.*;
@@ -12,7 +12,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public class RPDataGenerator {
+public class BbResourcePackGenerator {
     static class GeneratedModel {
         record Display(DisplayTransform head) {
             record DisplayTransform(Vector3f rotation){}
@@ -31,12 +31,12 @@ public class RPDataGenerator {
 
 
     public static ResourceLocation locationOf(BbModel model, String outliner) {
-        String id = RPDataGenerator.normalizedModelId(model);
+        String id = BbResourcePackGenerator.normalizedModelId(model);
         return new ResourceLocation("bil:item/" + id + "/" + outliner);
     }
 
     public static void makePart(BbModel model, String partName, List<BbElement> elements, List<BbTexture> textures) {
-        String id = RPDataGenerator.normalizedModelId(model);
+        String id = BbResourcePackGenerator.normalizedModelId(model);
 
         Map<String, ResourceLocation> textureMap = new Object2ObjectLinkedOpenHashMap<>();
         for (BbTexture texture: model.textures) {
@@ -44,7 +44,7 @@ public class RPDataGenerator {
         }
 
         GeneratedModel generatedModel = new GeneratedModel(textureMap, elements);
-        Gson gson = JSON.BUILDER
+        Gson gson = JSON.GENERIC_BUILDER
                 .registerTypeAdapter(BbFace.class, new FaceSerializer())
                 .registerTypeAdapter(BbElement.class, new ElementSerializer())
                 .create();
@@ -52,7 +52,7 @@ public class RPDataGenerator {
     }
 
     public static void makeTextures(BbModel model, List<BbTexture> textures) {
-        String id = RPDataGenerator.normalizedModelId(model);
+        String id = BbResourcePackGenerator.normalizedModelId(model);
 
         for (BbTexture texture: textures) {
             byte[] texData = Base64.getDecoder().decode(texture.source.replace("data:image/png;base64,", ""));

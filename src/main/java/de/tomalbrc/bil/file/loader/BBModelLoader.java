@@ -2,12 +2,13 @@ package de.tomalbrc.bil.file.loader;
 
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.file.bbmodel.*;
+import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 import de.tomalbrc.bil.file.importer.BBModelImporter;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.core.model.Model;
-import de.tomalbrc.bil.json.VariablePlaceholdersDeserializer;
+import de.tomalbrc.bil.json.BbVariablePlaceholdersDeserializer;
 import org.joml.Vector3f;
 
 import java.io.InputStream;
@@ -19,10 +20,10 @@ public class BBModelLoader implements ModelLoader {
     @Override
     public Model load(String name, InputStream input) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
-            BbModel model = JSON.BUILDER
+            BbModel model = JSON.GENERIC_BUILDER
                     .registerTypeAdapter(BbOutliner.ChildEntry.class, new ChildEntryDeserializer())
                     .registerTypeAdapter(BbKeyframe.DataPointValue.class, new DataPointValueDeserializer())
-                    .registerTypeAdapter(BbVariablePlaceholders.class, new VariablePlaceholdersDeserializer())
+                    .registerTypeAdapter(BbVariablePlaceholders.class, new BbVariablePlaceholdersDeserializer())
                     .create()
                     .fromJson(reader, BbModel.class);
 
@@ -87,7 +88,7 @@ public class BBModelLoader implements ModelLoader {
 
     public Model load(String name) throws IllegalArgumentException, JsonParseException {
         String path = String.format("/bbmodel/%s.bbmodel", name);
-        InputStream input = BBModelImporter.class.getResourceAsStream(path);
+        InputStream input = BBModelLoader.class.getResourceAsStream(path);
         if (input == null) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }

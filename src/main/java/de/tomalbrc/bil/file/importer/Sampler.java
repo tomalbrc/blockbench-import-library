@@ -2,7 +2,7 @@ package de.tomalbrc.bil.file.importer;
 
 import de.tomalbrc.bil.file.bbmodel.BbKeyframe;
 import de.tomalbrc.bil.file.bbmodel.BbOutliner;
-import de.tomalbrc.bil.file.bbmodel.BbVariablePlaceholders;
+import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 import dev.omega.arcane.ast.MolangExpression;
 import dev.omega.arcane.reference.ExpressionBindingContext;
 import dev.omega.arcane.reference.ReferenceType;

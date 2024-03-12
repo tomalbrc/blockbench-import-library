@@ -4,11 +4,11 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import de.tomalbrc.bil.file.bbmodel.BbVariablePlaceholders;
+import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 
 import java.lang.reflect.Type;
 
-public class VariablePlaceholdersDeserializer implements JsonDeserializer<BbVariablePlaceholders> {
+public class BbVariablePlaceholdersDeserializer implements JsonDeserializer<BbVariablePlaceholders> {
     @Override
     public BbVariablePlaceholders deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         if (jsonElement.getAsJsonPrimitive().isString()) {

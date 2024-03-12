@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.file.importer;
 
-import de.tomalbrc.bil.datagen.RPDataGenerator;
+import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.core.model.*;
 import de.tomalbrc.bil.core.model.Animation;
@@ -37,15 +37,15 @@ public class BBModelImporter implements ModelImporter<BbModel> {
 
                 String modelName = outliner.name;
 
-                RPDataGenerator.makePart(model, modelName, elements, model.textures);
+                BbResourcePackGenerator.makePart(model, modelName, elements, model.textures);
                 textures.addAll(model.textures);
 
-                ResourceLocation location = RPDataGenerator.locationOf(model, modelName);
+                ResourceLocation location = BbResourcePackGenerator.locationOf(model, modelName);
                 nodeMap.put(outliner.uuid, new Node(Node.NodeType.bone, outliner.name, outliner.uuid, new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, location).value(), location)));
             }
         }
 
-        RPDataGenerator.makeTextures(model, textures);
+        BbResourcePackGenerator.makeTextures(model, textures);
 
         return nodeMap;
     }
@@ -95,18 +95,21 @@ public class BBModelImporter implements ModelImporter<BbModel> {
         return res;
     }
 
+    private List<BbOutliner> nodePath(BbModel model, BbOutliner nestedOutliner) {
+        List<BbOutliner> nodePath = new ObjectArrayList<>();
+        BbOutliner parent = nestedOutliner;
+        while (parent != null) {
+            nodePath.add(0, parent);
+            parent = model.getParent(parent);
+        }
+        return nodePath;
+    }
+
     private Reference2ObjectOpenHashMap<UUID, Pose> poses(BbModel model, BbAnimation animation, float time) {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
 
         for (BbOutliner bone: model.modelOutliner()) {
-            List<BbOutliner> nodePath = new ObjectArrayList<>();
-            BbOutliner parent = bone;
-            while (parent != null) {
-                nodePath.add(0, parent);
-                parent = model.getParent(parent);
-            }
-
-            parent = null;
+            List<BbOutliner> nodePath = nodePath(model, bone);
 
             Vector3f parentPos = new Vector3f();
             Quaternionf parentRot = new Quaternionf();
@@ -116,19 +119,16 @@ public class BBModelImporter implements ModelImporter<BbModel> {
             // no need to save the frame
             boolean requiresFrame = false;
 
+            BbOutliner parent = null;
+
             // sample from root to bone
-            for (var node: nodePath) {
-                BbAnimator a = animation.animators.get(node.uuid);
-                requiresFrame |= a != null;
+            for (BbOutliner node: nodePath) {
+                BbAnimator animator = animation.animators.get(node.uuid);
+                requiresFrame |= animator != null;
 
-                Vector3f origin;
-                if (parent != null)
-                    origin = node.origin.sub(parent.origin, new Vector3f());
-                else {
-                    origin = new Vector3f(node.origin);
-                }
+                Vector3f origin = parent != null ? node.origin.sub(parent.origin, new Vector3f()) : new Vector3f(node.origin);
 
-                var triple = a == null ? Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) : Sampler.sample(node, a.keyframes, model.animationVariablePlaceholders, time);
+                var triple = animator == null ? Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) : Sampler.sample(node, animator.keyframes, model.animationVariablePlaceholders, time);
                 var localRot = node.rotation.add(triple.getMiddle(), new Vector3f()).mul(Mth.DEG_TO_RAD);
                 var localPos = origin.add(triple.getLeft());
 

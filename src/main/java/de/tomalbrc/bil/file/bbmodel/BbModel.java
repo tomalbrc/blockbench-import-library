@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.joml.Vector2i;
 

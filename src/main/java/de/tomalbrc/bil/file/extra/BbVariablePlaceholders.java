@@ -1,4 +1,4 @@
-package de.tomalbrc.bil.file.bbmodel;
+package de.tomalbrc.bil.file.extra;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 

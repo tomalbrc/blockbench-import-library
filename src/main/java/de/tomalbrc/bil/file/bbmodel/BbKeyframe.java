@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 import dev.omega.arcane.ast.MolangExpression;
 import dev.omega.arcane.exception.MolangLexException;
 import dev.omega.arcane.exception.MolangParseException;
@@ -36,14 +37,6 @@ public class BbKeyframe {
         position,
         rotation,
         scale
-    }
-
-    static class Suu {
-        final public float time;
-
-        Suu(float time) {
-            this.time = time;
-        }
     }
 
     static public class DataPointValue {

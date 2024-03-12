@@ -12,7 +12,7 @@ import org.joml.Vector3f;
 import java.util.UUID;
 
 public class JSON {
-    public static final GsonBuilder BUILDER = new GsonBuilder()
+    public static final GsonBuilder GENERIC_BUILDER = new GsonBuilder()
             // Reference equality
             .registerTypeAdapter(UUID.class, new ReferenceUuidDeserializer())
 

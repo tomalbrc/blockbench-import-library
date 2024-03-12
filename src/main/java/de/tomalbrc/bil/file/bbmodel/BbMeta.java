@@ -2,7 +2,7 @@ package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Meta {
+public class BbMeta {
     @SerializedName("format_version")
     String formatVersion;
 

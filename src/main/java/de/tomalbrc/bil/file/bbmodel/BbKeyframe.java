@@ -2,20 +2,17 @@ package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
 import dev.omega.arcane.ast.MolangExpression;
-import dev.omega.arcane.ast.ObjectAwareExpression;
 import dev.omega.arcane.exception.MolangLexException;
 import dev.omega.arcane.exception.MolangParseException;
 import dev.omega.arcane.parser.MolangParser;
 import dev.omega.arcane.reference.ExpressionBindingContext;
 import dev.omega.arcane.reference.ReferenceType;
-import org.joml.Matrix4f;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class Keyframe {
+public class BbKeyframe {
     public Channel channel;
     @SerializedName("data_points")
     public List<Map<String, DataPointValue>> dataPoints;
@@ -53,7 +50,7 @@ public class Keyframe {
         public float value;
         public String expression;
 
-        public float getValue(VariablePlaceholders placeholders, float time) {
+        public float getValue(BbVariablePlaceholders placeholders, float time) {
             if (expression == null)
                 return value;
 

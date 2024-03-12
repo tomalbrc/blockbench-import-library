@@ -4,8 +4,8 @@ import it.unimi.dsi.fastutil.floats.FloatArrayList;
 
 import java.util.List;
 
-public class Face {
-    public Face(Face other) {
+public class BbFace {
+    public BbFace(BbFace other) {
         this.texture = other.texture;
         this.uv = new FloatArrayList(other.uv);
         this.tintindex = other.tintindex;

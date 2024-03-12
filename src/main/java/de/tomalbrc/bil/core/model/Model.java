@@ -8,16 +8,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 /**
- * Represents an Animated Java JSON intermediate exported from Blockbench.
- * <a href="https://github.com/Animated-Java/animated-java/blob/main/exporters/jsonExporter/jsonStructure.json">JSON Structure</a>
+ * Intermediate/interal model representation
  */
-public record Model(
-        @Nullable Vec2 size,
+public record Model(Object2ObjectOpenHashMap<UUID, Node> nodeMap, Reference2ObjectOpenHashMap<UUID, Pose> defaultPose,
 
-        Object2ObjectOpenHashMap<UUID, Node> nodeMap,
-        Reference2ObjectOpenHashMap<UUID, Pose> defaultPose,
-
-        Reference2ObjectOpenHashMap<UUID, Variant> variants,
-        Object2ObjectOpenHashMap<String, Animation> animations
-) {
+                    Reference2ObjectOpenHashMap<UUID, Variant> variants,
+                    Object2ObjectOpenHashMap<String, Animation> animations, @Nullable Vec2 size) {
 }

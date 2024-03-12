@@ -1,13 +1,13 @@
 package de.tomalbrc.bil.json;
 
 import com.google.gson.*;
-import de.tomalbrc.bil.file.bbmodel.Element;
+import de.tomalbrc.bil.file.bbmodel.BbElement;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class ElementSerializer implements JsonSerializer<Element> {
+public class ElementSerializer implements JsonSerializer<BbElement> {
 
     String getAxis(Vector3f v) {
         if (v != null) {
@@ -36,7 +36,7 @@ public class ElementSerializer implements JsonSerializer<Element> {
 
 
     @Override
-    public JsonElement serialize(Element src, Type typeOfSrc,
+    public JsonElement serialize(BbElement src, Type typeOfSrc,
                                  JsonSerializationContext context) {
 
         JsonObject obj = new JsonObject();

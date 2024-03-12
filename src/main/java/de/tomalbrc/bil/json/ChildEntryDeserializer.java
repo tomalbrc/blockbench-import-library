@@ -1,18 +1,17 @@
 package de.tomalbrc.bil.json;
 
 import com.google.gson.*;
-import de.tomalbrc.bil.file.bbmodel.Outliner;
-import org.joml.Vector3f;
+import de.tomalbrc.bil.file.bbmodel.BbOutliner;
 
 import java.lang.reflect.Type;
 import java.util.UUID;
 
-public class ChildEntryDeserializer implements JsonDeserializer<Outliner.ChildEntry> {
+public class ChildEntryDeserializer implements JsonDeserializer<BbOutliner.ChildEntry> {
     @Override
-    public Outliner.ChildEntry deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        var entry = new Outliner.ChildEntry();
+    public BbOutliner.ChildEntry deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        var entry = new BbOutliner.ChildEntry();
         if (jsonElement.isJsonObject()) {
-            entry.outliner = jsonDeserializationContext.deserialize(jsonElement, Outliner.class);
+            entry.outliner = jsonDeserializationContext.deserialize(jsonElement, BbOutliner.class);
         }
         else {
             entry.uuid = jsonDeserializationContext.deserialize(jsonElement, UUID.class);

@@ -1,18 +1,12 @@
 package de.tomalbrc.bil.file.importer;
 
-import de.tomalbrc.bil.file.bbmodel.Keyframe;
-import de.tomalbrc.bil.file.bbmodel.Outliner;
-import de.tomalbrc.bil.file.bbmodel.VariablePlaceholders;
+import de.tomalbrc.bil.file.bbmodel.BbKeyframe;
+import de.tomalbrc.bil.file.bbmodel.BbOutliner;
+import de.tomalbrc.bil.file.bbmodel.BbVariablePlaceholders;
 import dev.omega.arcane.ast.MolangExpression;
-import dev.omega.arcane.ast.ObjectAwareExpression;
-import dev.omega.arcane.exception.MolangLexException;
-import dev.omega.arcane.exception.MolangParseException;
-import dev.omega.arcane.parser.MolangParser;
 import dev.omega.arcane.reference.ExpressionBindingContext;
 import dev.omega.arcane.reference.ReferenceType;
-import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Triple;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -30,18 +24,18 @@ class Sampler {
     }
 
 
-    private static Vector3f interpolateKeyframeChannelAt(List<Keyframe> keyframes, Keyframe.Channel channel, VariablePlaceholders placeholders, float time) {
+    private static Vector3f interpolateKeyframeChannelAt(List<BbKeyframe> keyframes, BbKeyframe.Channel channel, BbVariablePlaceholders placeholders, float time) {
         if (keyframes == null || keyframes.isEmpty()) {
             return null;
         }
 
         // Find the closest keyframes before and after the target time
-        Keyframe before = null;
-        Keyframe after = null;
+        BbKeyframe before = null;
+        BbKeyframe after = null;
         float closestBeforeTime = Float.NEGATIVE_INFINITY;
         float closestAfterTime = Float.POSITIVE_INFINITY;
 
-        for (Keyframe keyframe : keyframes) {
+        for (BbKeyframe keyframe : keyframes) {
             if (keyframe.channel == channel) {
                 float keyframeTime = keyframe.time;
                 if (keyframeTime <= time && keyframeTime > closestBeforeTime) {
@@ -79,10 +73,10 @@ class Sampler {
         return beforeValue.lerp(afterValue, t);
     }
 
-    public static Triple<Vector3f, Vector3f, Vector3f> sample(Outliner bone, List<Keyframe> keyframes, VariablePlaceholders placeholders, float time) {
-        Vector3f pos = interpolateKeyframeChannelAt(keyframes, Keyframe.Channel.position, placeholders, time);
-        Vector3f rot = interpolateKeyframeChannelAt(keyframes, Keyframe.Channel.rotation, placeholders, time);
-        Vector3f scale = interpolateKeyframeChannelAt(keyframes, Keyframe.Channel.scale, placeholders, time);
+    public static Triple<Vector3f, Vector3f, Vector3f> sample(BbOutliner bone, List<BbKeyframe> keyframes, BbVariablePlaceholders placeholders, float time) {
+        Vector3f pos = interpolateKeyframeChannelAt(keyframes, BbKeyframe.Channel.position, placeholders, time);
+        Vector3f rot = interpolateKeyframeChannelAt(keyframes, BbKeyframe.Channel.rotation, placeholders, time);
+        Vector3f scale = interpolateKeyframeChannelAt(keyframes, BbKeyframe.Channel.scale, placeholders, time);
 
         if (pos == null) pos = new Vector3f();
         if (rot == null) rot = new Vector3f();

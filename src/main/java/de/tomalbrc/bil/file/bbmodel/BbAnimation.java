@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Map;
 import java.util.UUID;
 
-public class Animation {
+public class BbAnimation {
     public UUID uuid;
     public String name;
     public de.tomalbrc.bil.core.model.Animation.LoopMode loop;
@@ -21,5 +21,5 @@ public class Animation {
     public String startDelay;
     @SerializedName("loop_delay")
     public String loopDelay;
-    public Map<UUID, Animator> animators;
+    public Map<UUID, BbAnimator> animators;
 }

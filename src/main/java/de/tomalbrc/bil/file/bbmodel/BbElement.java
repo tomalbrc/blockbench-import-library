@@ -3,11 +3,10 @@ package de.tomalbrc.bil.file.bbmodel;
 import com.google.gson.annotations.SerializedName;
 import org.joml.Vector3f;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class Element {
+public class BbElement {
     public String name;
     @SerializedName("box_uv")
     public boolean boxUv;
@@ -25,7 +24,7 @@ public class Element {
     public int color;
     public float inflate;
     public Vector3f origin;
-    public Map<String, Face> faces;
+    public Map<String, BbFace> faces;
     public String type;
     public UUID uuid;
 }

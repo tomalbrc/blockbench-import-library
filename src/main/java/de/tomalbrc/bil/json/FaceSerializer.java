@@ -4,14 +4,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import de.tomalbrc.bil.file.bbmodel.Element;
-import de.tomalbrc.bil.file.bbmodel.Face;
+import de.tomalbrc.bil.file.bbmodel.BbFace;
 
 import java.lang.reflect.Type;
 
-public class FaceSerializer implements JsonSerializer<Face> {
+public class FaceSerializer implements JsonSerializer<BbFace> {
     @Override
-    public JsonElement serialize(Face src, Type typeOfSrc,
+    public JsonElement serialize(BbFace src, Type typeOfSrc,
                                  JsonSerializationContext context) {
 
         JsonObject obj = new JsonObject();

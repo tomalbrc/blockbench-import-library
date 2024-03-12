@@ -1,7 +1,6 @@
 package de.tomalbrc.bil.json;
 
 import com.google.gson.*;
-import de.tomalbrc.bil.file.bbmodel.Element;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Type;

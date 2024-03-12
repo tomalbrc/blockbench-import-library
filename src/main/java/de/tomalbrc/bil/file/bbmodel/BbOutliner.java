@@ -6,7 +6,7 @@ import org.joml.Vector3f;
 import java.util.List;
 import java.util.UUID;
 
-public class Outliner {
+public class BbOutliner {
     public String name;
     public Vector3f origin = new Vector3f();
     public Vector3f rotation = new Vector3f();
@@ -29,7 +29,7 @@ public class Outliner {
 
     static public class ChildEntry {
         public UUID uuid;
-        public Outliner outliner;
+        public BbOutliner outliner;
         public boolean isNode() {
             return this.outliner != null;
         }
@@ -51,7 +51,7 @@ public class Outliner {
         return false;
     }
 
-    public boolean hasChildOutliner(Outliner outliner) {
+    public boolean hasChildOutliner(BbOutliner outliner) {
         for (ChildEntry childEntry: this.children) {
             if (childEntry.isNode() && childEntry.outliner.uuid.equals(outliner.uuid))
                 return true;

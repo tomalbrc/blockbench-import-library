@@ -1,7 +1,6 @@
 package de.tomalbrc.bil.file.loader;
 
 import com.google.gson.JsonParseException;
-import de.tomalbrc.bil.datagen.RPDataGenerator;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.importer.BBModelImporter;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
@@ -21,9 +20,9 @@ public class BBModelLoader implements ModelLoader {
     public Model load(String name, InputStream input) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
             BbModel model = JSON.BUILDER
-                    .registerTypeAdapter(Outliner.ChildEntry.class, new ChildEntryDeserializer())
-                    .registerTypeAdapter(Keyframe.DataPointValue.class, new DataPointValueDeserializer())
-                    .registerTypeAdapter(VariablePlaceholders.class, new VariablePlaceholdersDeserializer())
+                    .registerTypeAdapter(BbOutliner.ChildEntry.class, new ChildEntryDeserializer())
+                    .registerTypeAdapter(BbKeyframe.DataPointValue.class, new DataPointValueDeserializer())
+                    .registerTypeAdapter(BbVariablePlaceholders.class, new VariablePlaceholdersDeserializer())
                     .create()
                     .fromJson(reader, BbModel.class);
 
@@ -31,10 +30,10 @@ public class BBModelLoader implements ModelLoader {
                 model.modelIdentifier = name;
             }
 
-            for (Element element: model.elements) {
+            for (BbElement element: model.elements) {
                 for (var entry: element.faces.entrySet()) {
                     // re-map uv based on resolution
-                    Face face = entry.getValue();
+                    BbFace face = entry.getValue();
                     for (int i = 0; i < face.uv.size(); i++) {
                         face.uv.set(i, (face.uv.get(i) * 16.f) / model.resolution.get(i % 2));
                     }
@@ -49,12 +48,12 @@ public class BBModelLoader implements ModelLoader {
                 element.to.sub(parent.origin);
             }
 
-            for (Outliner parent: model.modelOutliner()) {
+            for (BbOutliner parent: model.modelOutliner()) {
                 Vector3f min = new Vector3f(), max = new Vector3f();
                 // find max for scale (aj compat)
                 for (var childEntry: parent.children) {
                     if (!childEntry.isNode()) {
-                        Element element = model.getElement(childEntry.uuid);
+                        BbElement element = model.getElement(childEntry.uuid);
                         min.min(element.from);
                         max.max(element.to);
                     }
@@ -62,7 +61,7 @@ public class BBModelLoader implements ModelLoader {
 
                 for (var childEntry: parent.children) {
                     if (!childEntry.isNode()) {
-                        Element element = model.getElement(childEntry.uuid);
+                        BbElement element = model.getElement(childEntry.uuid);
 
                         var diff = min.sub(max, new Vector3f()).absolute();
                         float m = diff.get(diff.maxComponent());

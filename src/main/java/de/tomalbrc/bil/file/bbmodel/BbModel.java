@@ -1,19 +1,15 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
-import de.tomalbrc.bil.core.model.Frame;
-import de.tomalbrc.bil.core.model.Pose;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.joml.Vector2i;
-import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class BbModel {
-    public Meta meta;
+    public BbMeta meta;
     public String name;
     @SerializedName("model_identifier")
     public String modelIdentifier;
@@ -21,26 +17,26 @@ public class BbModel {
     @SerializedName("unhandled_root_fields")
     public Map<String, Object> unhandledRootFields;
     public Vector2i resolution;
-    public List<Element> elements;
-    public List<Outliner> outliner;
-    public List<Texture> textures;
-    public List<Animation> animations;
+    public List<BbElement> elements;
+    public List<BbOutliner> outliner;
+    public List<BbTexture> textures;
+    public List<BbAnimation> animations;
 
     @SerializedName("animation_variable_placeholders")
-    public VariablePlaceholders animationVariablePlaceholders;
+    public BbVariablePlaceholders animationVariablePlaceholders;
 
 
-    public Element getElement(UUID uuid) {
-        for (Element element: this.elements) {
+    public BbElement getElement(UUID uuid) {
+        for (BbElement element: this.elements) {
             if (element.uuid.equals(uuid))
                 return element;
         }
         return null;
     }
 
-    public Outliner getOutliner(UUID uuid) {
-        for (Outliner outliner: this.outliner) {
-            Outliner res = findNode(outliner, uuid);
+    public BbOutliner getOutliner(UUID uuid) {
+        for (BbOutliner outliner: this.outliner) {
+            BbOutliner res = findNode(outliner, uuid);
             if (res != null) {
                 return res;
             }
@@ -48,10 +44,10 @@ public class BbModel {
         return null;
     }
 
-    public List<Outliner> modelOutliner() {
-        List<Outliner> list = new ObjectArrayList<>();
+    public List<BbOutliner> modelOutliner() {
+        List<BbOutliner> list = new ObjectArrayList<>();
 
-        for (Outliner outliner: this.outliner) {
+        for (BbOutliner outliner: this.outliner) {
             if (outliner.hasModel()) {
                 list.add(outliner);
             }
@@ -62,8 +58,8 @@ public class BbModel {
         return list;
     }
 
-    private void findModelOutlinerChildren(List<Outliner> list, Outliner x) {
-        for (Outliner.ChildEntry child: x.children) {
+    private void findModelOutlinerChildren(List<BbOutliner> list, BbOutliner x) {
+        for (BbOutliner.ChildEntry child: x.children) {
             if (child.isNode()) {
                 if (child.outliner.hasModel())
                     list.add(child.outliner);
@@ -74,11 +70,11 @@ public class BbModel {
     }
 
 
-    private Outliner findNode(Outliner x, UUID uuid) {
+    private BbOutliner findNode(BbOutliner x, UUID uuid) {
         if (x.uuid.equals(uuid)) {
             return x;
         }
-        for (Outliner.ChildEntry child: x.children) {
+        for (BbOutliner.ChildEntry child: x.children) {
             if (child.isNode() && child.outliner.uuid.equals(uuid)) {
                 return child.outliner;
             } else if (child.isNode()) {
@@ -90,20 +86,20 @@ public class BbModel {
         return null;
     }
 
-    public Outliner getParent(Element element) {
-        for (Outliner outliner: this.outliner) {
-            Outliner res = findParent(outliner, element);
+    public BbOutliner getParent(BbElement element) {
+        for (BbOutliner outliner: this.outliner) {
+            BbOutliner res = findParent(outliner, element);
             if (res != null)
                 return res;
         }
         return null;
     }
 
-    private Outliner findParent(Outliner x, Element element) {
+    private BbOutliner findParent(BbOutliner x, BbElement element) {
         if (x.hasUuidChild(element.uuid))
             return x;
 
-        for (Outliner.ChildEntry child: x.children) {
+        for (BbOutliner.ChildEntry child: x.children) {
             if (child.isNode() && child.outliner.hasUuidChild(element.uuid)) {
                 return child.outliner;
             } else if (child.isNode()) {
@@ -115,20 +111,20 @@ public class BbModel {
         return null;
     }
 
-    public Outliner getParent(Outliner x) {
-        for (Outliner outliner: this.outliner) {
-            Outliner res = findParent(outliner, x);
+    public BbOutliner getParent(BbOutliner x) {
+        for (BbOutliner outliner: this.outliner) {
+            BbOutliner res = findParent(outliner, x);
             if (res != null)
                 return res;
         }
         return null;
     }
 
-    private Outliner findParent(Outliner x, Outliner childOutliner) {
+    private BbOutliner findParent(BbOutliner x, BbOutliner childOutliner) {
         if (x.hasChildOutliner(childOutliner))
             return x;
 
-        for (Outliner.ChildEntry child: x.children) {
+        for (BbOutliner.ChildEntry child: x.children) {
             if (child.isNode() && child.outliner.hasChildOutliner(childOutliner)) {
                 return child.outliner;
             } else if (child.isNode()) {

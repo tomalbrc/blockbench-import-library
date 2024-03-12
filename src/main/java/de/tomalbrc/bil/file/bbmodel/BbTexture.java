@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.UUID;
 
-public class Texture {
+public class BbTexture {
     public String path;
     public String name;
     public String folder;

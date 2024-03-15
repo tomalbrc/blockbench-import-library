@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.joml.Vector2i;
@@ -35,56 +36,32 @@ public class BbModel {
         return null;
     }
 
-    public BbOutliner getOutliner(UUID uuid) {
-        for (BbOutliner outliner: this.outliner) {
-            BbOutliner res = findNode(outliner, uuid);
-            if (res != null) {
-                return res;
-            }
-        }
-        return null;
+
+    private boolean isHitbox(BbOutliner outliner) {
+        return outliner.name != null && outliner.name.equals("hitbox");
     }
 
     public List<BbOutliner> modelOutliner() {
         List<BbOutliner> list = new ObjectArrayList<>();
-
         for (BbOutliner outliner: this.outliner) {
-            if (outliner.hasModel()) {
+            if (outliner.hasModel() && !this.isHitbox(outliner)) {
                 list.add(outliner);
             }
 
             findModelOutlinerChildren(list, outliner);
         }
-
         return list;
     }
 
     private void findModelOutlinerChildren(List<BbOutliner> list, BbOutliner x) {
         for (BbOutliner.ChildEntry child: x.children) {
             if (child.isNode()) {
-                if (child.outliner.hasModel())
+                if (child.outliner.hasModel() && !this.isHitbox(child.outliner))
                     list.add(child.outliner);
 
                 findModelOutlinerChildren(list, child.outliner);
             }
         }
-    }
-
-
-    private BbOutliner findNode(BbOutliner x, UUID uuid) {
-        if (x.uuid.equals(uuid)) {
-            return x;
-        }
-        for (BbOutliner.ChildEntry child: x.children) {
-            if (child.isNode() && child.outliner.uuid.equals(uuid)) {
-                return child.outliner;
-            } else if (child.isNode()) {
-                var res = findNode(child.outliner, uuid);
-                if (res != null)
-                    return res;
-            }
-        }
-        return null;
     }
 
     public BbOutliner getParent(BbElement element) {

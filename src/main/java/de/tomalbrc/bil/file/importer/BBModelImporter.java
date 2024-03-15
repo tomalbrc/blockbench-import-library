@@ -1,5 +1,7 @@
 package de.tomalbrc.bil.file.importer;
 
+import com.mojang.math.Axis;
+import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.core.model.*;
@@ -21,7 +23,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class BBModelImporter implements ModelImporter<BbModel> {
-
     private Object2ObjectOpenHashMap<UUID, Node> nodeMap(BbModel model) {
         Object2ObjectOpenHashMap<UUID, Node> nodeMap = new Object2ObjectOpenHashMap<>();
         List<BbTexture> textures = new ObjectArrayList<>();
@@ -50,41 +51,34 @@ public class BBModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
+    private Quaternionf createQuaternion(Vector3f eulerAngles) {
+        return new Quaternionf()
+                .rotateZ(Mth.DEG_TO_RAD * eulerAngles.z)
+                .rotateY(Mth.DEG_TO_RAD * eulerAngles.y)
+                .rotateX(Mth.DEG_TO_RAD * eulerAngles.x);
+    }
+
     private Reference2ObjectOpenHashMap<UUID, Pose> defaultPose(BbModel model) {
         Reference2ObjectOpenHashMap<UUID, Pose> res = new Reference2ObjectOpenHashMap<>();
 
         var list = model.modelOutliner();
-        for (BbOutliner outliner: list) {
-            Matrix4f matrix4f = new Matrix4f();
+        for (BbOutliner bone: list) {
+            List<BbOutliner> nodePath = nodePath(model, bone);
 
-            List<BbOutliner> nodePath = new ObjectArrayList<>();
-            BbOutliner parent = outliner;
-            while (parent != null) {
-                nodePath.add(0, parent);
-                parent = model.getParent(parent);
-            }
+            Vector3f parentPos = new Vector3f();
+            Quaternionf parentRot = Axis.YP.rotationDegrees(180);
 
-            Vector3f prev = null;
+            BbOutliner parent = null;
             for (BbOutliner node: nodePath) {
-                if (prev == null) {
-                    var p = node.origin.mul(1 / 16.f, new Vector3f());
-                    matrix4f.translate(p);
-                } else {
-                    // relative position to parent bone, for correct rotation in default pose
-                    Vector3f relativePos = node.origin.mul(1 / 16.f, new Vector3f()).sub(prev);
-                    matrix4f.translate(relativePos);
-                }
+                var localPos = parent != null ? node.origin.sub(parent.origin, new Vector3f()) : new Vector3f(node.origin);
 
-                if (node.rotation != null)
-                    matrix4f.rotateXYZ(node.rotation.mul(Mth.DEG_TO_RAD, new Vector3f()));
+                parentPos = localPos.div(16).rotate(parentRot).add(parentPos);
+                parentRot.mul(createQuaternion(node.rotation));
 
-                prev = node.origin.mul(1 / 16.f, new Vector3f());
+                parent = node;
             }
 
-            // Animated-java compat for larger models
-            matrix4f.scale(outliner.scale);
-
-            res.put(outliner.uuid, Pose.of(matrix4f));
+            res.put(bone.uuid, new Pose(parentPos, new Vector3f(bone.scale), parentRot, new Quaternionf()));
         }
 
         return res;
@@ -112,8 +106,8 @@ public class BBModelImporter implements ModelImporter<BbModel> {
             List<BbOutliner> nodePath = nodePath(model, bone);
 
             Vector3f parentPos = new Vector3f();
-            Quaternionf parentRot = new Quaternionf();
-            Vector3f parentScale = new Vector3f(1.f/16.f);
+            Quaternionf parentRot = Axis.YP.rotationDegrees(180);
+            Vector3f parentScale = new Vector3f(1);
 
             // to check if any parent node has an animator, if not then there is no animation happening at all,
             // no need to save the frame
@@ -123,24 +117,26 @@ public class BBModelImporter implements ModelImporter<BbModel> {
 
             // sample from root to bone
             for (BbOutliner node: nodePath) {
+
                 BbAnimator animator = animation.animators.get(node.uuid);
                 requiresFrame |= animator != null;
 
                 Vector3f origin = parent != null ? node.origin.sub(parent.origin, new Vector3f()) : new Vector3f(node.origin);
 
                 var triple = animator == null ? Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) : Sampler.sample(node, animator.keyframes, model.animationVariablePlaceholders, time);
-                var localRot = node.rotation.add(triple.getMiddle(), new Vector3f()).mul(Mth.DEG_TO_RAD);
-                var localPos = origin.add(triple.getLeft());
 
-                parentScale.mul(triple.getRight().mul(localRot));
-                parentPos = localPos.mul(1/16.f).rotate(parentRot).add(parentPos);
-                parentRot.mul(new Quaternionf().rotateXYZ(-localRot.x, -localRot.y, localRot.z));
+                Vector3f localRot = node.rotation.add(triple.getMiddle().mul(-1,-1,1), new Vector3f());
+                Vector3f localPos = origin.add(triple.getLeft());
+
+                parentPos = localPos.div(16).mul(parentScale).rotate(parentRot).add(parentPos);
+                parentRot.mul(createQuaternion(localRot));
+                parentScale.mul(triple.getRight());
 
                 parent = node;
             }
 
             if (requiresFrame)
-                poses.put(bone.uuid, Pose.of(new Matrix4f().rotateY(Mth.PI).translate(parentPos).rotate(parentRot).scale(parentScale)));
+                poses.put(bone.uuid, new Pose(parentPos, parentScale.mul(bone.scale), parentRot, new Quaternionf()));
         }
         return poses;
     }
@@ -161,7 +157,7 @@ public class BBModelImporter implements ModelImporter<BbModel> {
 
             int startDelay = 0;
             int loopDelay = 0;
-            Animation animation = new Animation((Frame[]) frames.toArray(), startDelay, loopDelay, frameCount, anim.loop, new ReferenceOpenHashSet<>(), false);
+            Animation animation = new Animation(frames.toArray(new Frame[frames.size()]), startDelay, loopDelay, frameCount, anim.loop, new ReferenceOpenHashSet<>(), false);
 
             res.put(anim.name, animation);
         }

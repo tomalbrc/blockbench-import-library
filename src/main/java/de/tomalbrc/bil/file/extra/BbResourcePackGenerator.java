@@ -13,6 +13,14 @@ import org.joml.Vector3f;
 import java.util.*;
 
 public class BbResourcePackGenerator {
+    static Gson gson = JSON.GENERIC_BUILDER
+            .registerTypeAdapter(BbFace.class, new FaceSerializer())
+            .registerTypeAdapter(BbElement.class, new ElementSerializer())
+            .create();
+    static String BASE64_PNG_PREFIX = "data:image/png;base64,";
+    static String MODEL_DIR = ":assets/bil/models/item/";
+    static String TEXTURE_DIR = ":assets/bil/textures/item/";
+
     static class GeneratedModel {
         record Display(DisplayTransform head) {
             record DisplayTransform(Vector3f rotation){}
@@ -27,15 +35,13 @@ public class BbResourcePackGenerator {
             this.elements = elements;
             this.display = new Display(new Display.DisplayTransform(new Vector3f(0,180,0)));
         }
+
+        public byte[] getBytes() {
+            return gson.toJson(this).getBytes();
+        }
     }
 
-
-    public static ResourceLocation locationOf(BbModel model, String outliner) {
-        String id = BbResourcePackGenerator.normalizedModelId(model);
-        return new ResourceLocation("bil:item/" + id + "/" + outliner);
-    }
-
-    public static void makePart(BbModel model, String partName, List<BbElement> elements, List<BbTexture> textures) {
+    public static ResourceLocation makePart(BbModel model, String partName, List<BbElement> elements, List<BbTexture> textures) {
         String id = BbResourcePackGenerator.normalizedModelId(model);
 
         Map<String, ResourceLocation> textureMap = new Object2ObjectLinkedOpenHashMap<>();
@@ -44,19 +50,18 @@ public class BbResourcePackGenerator {
         }
 
         GeneratedModel generatedModel = new GeneratedModel(textureMap, elements);
-        Gson gson = JSON.GENERIC_BUILDER
-                .registerTypeAdapter(BbFace.class, new FaceSerializer())
-                .registerTypeAdapter(BbElement.class, new ElementSerializer())
-                .create();
-        RPUtil.add(new ResourceLocation(":assets/bil/models/item/" + id + "/" + partName + ".json"), gson.toJson(generatedModel).getBytes());
+        ResourceLocation modelResource = new ResourceLocation(MODEL_DIR + id + "/" + partName + ".json");
+        RPUtil.add(modelResource, generatedModel.getBytes());
+
+        return modelResource;
     }
 
-    public static void makeTextures(BbModel model, List<BbTexture> textures) {
+    public static void makeTextures(BbModel model, Collection<BbTexture> textures) {
         String id = BbResourcePackGenerator.normalizedModelId(model);
 
         for (BbTexture texture: textures) {
-            byte[] texData = Base64.getDecoder().decode(texture.source.replace("data:image/png;base64,", ""));
-            RPUtil.add(new ResourceLocation(":assets/bil/textures/item/" + id + "/" + texture.name + ".png"), texData);
+            byte[] texData = Base64.getDecoder().decode(texture.source.replace(BASE64_PNG_PREFIX, ""));
+            RPUtil.add(new ResourceLocation(TEXTURE_DIR + id + "/" + texture.name + ".png"), texData);
         }
     }
 

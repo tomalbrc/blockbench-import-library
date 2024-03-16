@@ -5,10 +5,7 @@ import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.core.model.*;
 import de.tomalbrc.bil.core.model.Animation;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Items;
@@ -23,7 +20,7 @@ import java.util.UUID;
 public class BbModelImporter implements ModelImporter<BbModel> {
     private Object2ObjectOpenHashMap<UUID, Node> nodeMap(BbModel model) {
         Object2ObjectOpenHashMap<UUID, Node> nodeMap = new Object2ObjectOpenHashMap<>();
-        List<BbTexture> textures = new ObjectArrayList<>();
+        ObjectArraySet<BbTexture> textures = new ObjectArraySet<>();
 
         for (BbOutliner outliner: model.modelOutliner()) {
             if (outliner.export) {
@@ -36,11 +33,11 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
                 String modelName = outliner.name;
 
-                BbResourcePackGenerator.makePart(model, modelName, elements, model.textures);
+                ResourceLocation location = BbResourcePackGenerator.makePart(model, modelName, elements, model.textures);
                 textures.addAll(model.textures);
 
-                ResourceLocation location = BbResourcePackGenerator.locationOf(model, modelName);
-                nodeMap.put(outliner.uuid, new Node(Node.NodeType.bone, outliner.name, outliner.uuid, new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, location).value(), location)));
+                RPModelInfo modelInfo = new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, location).value(), location);
+                nodeMap.put(outliner.uuid, new Node(Node.NodeType.bone, outliner.name, outliner.uuid, modelInfo));
             }
         }
 

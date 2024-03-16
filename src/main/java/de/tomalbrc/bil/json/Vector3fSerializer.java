@@ -7,9 +7,7 @@ import java.lang.reflect.Type;
 
 public class Vector3fSerializer implements JsonSerializer<Vector3f> {
     @Override
-    public JsonElement serialize(Vector3f src, Type typeOfSrc,
-                                 JsonSerializationContext context) {
-
+    public JsonElement serialize(Vector3f src, Type typeOfSrc, JsonSerializationContext context) {
         JsonArray array = new JsonArray();
         array.add(src.x);
         array.add(src.y);

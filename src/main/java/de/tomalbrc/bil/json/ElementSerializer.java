@@ -2,10 +2,13 @@ package de.tomalbrc.bil.json;
 
 import com.google.gson.*;
 import de.tomalbrc.bil.file.bbmodel.BbElement;
+import de.tomalbrc.bil.file.bbmodel.BbFace;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 public class ElementSerializer implements JsonSerializer<BbElement> {
 

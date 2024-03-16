@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 import java.util.Map;
@@ -10,12 +11,13 @@ public class BbElement {
     public String name;
     @SerializedName("box_uv")
     public boolean boxUv;
+    @SerializedName("uv_offset")
+    public Vector2i uvOffset;
+
     public boolean rescale;
     public boolean locked;
-    @SerializedName("render_order")
-    public String renderOrder;
-    @SerializedName("allow_mirror_modeling")
-    public boolean allowMirrorModeling;
+
+
     public Vector3f from;
     public Vector3f to;
 

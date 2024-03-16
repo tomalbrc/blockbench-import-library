@@ -12,18 +12,6 @@ import org.joml.Vector3f;
 import java.util.List;
 
 class Sampler {
-
-    private static void f(MolangExpression expression, Float time) {
-        ExpressionBindingContext context = ExpressionBindingContext.create();
-
-        context.registerDirectReferenceResolver(ReferenceType.QUERY, "life_time", () -> {return  time;});
-        context.registerDirectReferenceResolver(ReferenceType.QUERY, "anim_time", () -> {return  time;});
-        context.registerDirectReferenceResolver(ReferenceType.VARIABLE, "mech_mul", () -> {return  time;});
-
-        expression.bind(context, time);
-    }
-
-
     private static Vector3f interpolateKeyframeChannelAt(List<BbKeyframe> keyframes, BbKeyframe.Channel channel, BbVariablePlaceholders placeholders, float time) {
         if (keyframes == null || keyframes.isEmpty()) {
             return null;
@@ -70,7 +58,7 @@ class Sampler {
                 after.dataPoints.get(0).get("y").getValue(placeholders, time),
                 after.dataPoints.get(0).get("z").getValue(placeholders, time));
 
-        return beforeValue.lerp(afterValue, t);
+        return Interpolator.linear(beforeValue, afterValue, t);
     }
 
     public static Triple<Vector3f, Vector3f, Vector3f> sample(BbOutliner bone, List<BbKeyframe> keyframes, BbVariablePlaceholders placeholders, float time) {

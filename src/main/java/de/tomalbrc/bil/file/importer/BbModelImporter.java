@@ -1,7 +1,5 @@
 package de.tomalbrc.bil.file.importer;
 
-import com.mojang.math.Axis;
-import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.core.model.*;
@@ -22,7 +20,7 @@ import java.lang.Math;
 import java.util.List;
 import java.util.UUID;
 
-public class BBModelImporter implements ModelImporter<BbModel> {
+public class BbModelImporter implements ModelImporter<BbModel> {
     private Object2ObjectOpenHashMap<UUID, Node> nodeMap(BbModel model) {
         Object2ObjectOpenHashMap<UUID, Node> nodeMap = new Object2ObjectOpenHashMap<>();
         List<BbTexture> textures = new ObjectArrayList<>();
@@ -65,20 +63,17 @@ public class BBModelImporter implements ModelImporter<BbModel> {
         for (BbOutliner bone: list) {
             List<BbOutliner> nodePath = nodePath(model, bone);
 
-            Vector3f parentPos = new Vector3f();
-            Quaternionf parentRot = Axis.YP.rotationDegrees(180);
-
+            Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
             BbOutliner parent = null;
             for (BbOutliner node: nodePath) {
                 var localPos = parent != null ? node.origin.sub(parent.origin, new Vector3f()) : new Vector3f(node.origin);
 
-                parentPos = localPos.div(16).rotate(parentRot).add(parentPos);
-                parentRot.mul(createQuaternion(node.rotation));
+                matrix4f.translate(localPos.div(16));
+                matrix4f.rotate(createQuaternion(node.rotation));
 
                 parent = node;
             }
-
-            res.put(bone.uuid, new Pose(parentPos, new Vector3f(bone.scale), parentRot, new Quaternionf()));
+            res.put(bone.uuid, Pose.of(matrix4f.scale(bone.scale)));
         }
 
         return res;
@@ -105,19 +100,16 @@ public class BBModelImporter implements ModelImporter<BbModel> {
         for (BbOutliner bone: model.modelOutliner()) {
             List<BbOutliner> nodePath = nodePath(model, bone);
 
-            Vector3f parentPos = new Vector3f();
-            Quaternionf parentRot = Axis.YP.rotationDegrees(180);
-            Vector3f parentScale = new Vector3f(1);
-
             // to check if any parent node has an animator, if not then there is no animation happening at all,
             // no need to save the frame
             boolean requiresFrame = false;
 
             BbOutliner parent = null;
 
+            Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
+
             // sample from root to bone
             for (BbOutliner node: nodePath) {
-
                 BbAnimator animator = animation.animators.get(node.uuid);
                 requiresFrame |= animator != null;
 
@@ -128,15 +120,15 @@ public class BBModelImporter implements ModelImporter<BbModel> {
                 Vector3f localRot = node.rotation.add(triple.getMiddle().mul(-1,-1,1), new Vector3f());
                 Vector3f localPos = origin.add(triple.getLeft());
 
-                parentPos = localPos.div(16).mul(parentScale).rotate(parentRot).add(parentPos);
-                parentRot.mul(createQuaternion(localRot));
-                parentScale.mul(triple.getRight());
+                matrix4f.translate(localPos.div(16));
+                matrix4f.rotate(createQuaternion(localRot));
+                matrix4f.scale(triple.getRight());
 
                 parent = node;
             }
 
             if (requiresFrame)
-                poses.put(bone.uuid, new Pose(parentPos, parentScale.mul(bone.scale), parentRot, new Quaternionf()));
+                poses.put(bone.uuid, Pose.of(matrix4f.scale(bone.scale)));
         }
         return poses;
     }

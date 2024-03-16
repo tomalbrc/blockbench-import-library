@@ -3,7 +3,7 @@ package de.tomalbrc.bil.file.loader;
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
-import de.tomalbrc.bil.file.importer.BBModelImporter;
+import de.tomalbrc.bil.file.importer.BbModelImporter;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-public class BBModelLoader implements ModelLoader {
+public class BbModelLoader implements ModelLoader {
 
     @Override
     public Model load(String name, InputStream input) throws JsonParseException {
@@ -79,7 +79,7 @@ public class BBModelLoader implements ModelLoader {
                 }
             }
 
-            Model newModel = new BBModelImporter().importModel(model);
+            Model newModel = new BbModelImporter().importModel(model);
             return newModel;
         } catch (Throwable throwable) {
             throw new JsonParseException("Failed to parse: " + name, throwable);
@@ -88,7 +88,7 @@ public class BBModelLoader implements ModelLoader {
 
     public Model load(String name) throws IllegalArgumentException, JsonParseException {
         String path = String.format("/bbmodel/%s.bbmodel", name);
-        InputStream input = BBModelLoader.class.getResourceAsStream(path);
+        InputStream input = BbModelLoader.class.getResourceAsStream(path);
         if (input == null) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }

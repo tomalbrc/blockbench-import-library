@@ -14,7 +14,7 @@ import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import de.tomalbrc.bil.api.VariantController;
 import de.tomalbrc.bil.core.extra.ModelEntity;
-import de.tomalbrc.bil.file.loader.BBModelLoader;
+import de.tomalbrc.bil.file.loader.BbModelLoader;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Variant;
 import de.tomalbrc.bil.util.Utils;
@@ -71,7 +71,7 @@ public class ModelCommand {
     }
 
     private static int spawnModel(CommandSourceStack source, String path) throws CommandSyntaxException {
-        return spawnModel(source, () -> new BBModelLoader().load(path), path);
+        return spawnModel(source, () -> new BbModelLoader().load(path), path);
     }
 
     private static int spawnModel(CommandSourceStack source, Supplier<Model> supplier, String path) throws CommandSyntaxException {

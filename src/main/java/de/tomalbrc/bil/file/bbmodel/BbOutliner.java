@@ -58,4 +58,8 @@ public class BbOutliner {
         }
         return false;
     }
+
+    public boolean isHitbox() {
+        return this.name != null && this.name.equals("hitbox");
+    }
 }

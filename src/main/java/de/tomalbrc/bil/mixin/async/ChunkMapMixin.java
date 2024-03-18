@@ -1,6 +1,6 @@
 package de.tomalbrc.bil.mixin.async;
 
-import de.tomalbrc.bil.core.holder.base.BaseElementHolder;
+import de.tomalbrc.bil.core.holder.base.AbstractElementHolder;
 import de.tomalbrc.bil.util.IChunkMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.server.level.ChunkMap;
@@ -16,37 +16,37 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(value = ChunkMap.class, priority = 900)
 public class ChunkMapMixin implements IChunkMap {
     @Unique
-    private ObjectArrayList<BaseElementHolder> resin$scheduledAsyncTicks = new ObjectArrayList<>();
+    private ObjectArrayList<AbstractElementHolder> bil$scheduledAsyncTicks = new ObjectArrayList<>();
     @Unique
     @Nullable
-    private CompletableFuture<Void> resin$asyncTickFuture;
+    private CompletableFuture<Void> bil$asyncTickFuture;
 
     @Inject(method = "tick()V", at = @At("TAIL"))
-    private void resin$afterTickEntityTrackers(CallbackInfo ci) {
-        ObjectArrayList<BaseElementHolder> holders = this.resin$scheduledAsyncTicks;
+    private void bil$afterTickEntityTrackers(CallbackInfo ci) {
+        ObjectArrayList<AbstractElementHolder> holders = this.bil$scheduledAsyncTicks;
         if (holders.isEmpty()) {
-            this.resin$asyncTickFuture = null;
+            this.bil$asyncTickFuture = null;
             return;
         }
 
-        this.resin$scheduledAsyncTicks = new ObjectArrayList<>(holders.size());
-        this.resin$asyncTickFuture = CompletableFuture.runAsync(() -> {
-            for (BaseElementHolder holder : holders) {
+        this.bil$scheduledAsyncTicks = new ObjectArrayList<>(holders.size());
+        this.bil$asyncTickFuture = CompletableFuture.runAsync(() -> {
+            for (AbstractElementHolder holder : holders) {
                 holder.asyncTick();
             }
         });
     }
 
     @Override
-    public void resin$scheduleAsyncTick(BaseElementHolder holder) {
-        this.resin$scheduledAsyncTicks.add(holder);
+    public void bil$scheduleAsyncTick(AbstractElementHolder holder) {
+        this.bil$scheduledAsyncTicks.add(holder);
     }
 
     @Override
-    public void resin$blockUntilAsyncTickFinished() {
-        if (this.resin$asyncTickFuture != null && !this.resin$asyncTickFuture.isDone()) {
+    public void bil$blockUntilAsyncTickFinished() {
+        if (this.bil$asyncTickFuture != null && !this.bil$asyncTickFuture.isDone()) {
             // Makes sure that all the async ticks have finished.
-            this.resin$asyncTickFuture.join();
+            this.bil$asyncTickFuture.join();
         }
     }
 }

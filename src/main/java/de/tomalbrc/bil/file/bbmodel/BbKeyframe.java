@@ -1,13 +1,13 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
-import dev.omega.arcane.ast.MolangExpression;
-import dev.omega.arcane.exception.MolangLexException;
-import dev.omega.arcane.exception.MolangParseException;
-import dev.omega.arcane.parser.MolangParser;
-import dev.omega.arcane.reference.ExpressionBindingContext;
-import dev.omega.arcane.reference.ReferenceType;
+import gg.moonflower.molangcompiler.api.MolangEnvironment;
+import gg.moonflower.molangcompiler.api.MolangExpression;
+import gg.moonflower.molangcompiler.api.MolangRuntime;
+import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Map;
@@ -39,32 +39,53 @@ public class BbKeyframe {
         scale
     }
 
+    public Vector3f getVector3f(int index, BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
+        return new Vector3f(
+                this.dataPoints.get(index).get("x").getValue(placeholders, environment),
+                this.dataPoints.get(index).get("y").getValue(placeholders, environment),
+                this.dataPoints.get(index).get("z").getValue(placeholders, environment)
+        );
+    }
+
     static public class DataPointValue {
-        public float value;
-        public String expression;
+        private float value;
+        private String expression;
+        private MolangExpression molangExpression;
 
-        public float getValue(BbVariablePlaceholders placeholders, float time) {
-            if (expression == null)
-                return value;
+        public void setValue(float value) {
+            this.value = value;
+        }
 
-            String modifiedExpression = expression;
-            if (placeholders != null)
-                modifiedExpression = placeholders.substituteVariables(expression).replace("\n", " ").trim();
+        public void setExpression(String expression) {
+            this.expression = expression;
+        }
 
-            MolangExpression molangExpression = null;
-            try {
-                molangExpression = MolangParser.parse(modifiedExpression);
-            } catch (MolangLexException ex) {
-                throw new RuntimeException(ex);
-            } catch (MolangParseException ex) {
-                throw new RuntimeException(ex);
+        public float getValue(BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
+            if (this.expression == null)
+                return this.value;
+
+            if (this.expression.trim().length() <= 2) {
+                this.value = Float.parseFloat(this.expression.trim());
+                this.expression = null;
+                return this.value;
             }
 
-            return molangExpression.bind(ExpressionBindingContext
-                    .create()
-                    .registerDirectReferenceResolver(ReferenceType.QUERY, "anim_time", () -> time)
-                    .registerDirectReferenceResolver(ReferenceType.QUERY, "life_time", () -> time)
-            ).evaluate();
+            // dirty hack, caching the molang expression for performance,
+            // would be better to post-process the expressions as string,
+            // for the placeholder substitution
+            if (this.molangExpression == null) {
+                String modifiedExpression = this.expression;
+                if (placeholders != null)
+                    modifiedExpression = placeholders.substituteVariables(this.expression);
+
+                try {
+                    this.molangExpression = BIL.COMPILER.compile(modifiedExpression);
+                } catch(Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            return this.molangExpression.get(environment);
         }
     }
 }

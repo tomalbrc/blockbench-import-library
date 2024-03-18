@@ -24,7 +24,7 @@ public abstract class MinecraftServerMixin {
                     ordinal = 0
             )
     )
-    private void resin$ensureAsyncTickFinished(BooleanSupplier booleanSupplier, CallbackInfo ci) {
+    private void bil$ensureAsyncTickFinished(BooleanSupplier booleanSupplier, CallbackInfo ci) {
         // Block here at the end of the gametick just before packet flushing is resumed until all the async element updates have completed.
         // This way we can take advantage of suspending packet flushing, which gives a significant improvement in network performance and ping.
         // This will never realistically block the main thread, as these async intermediate ticks are done at the same time as entity ticks on the main thread,

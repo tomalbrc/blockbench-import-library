@@ -14,10 +14,10 @@ public class DataPointValueDeserializer implements JsonDeserializer<BbKeyframe.D
         var entry = new BbKeyframe.DataPointValue();
         var prim = jsonElement.getAsJsonPrimitive();
         if (prim.isNumber()) {
-            entry.value = prim.getAsFloat();
+            entry.setValue(prim.getAsFloat());
         }
         else if (prim.isString()) {
-            entry.expression = prim.getAsString();
+            entry.setExpression(prim.getAsString());
         }
         return entry;
     }

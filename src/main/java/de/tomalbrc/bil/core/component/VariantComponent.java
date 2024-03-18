@@ -4,8 +4,8 @@ import de.tomalbrc.bil.api.VariantController;
 import de.tomalbrc.bil.core.holder.base.AbstractAnimationHolder;
 import de.tomalbrc.bil.core.holder.wrapper.Bone;
 import de.tomalbrc.bil.core.model.Model;
-import de.tomalbrc.bil.core.model.RPModelInfo;
 import de.tomalbrc.bil.core.model.Variant;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -29,7 +29,7 @@ public class VariantComponent extends ComponentBase implements VariantController
         if (this.currentVariant != null) {
             this.currentVariant = null;
             for (Bone bone : this.holder.getBones()) {
-                bone.updateModelData(bone.node().modelInfo().customModelData());
+                bone.updateModelData(bone.node().modelData().value());
             }
         }
     }
@@ -71,9 +71,9 @@ public class VariantComponent extends ComponentBase implements VariantController
     private void applyVariantToBones(Variant variant) {
         for (Bone bone : this.holder.getBones()) {
             UUID uuid = bone.node().uuid();
-            RPModelInfo modelInfo = variant.models().get(uuid);
-            if (modelInfo != null && variant.isAffected(uuid)) {
-                bone.updateModelData(modelInfo.customModelData());
+            PolymerModelData modelData = variant.models().get(uuid);
+            if (modelData != null && variant.isAffected(uuid)) {
+                bone.updateModelData(modelData.value());
             }
         }
     }

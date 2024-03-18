@@ -21,6 +21,6 @@ public class BbVariablePlaceholders {
         for (var entry: values.entrySet()) {
             expression = expression.replace(entry.getKey(), entry.getValue());
         }
-        return expression;
+        return expression.replace("\n", "").trim();
     }
 }

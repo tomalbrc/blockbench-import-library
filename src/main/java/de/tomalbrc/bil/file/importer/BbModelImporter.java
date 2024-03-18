@@ -1,49 +1,110 @@
 package de.tomalbrc.bil.file.importer;
 
+import com.mojang.math.Axis;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.core.model.*;
 import de.tomalbrc.bil.core.model.Animation;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import gg.moonflower.molangcompiler.api.MolangEnvironment;
+import gg.moonflower.molangcompiler.api.MolangRuntime;
+import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.phys.Vec2;
 import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 import java.lang.Math;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BbModelImporter implements ModelImporter<BbModel> {
     private Object2ObjectOpenHashMap<UUID, Node> nodeMap(BbModel model) {
         Object2ObjectOpenHashMap<UUID, Node> nodeMap = new Object2ObjectOpenHashMap<>();
         ObjectArraySet<BbTexture> textures = new ObjectArraySet<>();
 
-        for (BbOutliner outliner: model.modelOutliner()) {
-            if (outliner.export) {
-                List<BbElement> elements = new ObjectArrayList<>();
-                for (BbElement element: model.elements) {
-                    if (outliner.hasUuidChild(element.uuid)) {
-                        elements.add(element);
-                    }
-                }
-
-                String modelName = outliner.name;
-
-                ResourceLocation location = BbResourcePackGenerator.makePart(model, modelName, elements, model.textures);
-                textures.addAll(model.textures);
-
-                RPModelInfo modelInfo = new RPModelInfo(PolymerResourcePackUtils.requestModel(Items.PAPER, location).value(), location);
-                nodeMap.put(outliner.uuid, new Node(Node.NodeType.bone, outliner.name, outliner.uuid, modelInfo));
+        for (BbOutliner.ChildEntry entry: model.outliner) {
+            if (entry.isNode()) {
+                createBones(model, null, null, model.outliner, nodeMap, textures);
             }
         }
 
         BbResourcePackGenerator.makeTextures(model, textures);
 
         return nodeMap;
+    }
+
+    void createBones(BbModel model, Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap, ObjectArraySet<BbTexture> textures) {
+        for (BbOutliner.ChildEntry x: children) {
+            if (x.isNode()) {
+                BbOutliner outliner = x.outliner;
+                PolymerModelData modelData = null;
+
+                if (outliner.hasModel() && outliner.export && !outliner.isHitbox()) {
+                    // process model
+                    List<BbElement> elements = new ObjectArrayList<>();
+                    for (BbElement element: model.elements) {
+                        if (outliner.hasUuidChild(element.uuid)) {
+                            elements.add(element);
+                        }
+                    }
+
+                    String modelName = outliner.name;
+
+                    ResourceLocation location = BbResourcePackGenerator.makePart(model, modelName, elements, model.textures);
+                    textures.addAll(model.textures);
+
+                    modelData = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
+                }
+
+                Vector3f localPos = parentOutliner != null ? outliner.origin.sub(parentOutliner.origin, new Vector3f()) : new Vector3f(outliner.origin);
+                Quaternionf localRot = createQuaternion(outliner.rotation);
+
+                var tr = new Node.Transform(localPos.div(16), localRot, outliner.scale);
+                if (parent != null)
+                    tr.mul(parent.transform());
+                else
+                    tr.mul(new Matrix4f().rotateY(Mth.PI));
+
+                Node node = new Node(Node.NodeType.bone, parent, tr, outliner.name, outliner.uuid, this.createBoneDisplay(modelData), modelData);
+                nodeMap.put(outliner.uuid, node);
+
+                // children
+                createBones(model, node, outliner, outliner.children, nodeMap, textures);
+            }
+        }
+    }
+
+    @Nullable
+    protected ItemDisplayElement createBoneDisplay(PolymerModelData modelData) {
+        if (modelData == null)
+            return null;
+
+        ItemDisplayElement element = new ItemDisplayElement();
+        element.setModelTransformation(ItemDisplayContext.HEAD);
+        element.setInvisible(true);
+        element.setInterpolationDuration(2);
+        element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
+
+        ItemStack itemStack = new ItemStack(modelData.item());
+        itemStack.getOrCreateTag().putInt("CustomModelData", modelData.value());
+        if (modelData.item() instanceof DyeableLeatherItem dyeableItem) {
+            dyeableItem.setColor(itemStack, -1);
+        }
+
+        element.setItem(itemStack);
+        return element;
     }
 
     private Quaternionf createQuaternion(Vector3f eulerAngles) {
@@ -53,24 +114,13 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 .rotateX(Mth.DEG_TO_RAD * eulerAngles.x);
     }
 
-    private Reference2ObjectOpenHashMap<UUID, Pose> defaultPose(BbModel model) {
+    private Reference2ObjectOpenHashMap<UUID, Pose> defaultPose(BbModel model, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         Reference2ObjectOpenHashMap<UUID, Pose> res = new Reference2ObjectOpenHashMap<>();
 
-        var list = model.modelOutliner();
-        for (BbOutliner bone: list) {
-            List<BbOutliner> nodePath = nodePath(model, bone);
-
-            Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
-            BbOutliner parent = null;
-            for (BbOutliner node: nodePath) {
-                var localPos = parent != null ? node.origin.sub(parent.origin, new Vector3f()) : new Vector3f(node.origin);
-
-                matrix4f.translate(localPos.div(16));
-                matrix4f.rotate(createQuaternion(node.rotation));
-
-                parent = node;
-            }
-            res.put(bone.uuid, Pose.of(matrix4f.scale(bone.scale)));
+        for (var entry: nodeMap.entrySet()) {
+            var bone = entry.getValue();
+            if (bone.modelData() != null)
+                res.put(bone.uuid(), Pose.of(bone.transform().globalTransform().scale(bone.transform().scale())));
         }
 
         return res;
@@ -81,75 +131,89 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return res;
     }
 
-    private List<BbOutliner> nodePath(BbModel model, BbOutliner nestedOutliner) {
-        List<BbOutliner> nodePath = new ObjectArrayList<>();
-        BbOutliner parent = nestedOutliner;
-        while (parent != null) {
-            nodePath.add(0, parent);
-            parent = model.getParent(parent);
+    private List<Node> nodePath(Node child) {
+        List<Node> nodePath = new ObjectArrayList<>();
+        while (child != null) {
+            nodePath.add(0, child);
+            child = child.parent();
         }
         return nodePath;
     }
 
-    private Reference2ObjectOpenHashMap<UUID, Pose> poses(BbModel model, BbAnimation animation, float time) {
+    private Reference2ObjectOpenHashMap<UUID, Pose> poses(BbModel model, BbAnimation animation, Object2ObjectOpenHashMap<UUID, Node> nodeMap, MolangEnvironment environment, float time) throws MolangRuntimeException {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
 
-        for (BbOutliner bone: model.modelOutliner()) {
-            List<BbOutliner> nodePath = nodePath(model, bone);
+        for (var entry: nodeMap.entrySet()) {
+            if (entry.getValue().modelData() != null) {
+                Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
+                boolean requiresFrame = false;
+                var nodePath = nodePath(entry.getValue());
 
-            // to check if any parent node has an animator, if not then there is no animation happening at all,
-            // no need to save the frame
-            boolean requiresFrame = false;
+                for (var node : nodePath) {
+                    BbAnimator animator = animation.animators.get(node.uuid());
+                    requiresFrame |= animator != null;
 
-            BbOutliner parent = null;
+                    Vector3fc origin = node.transform().origin();
 
-            Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
+                    var triple = animator == null ?
+                            Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
+                            Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
-            // sample from root to bone
-            for (BbOutliner node: nodePath) {
-                BbAnimator animator = animation.animators.get(node.uuid);
-                requiresFrame |= animator != null;
+                    Quaternionf localRot = node.transform().rotation().mul(createQuaternion(triple.getMiddle().mul(-1, -1, 1)), new Quaternionf());
+                    Vector3f localPos = triple.getLeft().div(16).add(origin);
 
-                Vector3f origin = parent != null ? node.origin.sub(parent.origin, new Vector3f()) : new Vector3f(node.origin);
+                    matrix4f.translate(localPos);
+                    matrix4f.rotate(localRot);
+                    matrix4f.scale(triple.getRight());
+                }
 
-                var triple = animator == null ? Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) : Sampler.sample(node, animator.keyframes, model.animationVariablePlaceholders, time);
-
-                Vector3f localRot = node.rotation.add(triple.getMiddle().mul(-1,-1,1), new Vector3f());
-                Vector3f localPos = origin.add(triple.getLeft());
-
-                matrix4f.translate(localPos.div(16));
-                matrix4f.rotate(createQuaternion(localRot));
-                matrix4f.scale(triple.getRight());
-
-                parent = node;
+                if (requiresFrame)
+                    poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
             }
-
-            if (requiresFrame)
-                poses.put(bone.uuid, Pose.of(matrix4f.scale(bone.scale)));
         }
         return poses;
     }
 
-    private Object2ObjectOpenHashMap<String, Animation> animations(BbModel model) {
+    static ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+    private Object2ObjectOpenHashMap<String, Animation> animations(BbModel model, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         Object2ObjectOpenHashMap<String, Animation> res = new Object2ObjectOpenHashMap<>();
         float step = 0.05f;
+
+        List<CompletableFuture<Void>> futures = new ObjectArrayList<>();
         for (BbAnimation anim: model.animations) {
-            List<Frame> frames = new ObjectArrayList<>();
-            int frameCount = Math.round(anim.length / step);
-            for (int i = 0; i <= frameCount; i++) {
-                float time = i * step;
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    List<Frame> frames = new ObjectArrayList<>();
+                    int frameCount = Math.round(anim.length / step);
+                    for (int i = 0; i <= frameCount; i++) {
+                        float time = i * step;
 
-                // pose for bone in list of frames for an animation
-                Reference2ObjectOpenHashMap<UUID, Pose> poses = poses(model, anim, time);
-                frames.add(new Frame(time, poses, null, null, null, false));
-            }
+                        MolangEnvironment env = MolangRuntime.runtime()
+                                .setQuery("life_time", time)
+                                .setQuery("anim_time", time)
+                                .create();
 
-            int startDelay = 0;
-            int loopDelay = 0;
-            Animation animation = new Animation(frames.toArray(new Frame[frames.size()]), startDelay, loopDelay, frameCount, anim.loop, new ReferenceOpenHashSet<>(), false);
+                        // pose for bone in list of frames for an animation
+                        Reference2ObjectOpenHashMap<UUID, Pose> poses = poses(model, anim, nodeMap, env, time);
+                        frames.add(new Frame(time, poses, null, null, null, false));
+                    }
 
-            res.put(anim.name, animation);
+                    int startDelay = 0;
+                    int loopDelay = 0;
+
+                    ReferenceOpenHashSet<UUID> affectedBones = new ReferenceOpenHashSet<>();
+                    Frame[] framesArray = frames.toArray(new Frame[frames.size()]);
+                    Animation animation = new Animation(framesArray, startDelay, loopDelay, frameCount, anim.loop, affectedBones, false);
+
+                    res.put(anim.name, animation);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }, executorService);
+            futures.add(future);
         }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
         return res;
     }
@@ -162,9 +226,9 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @Override
     public Model importModel(BbModel model) {
         Object2ObjectOpenHashMap<UUID, Node> nodeMap = this.nodeMap(model);
-        Reference2ObjectOpenHashMap<UUID, Pose> defaultPose = this.defaultPose(model);
+        Reference2ObjectOpenHashMap<UUID, Pose> defaultPose = this.defaultPose(model, nodeMap);
+        Object2ObjectOpenHashMap<String, Animation> animations = this.animations(model, nodeMap);
         Reference2ObjectOpenHashMap<UUID, Variant> variants = this.variants(model);
-        Object2ObjectOpenHashMap<String, Animation> animations = this.animations(model);
 
         Model result = new Model(nodeMap, defaultPose, variants, animations, this.size(model));
 

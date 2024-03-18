@@ -20,7 +20,7 @@ public class ClientboundEntityEventPacketMixin {
     private int entityId;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;B)V", at = @At("RETURN"))
-    private void resin$modifyEventPacket(Entity entity, byte b, CallbackInfo ci) {
+    private void bil$modifyEventPacket(Entity entity, byte b, CallbackInfo ci) {
         AnimatedEntityHolder holder = AnimatedEntity.getHolder(entity);
         if (holder != null) {
             this.entityId = holder.getEntityEventId();

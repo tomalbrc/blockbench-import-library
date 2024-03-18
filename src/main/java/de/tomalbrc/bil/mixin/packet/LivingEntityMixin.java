@@ -18,7 +18,7 @@ public class LivingEntityMixin {
                     ordinal = 0
             )
     )
-    private int resin$modifyPickupItemPacket(LivingEntity entity) {
+    private int bil$modifyPickupItemPacket(LivingEntity entity) {
         // Return the entity id for entity events to prevent the client from incorrectly type casting.
         // This assumes that the entity event id is of a LivingEntity on the client.
         AnimatedEntityHolder holder = AnimatedEntity.getHolder(entity);

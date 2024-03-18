@@ -26,7 +26,7 @@ public class SynchedEntityDataMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private <T> void resin$onSetEntityData(EntityDataAccessor<T> key, T value, boolean force, CallbackInfo ci) {
+    private <T> void bil$onSetEntityData(EntityDataAccessor<T> key, T value, boolean force, CallbackInfo ci) {
         AnimatedEntityHolder holder = AnimatedEntity.getHolder(this.entity);
         if (holder != null) {
             holder.onSyncedDataUpdated(key, value);

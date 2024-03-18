@@ -46,16 +46,6 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
     }
 
     @Override
-    @Nullable
-    protected ItemDisplayElement createBone(Node node, Item rigItem) {
-        ItemDisplayElement element = super.createBone(node, rigItem);
-        if (element != null) {
-            element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, this.parent.getTeleportDuration());
-        }
-        return element;
-    }
-
-    @Override
     public boolean addAdditionalDisplay(DisplayElement element) {
         if (this.additionalDisplays.add(element)) {
             this.addElement(element);

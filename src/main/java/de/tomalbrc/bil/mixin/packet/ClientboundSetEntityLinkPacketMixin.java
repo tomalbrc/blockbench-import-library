@@ -21,7 +21,7 @@ public class ClientboundSetEntityLinkPacketMixin {
     private int sourceId;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
-    private void resin$modifyLeashPacket(Entity leashed, @Nullable Entity leashHolder, CallbackInfo ci) {
+    private void bil$modifyLeashPacket(Entity leashed, @Nullable Entity leashHolder, CallbackInfo ci) {
         AnimatedEntityHolder holder = AnimatedEntity.getHolder(leashed);
         if (holder != null) {
             this.sourceId = holder.getLeashedId();

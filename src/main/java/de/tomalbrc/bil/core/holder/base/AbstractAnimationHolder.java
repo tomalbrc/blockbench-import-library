@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.core.holder.base;
 
 import de.tomalbrc.bil.api.AnimatedHolder;
+import de.tomalbrc.bil.api.Animator;
 import de.tomalbrc.bil.core.component.AnimationComponent;
 import de.tomalbrc.bil.core.component.VariantComponent;
 import de.tomalbrc.bil.core.holder.wrapper.Bone;
@@ -10,21 +11,19 @@ import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class AbstractAnimationHolder extends BaseElementHolder implements AnimatedHolder {
+public abstract class AbstractAnimationHolder extends AbstractElementHolder implements AnimatedHolder {
 
     protected final Model model;
-    protected final AnimationComponent animation;
-    protected final VariantComponent variant;
+    protected final AnimationComponent animationComponent;
+    protected final VariantComponent variantComponent;
     protected final Object2ObjectOpenHashMap<String, Locator> locatorMap;
 
     protected Bone[] bones;
@@ -35,8 +34,8 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
     protected AbstractAnimationHolder(Model model, ServerLevel level) {
         super(level);
         this.model = model;
-        this.animation = new AnimationComponent(model, this);
-        this.variant = new VariantComponent(model, this);
+        this.animationComponent = new AnimationComponent(model, this);
+        this.variantComponent = new VariantComponent(model, this);
         this.locatorMap = new Object2ObjectOpenHashMap<>();
     }
 
@@ -63,7 +62,7 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
             Pose defaultPose = this.model.defaultPose().get(node.uuid());
             switch (node.type()) {
                 case bone -> {
-                    ItemDisplayElement bone = this.createBone(node, Items.PAPER);
+                    ItemDisplayElement bone = node.display();
                     if (bone != null) {
                         bones.add(Bone.of(bone, node, defaultPose));
                         this.addElement(bone);
@@ -74,24 +73,6 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
                 }
             }
         }
-    }
-
-    @Nullable
-    protected ItemDisplayElement createBone(Node node, Item rigItem) {
-        ItemDisplayElement element = new ItemDisplayElement();
-        element.setModelTransformation(ItemDisplayContext.HEAD);
-        element.setInvisible(true);
-        element.setInterpolationDuration(2);
-        element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
-
-        ItemStack itemStack = new ItemStack(rigItem);
-        itemStack.getOrCreateTag().putInt("CustomModelData", node.modelInfo().customModelData());
-        if (rigItem instanceof DyeableLeatherItem dyeableItem) {
-            dyeableItem.setColor(itemStack, -1);
-        }
-
-        element.setItem(itemStack);
-        return element;
     }
 
     @Override
@@ -108,7 +89,7 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
 
     @Override
     protected void onTick() {
-        this.animation.tickAnimations();
+        this.animationComponent.tickAnimations();
     }
 
     @Override
@@ -123,7 +104,7 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
     }
 
     protected void updateElement(DisplayWrapper<?> display) {
-        this.updateElement(display, this.animation.findPose(display));
+        this.updateElement(display, this.animationComponent.findPose(display));
     }
 
     public void initializeDisplay(DisplayWrapper<?> display) {
@@ -138,7 +119,7 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
 
     protected void updateLocator(Locator locator) {
         if (locator.requiresUpdate()) {
-            Pose pose = this.animation.findPose(locator);
+            Pose pose = this.animationComponent.findPose(locator);
             if (pose != null) {
                 locator.updateListeners(this, pose);
             }
@@ -147,17 +128,17 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
 
     protected void applyPose(Pose pose, DisplayWrapper<?> display) {
         if (this.scale != 1F) {
-            display.setScale(pose.scale().mul(this.scale));
-            display.setTranslation(pose.translation().mul(this.scale));
+            display.element().setScale(pose.scale().mul(this.scale));
+            display.element().setTranslation(pose.translation().mul(this.scale));
         } else {
-            display.setScale(pose.readOnlyScale());
-            display.setTranslation(pose.readOnlyTranslation());
+            display.element().setScale(pose.readOnlyScale());
+            display.element().setTranslation(pose.readOnlyTranslation());
         }
 
-        display.setLeftRotation(pose.readOnlyLeftRotation());
-        display.setRightRotation(pose.readOnlyRightRotation());
+        display.element().setLeftRotation(pose.readOnlyLeftRotation());
+        display.element().setRightRotation(pose.readOnlyRightRotation());
 
-        display.startInterpolation();
+        display.element().startInterpolationIfDirty();
     }
 
     @Override
@@ -182,12 +163,12 @@ public abstract class AbstractAnimationHolder extends BaseElementHolder implemen
 
     @Override
     public VariantComponent getVariantController() {
-        return this.variant;
+        return this.variantComponent;
     }
 
     @Override
-    public AnimationComponent getAnimator() {
-        return this.animation;
+    public Animator getAnimator() {
+        return this.animationComponent;
     }
 
     @Override

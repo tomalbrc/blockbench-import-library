@@ -50,10 +50,11 @@ public class BbResourcePackGenerator {
         }
 
         GeneratedModel generatedModel = new GeneratedModel(textureMap, elements);
+
         ResourceLocation modelResource = new ResourceLocation(MODEL_DIR + id + "/" + partName + ".json");
         RPUtil.add(modelResource, generatedModel.getBytes());
 
-        return modelResource;
+        return new ResourceLocation("bil:item/" + id + "/" + partName);
     }
 
     public static void makeTextures(BbModel model, Collection<BbTexture> textures) {

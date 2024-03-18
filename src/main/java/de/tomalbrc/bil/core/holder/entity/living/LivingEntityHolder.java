@@ -71,7 +71,7 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
     @Override
     protected void updateLocator(Locator locator) {
         if (locator.requiresUpdate()) {
-            Pose pose = this.animation.findPose(locator);
+            Pose pose = this.animationComponent.findPose(locator);
             if (pose == null) {
                 locator.updateListeners(this, locator.getLastPose());
             } else {
@@ -98,22 +98,22 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
                 bodyRotation.rotateX(Mth.DEG_TO_RAD * Mth.lerp(0.5f, this.parent.xRotO, this.parent.getXRot()));
             }
 
-            display.setLeftRotation(bodyRotation.mul(pose.readOnlyLeftRotation()));
+            display.element().setLeftRotation(bodyRotation.mul(pose.readOnlyLeftRotation()));
         } else {
-            display.setLeftRotation(pose.readOnlyLeftRotation());
+            display.element().setLeftRotation(pose.readOnlyLeftRotation());
         }
 
         if (this.entityScale != 1F) {
             translation.mul(this.entityScale);
-            display.setScale(pose.scale().mul(this.entityScale));
+            display.element().setScale(pose.scale().mul(this.entityScale));
         } else {
-            display.setScale(pose.readOnlyScale());
+            display.element().setScale(pose.readOnlyScale());
         }
 
-        display.setTranslation(translation.sub(0, this.dimensions.height - 0.01f, 0));
-        display.setRightRotation(pose.readOnlyRightRotation());
+        display.element().setTranslation(translation.sub(0, this.dimensions.height - 0.01f, 0));
+        display.element().setRightRotation(pose.readOnlyRightRotation());
 
-        display.startInterpolation();
+        display.element().startInterpolationIfDirty();
     }
 
     @Override

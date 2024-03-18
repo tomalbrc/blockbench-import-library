@@ -1,20 +1,20 @@
 package de.tomalbrc.bil.util;
 
-import de.tomalbrc.bil.core.holder.base.BaseElementHolder;
+import de.tomalbrc.bil.core.holder.base.AbstractElementHolder;
 import net.minecraft.server.level.ChunkMap;
 
 public interface IChunkMap {
-    void resin$scheduleAsyncTick(BaseElementHolder holder);
+    void bil$scheduleAsyncTick(AbstractElementHolder holder);
 
-    void resin$blockUntilAsyncTickFinished();
+    void bil$blockUntilAsyncTickFinished();
 
-    static void scheduleAsyncTick(BaseElementHolder holder) {
+    static void scheduleAsyncTick(AbstractElementHolder holder) {
         IChunkMap chunkMap = (IChunkMap) holder.getLevel().getChunkSource().chunkMap;
-        chunkMap.resin$scheduleAsyncTick(holder);
+        chunkMap.bil$scheduleAsyncTick(holder);
     }
 
     static void blockUntilAsyncTickFinished(ChunkMap map) {
         IChunkMap chunkMap = (IChunkMap) map;
-        chunkMap.resin$blockUntilAsyncTickFinished();
+        chunkMap.bil$blockUntilAsyncTickFinished();
     }
 }

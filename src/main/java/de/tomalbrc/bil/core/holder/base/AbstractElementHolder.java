@@ -17,13 +17,13 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * This class mainly exists to split off ElementHolder logic from the element logic.
  */
-public abstract class BaseElementHolder extends ElementHolder {
+public abstract class AbstractElementHolder extends ElementHolder {
     protected final ServerLevel level;
     private ServerGamePacketListenerImpl[] watchingPlayers;
     private boolean elementsInitialized;
     private boolean isDataLoaded;
 
-    protected BaseElementHolder(ServerLevel level) {
+    protected AbstractElementHolder(ServerLevel level) {
         this.level = level;
         this.watchingPlayers = Utils.EMPTY_CONNECTION_ARRAY;
     }

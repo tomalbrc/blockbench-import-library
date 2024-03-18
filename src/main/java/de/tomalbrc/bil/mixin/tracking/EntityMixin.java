@@ -16,7 +16,7 @@ public class EntityMixin {
     private EntityDimensions dimensions;
 
     @Inject(method = "refreshDimensions", at = @At("RETURN"))
-    private void resin$onRefreshedDimensions(CallbackInfo ci) {
+    private void bil$onRefreshedDimensions(CallbackInfo ci) {
         AnimatedEntityHolder holder = AnimatedEntity.getHolder(this);
         if (holder != null) {
             holder.onDimensionsUpdated(this.dimensions);

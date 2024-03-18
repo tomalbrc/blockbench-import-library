@@ -14,10 +14,10 @@ public class FaceSerializer implements JsonSerializer<BbFace> {
                                  JsonSerializationContext context) {
 
         JsonObject obj = new JsonObject();
-        obj.add("uv", context.serialize(src.uv));
-        if (src.texture != -1)  obj.addProperty("texture", String.format("#%d", src.texture));
+        obj.addProperty("texture", String.format("#%d", src.texture));
         if (src.cullface != null) obj.addProperty("cullface", src.cullface);
-        if (src.tintindex != -1) obj.addProperty("tintindex", src.tintindex);
+        obj.addProperty("tintindex", 0);
+        obj.add("uv", context.serialize(src.uv));
 
         return obj;
     }

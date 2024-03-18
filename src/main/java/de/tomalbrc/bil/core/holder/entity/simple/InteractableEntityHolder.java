@@ -58,16 +58,16 @@ public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends
         Vector3f translation = pose.translation();
         if (this.scale != 1F) {
             translation.mul(this.scale);
-            display.setScale(pose.scale().mul(this.scale));
+            display.element().setScale(pose.scale().mul(this.scale));
         } else {
-            display.setScale(pose.readOnlyScale());
+            display.element().setScale(pose.readOnlyScale());
         }
 
-        display.setTranslation(translation.sub(0, this.dimensions.height - 0.01f, 0));
-        display.setLeftRotation(pose.leftRotation());
-        display.setRightRotation(pose.rightRotation());
+        display.element().setTranslation(translation.sub(0, this.dimensions.height - 0.01f, 0));
+        display.element().setLeftRotation(pose.leftRotation());
+        display.element().setRightRotation(pose.rightRotation());
 
-        display.startInterpolation();
+        display.element().startInterpolation();
     }
 
     @Override

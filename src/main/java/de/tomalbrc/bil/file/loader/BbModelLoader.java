@@ -40,6 +40,47 @@ public class BbModelLoader implements ModelLoader {
         element.to.add(element.inflate, element.inflate, element.inflate);
     }
 
+    private void postProcess(BbModel model) {
+        for (BbElement element: model.elements) {
+            this.rescaleUV(model.resolution, element);
+            this.inflaceElement(element);
+
+            BbOutliner parent = model.getParent(element);
+            element.from.sub(parent.origin);
+            element.to.sub(parent.origin);
+        }
+
+        for (BbOutliner parent: model.modelOutliner()) {
+            Vector3f min = new Vector3f(), max = new Vector3f();
+            // find max for scale (aj compat)
+            for (var childEntry: parent.children) {
+                if (!childEntry.isNode()) {
+                    BbElement element = model.getElement(childEntry.uuid);
+                    min.min(element.from);
+                    max.max(element.to);
+                }
+            }
+
+            for (var childEntry: parent.children) {
+                if (!childEntry.isNode()) {
+                    BbElement element = model.getElement(childEntry.uuid);
+
+                    var diff = min.sub(max, new Vector3f()).absolute();
+                    float m = diff.get(diff.maxComponent());
+                    float scale = Math.min(1.f, 24.f / m);
+
+                    // for animation + default pose later, to allow for larger models
+                    parent.scale = 1.f / scale;
+
+                    element.from.mul(scale).add(8,8,8);
+                    element.to.mul(scale).add(8,8,8);
+
+                    element.origin.sub(parent.origin).mul(scale).add(8,8,8);
+                }
+            }
+        }
+    }
+
     @Override
     public Model load(String name, InputStream input) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
@@ -49,44 +90,7 @@ public class BbModelLoader implements ModelLoader {
                 model.modelIdentifier = name;
             }
 
-            for (BbElement element: model.elements) {
-                this.rescaleUV(model.resolution, element);
-                this.inflaceElement(element);
-
-                BbOutliner parent = model.getParent(element);
-                element.from.sub(parent.origin);
-                element.to.sub(parent.origin);
-            }
-
-            for (BbOutliner parent: model.modelOutliner()) {
-                Vector3f min = new Vector3f(), max = new Vector3f();
-                // find max for scale (aj compat)
-                for (var childEntry: parent.children) {
-                    if (!childEntry.isNode()) {
-                        BbElement element = model.getElement(childEntry.uuid);
-                        min.min(element.from);
-                        max.max(element.to);
-                    }
-                }
-
-                for (var childEntry: parent.children) {
-                    if (!childEntry.isNode()) {
-                        BbElement element = model.getElement(childEntry.uuid);
-
-                        var diff = min.sub(max, new Vector3f()).absolute();
-                        float m = diff.get(diff.maxComponent());
-                        float scale = Math.min(1.f, 24.f / m);
-
-                        // for animation + default pose later, to allow for larger models
-                        parent.scale = 1.f / scale;
-
-                        element.from.mul(scale).add(8,8,8);
-                        element.to.mul(scale).add(8,8,8);
-
-                        element.origin.sub(parent.origin).mul(scale).add(8,8,8);
-                    }
-                }
-            }
+            this.postProcess(model);
 
             Model newModel = new BbModelImporter().importModel(model);
             return newModel;

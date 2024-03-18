@@ -23,7 +23,7 @@ public class ClientboundAnimatePacketMixin {
     private int id;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;I)V", at = @At("RETURN"))
-    private void resin$modifyAnimatePacket(Entity entity, int action, CallbackInfo ci) {
+    private void bil$modifyAnimatePacket(Entity entity, int action, CallbackInfo ci) {
         AnimatedEntityHolder holder = AnimatedEntity.getHolder(entity);
         if (holder != null) {
             this.id = switch (action) {

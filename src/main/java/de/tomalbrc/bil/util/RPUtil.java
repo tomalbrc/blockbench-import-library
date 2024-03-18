@@ -6,9 +6,12 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 public class RPUtil {
-    private static Object2ObjectArrayMap<ResourceLocation, byte[]> data = new Object2ObjectArrayMap<>();
+    private static ConcurrentHashMap<ResourceLocation, byte[]> data = new ConcurrentHashMap<>();
 
     public static byte[] add(ResourceLocation location, byte[] bytes) {
         return data.put(location, bytes);

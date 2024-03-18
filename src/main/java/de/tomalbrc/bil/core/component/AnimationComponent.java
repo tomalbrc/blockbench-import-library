@@ -17,8 +17,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntConsumer;
 
 public class AnimationComponent extends ComponentBase implements Animator {
-    private final Object2ObjectOpenHashMap<String, RunningAnimation> animationMap = new Object2ObjectOpenHashMap<>();
-    private final CopyOnWriteArrayList<RunningAnimation> runningAnimationList = new CopyOnWriteArrayList<>();
+    private final Object2ObjectOpenHashMap<String, AnimationPlayer> animationMap = new Object2ObjectOpenHashMap<>();
+    private final CopyOnWriteArrayList<AnimationPlayer> animationPlayerList = new CopyOnWriteArrayList<>();
 
     public AnimationComponent(Model model, AbstractAnimationHolder holder) {
         super(model, holder);
@@ -26,79 +26,79 @@ public class AnimationComponent extends ComponentBase implements Animator {
 
     @Override
     public void playAnimation(String name, int priority, boolean restartPaused, IntConsumer onFrame, Runnable onFinish) {
-        RunningAnimation runningAnimation = this.animationMap.get(name);
+        AnimationPlayer animationPlayer = this.animationMap.get(name);
         if (priority < 0) {
             priority = 0;
         }
 
-        if (runningAnimation == null) {
-            Animation anim = this.model.animations().get(name);
-            if (anim != null) {
-                this.addAnimation(new RunningAnimation(name, anim, this.holder, priority, onFrame, onFinish));
+        if (animationPlayer == null) {
+            Animation animation = this.model.animations().get(name);
+            if (animation != null) {
+                this.addAnimationPlayer(new AnimationPlayer(name, animation, this.holder, priority, onFrame, onFinish));
             }
         } else {
             // Update values of the existing animation.
-            runningAnimation.onFrameCallback = onFrame;
-            runningAnimation.onFinishCallback = onFinish;
+            animationPlayer.onFrameCallback = onFrame;
+            animationPlayer.onFinishCallback = onFinish;
 
-            if (runningAnimation.state == RunningAnimation.State.PAUSED) {
+            if (animationPlayer.state == AnimationPlayer.State.PAUSED) {
                 if (restartPaused) {
-                    runningAnimation.resetFrameCounter(false);
+                    animationPlayer.resetFrameCounter(false);
                 }
-                runningAnimation.state = RunningAnimation.State.PLAYING;
+                animationPlayer.state = AnimationPlayer.State.PLAYING;
             }
 
-            if (priority != runningAnimation.priority) {
-                runningAnimation.priority = priority;
-                Collections.sort(this.runningAnimationList);
+            if (priority != animationPlayer.priority) {
+                animationPlayer.priority = priority;
+                Collections.sort(this.animationPlayerList);
             }
         }
     }
 
     @Override
     public void setAnimationFrame(String name, int frame) {
-        RunningAnimation runningAnimation = this.animationMap.get(name);
-        if (runningAnimation != null) {
-            runningAnimation.skipToFrame(frame);
+        AnimationPlayer animationPlayer = this.animationMap.get(name);
+        if (animationPlayer != null) {
+            animationPlayer.skipToFrame(frame);
         }
     }
 
     @Override
     public void pauseAnimation(String name) {
-        RunningAnimation runningAnimation = this.animationMap.get(name);
-        if (runningAnimation != null && runningAnimation.state == RunningAnimation.State.PLAYING) {
-            runningAnimation.state = RunningAnimation.State.PAUSED;
+        AnimationPlayer animationPlayer = this.animationMap.get(name);
+        if (animationPlayer != null && animationPlayer.state == AnimationPlayer.State.PLAYING) {
+            animationPlayer.state = AnimationPlayer.State.PAUSED;
         }
     }
 
     @Override
     public void stopAnimation(String name) {
-        RunningAnimation runningAnimation = this.animationMap.remove(name);
-        if (runningAnimation != null) {
-            this.runningAnimationList.remove(runningAnimation);
+        AnimationPlayer animationPlayer = this.animationMap.remove(name);
+        if (animationPlayer != null) {
+            this.animationPlayerList.remove(animationPlayer);
         }
     }
 
-    private void addAnimation(RunningAnimation runningAnimation) {
-        this.animationMap.put(runningAnimation.name, runningAnimation);
+    private void addAnimationPlayer(AnimationPlayer animationPlayer) {
+        this.animationMap.put(animationPlayer.name, animationPlayer);
 
-        if (this.runningAnimationList.size() > 0 && runningAnimation.priority > 0) {
-            int index = Collections.binarySearch(this.runningAnimationList, runningAnimation);
-            this.runningAnimationList.add(index < 0 ? -index - 1 : index, runningAnimation);
+        if (this.animationPlayerList.size() > 0 && animationPlayer.priority > 0) {
+            int index = Collections.binarySearch(this.animationPlayerList, animationPlayer);
+            this.animationPlayerList.add(index < 0 ? -index - 1 : index, animationPlayer);
         } else {
-            this.runningAnimationList.add(runningAnimation);
+            this.animationPlayerList.add(animationPlayer);
         }
     }
 
     public void tickAnimations() {
-        for (int index = this.runningAnimationList.size() - 1; index >= 0; index--) {
-            RunningAnimation runningAnimation = this.runningAnimationList.get(index);
-            if (runningAnimation.hasFinished()) {
-                this.animationMap.remove(runningAnimation.name);
-                this.runningAnimationList.remove(index);
-                runningAnimation.onFinished();
+        for (int index = this.animationPlayerList.size() - 1; index >= 0; index--) {
+            AnimationPlayer animationPlayer = this.animationPlayerList.get(index);
+            if (animationPlayer.hasFinished()) {
+                this.animationMap.remove(animationPlayer.name);
+                this.animationPlayerList.remove(index);
+                animationPlayer.onFinished();
             } else {
-                runningAnimation.tick();
+                animationPlayer.tick();
             }
         }
     }
@@ -108,12 +108,12 @@ public class AnimationComponent extends ComponentBase implements Animator {
         UUID uuid = wrapper.node().uuid();
         Pose pose = null;
 
-        for (RunningAnimation runningAnimation : this.runningAnimationList) {
-            if (this.canAnimationAffect(runningAnimation, uuid)) {
-                if (runningAnimation.inResetState()) {
+        for (AnimationPlayer animationPlayer : this.animationPlayerList) {
+            if (this.canAnimationAffect(animationPlayer, uuid)) {
+                if (animationPlayer.inResetState()) {
                     pose = wrapper.getDefaultPose();
                 } else {
-                    pose = this.findAnimationPose(wrapper, runningAnimation, uuid);
+                    pose = this.findAnimationPose(wrapper, animationPlayer, uuid);
                     if (pose != null) {
                         return pose;
                     }
@@ -128,13 +128,13 @@ public class AnimationComponent extends ComponentBase implements Animator {
         return pose;
     }
 
-    private boolean canAnimationAffect(RunningAnimation anim, UUID uuid) {
+    private boolean canAnimationAffect(AnimationPlayer anim, UUID uuid) {
         final boolean canAnimate = anim.inResetState() || anim.shouldAnimate();
         return canAnimate && anim.animation.isAffected(uuid);
     }
 
     @Nullable
-    private Pose findAnimationPose(AbstractWrapper wrapper, RunningAnimation anim, UUID uuid) {
+    private Pose findAnimationPose(AbstractWrapper wrapper, AnimationPlayer anim, UUID uuid) {
         Animation animation = anim.animation;
         Frame frame = anim.currentFrame;
         if (frame == null) {
@@ -167,7 +167,7 @@ public class AnimationComponent extends ComponentBase implements Animator {
         return null;
     }
 
-    private static class RunningAnimation implements Comparable<RunningAnimation> {
+    private static class AnimationPlayer implements Comparable<AnimationPlayer> {
         @NotNull
         private final Animation animation;
         private final AbstractAnimationHolder holder;
@@ -184,7 +184,7 @@ public class AnimationComponent extends ComponentBase implements Animator {
         @Nullable
         private Runnable onFinishCallback;
 
-        private RunningAnimation(String name, @NotNull Animation animation, AbstractAnimationHolder holder, int priority, @Nullable IntConsumer onFrame, @Nullable Runnable onFinish) {
+        private AnimationPlayer(String name, @NotNull Animation animation, AbstractAnimationHolder holder, int priority, @Nullable IntConsumer onFrame, @Nullable Runnable onFinish) {
             this.name = name;
             this.holder = holder;
             this.animation = animation;
@@ -277,7 +277,7 @@ public class AnimationComponent extends ComponentBase implements Animator {
         }
 
         @Override
-        public int compareTo(@NotNull AnimationComponent.RunningAnimation other) {
+        public int compareTo(@NotNull AnimationPlayer other) {
             return Integer.compare(other.priority, this.priority);
         }
 

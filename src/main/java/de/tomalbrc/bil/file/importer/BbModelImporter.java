@@ -12,6 +12,7 @@ import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
+import it.unimi.dsi.fastutil.floats.Float2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -24,6 +25,7 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -147,7 +149,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             if (entry.getValue().modelData() != null) {
                 Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
                 boolean requiresFrame = false;
-                var nodePath = nodePath(entry.getValue());
+                List<Node> nodePath = nodePath(entry.getValue());
 
                 for (var node : nodePath) {
                     BbAnimator animator = animation.animators.get(node.uuid());
@@ -174,46 +176,39 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return poses;
     }
 
-    static ExecutorService executorService = Executors.newFixedThreadPool(10);
-
     private Object2ObjectOpenHashMap<String, Animation> animations(BbModel model, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         Object2ObjectOpenHashMap<String, Animation> res = new Object2ObjectOpenHashMap<>();
         float step = 0.05f;
 
-        List<CompletableFuture<Void>> futures = new ObjectArrayList<>();
-        for (BbAnimation anim: model.animations) {
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                try {
-                    List<Frame> frames = new ObjectArrayList<>();
-                    int frameCount = Math.round(anim.length / step);
-                    for (int i = 0; i <= frameCount; i++) {
-                        float time = i * step;
+        model.animations.parallelStream().forEach(anim -> {
+            try {
+                List<Frame> frames = new ObjectArrayList<>();
+                int frameCount = Math.round(anim.length / step);
+                for (int i = 0; i <= frameCount; i++) {
+                    float time = i * step;
 
-                        MolangEnvironment env = MolangRuntime.runtime()
-                                .setQuery("life_time", time)
-                                .setQuery("anim_time", time)
-                                .create();
+                    MolangEnvironment env = MolangRuntime.runtime()
+                            .setQuery("life_time", time)
+                            .setQuery("anim_time", time)
+                            .create();
 
-                        // pose for bone in list of frames for an animation
-                        Reference2ObjectOpenHashMap<UUID, Pose> poses = poses(model, anim, nodeMap, env, time);
-                        frames.add(new Frame(time, poses, null, null, null, false));
-                    }
-
-                    int startDelay = 0;
-                    int loopDelay = 0;
-
-                    ReferenceOpenHashSet<UUID> affectedBones = new ReferenceOpenHashSet<>();
-                    Frame[] framesArray = frames.toArray(new Frame[frames.size()]);
-                    Animation animation = new Animation(framesArray, startDelay, loopDelay, frameCount, anim.loop, affectedBones, false);
-
-                    res.put(anim.name, animation);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    // pose for bone in list of frames for an animation
+                    Reference2ObjectOpenHashMap<UUID, Pose> poses = poses(model, anim, nodeMap, env, time);
+                    frames.add(new Frame(time, poses, null, null, null, false));
                 }
-            }, executorService);
-            futures.add(future);
-        }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+                int startDelay = 0;
+                int loopDelay = 0;
+
+                ReferenceOpenHashSet<UUID> affectedBones = new ReferenceOpenHashSet<>();
+                Frame[] framesArray = frames.toArray(new Frame[frames.size()]);
+                Animation animation = new Animation(framesArray, startDelay, loopDelay, frameCount, anim.loop, affectedBones, false);
+
+                res.put(anim.name, animation);
+            } catch (MolangRuntimeException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         return res;
     }
@@ -225,10 +220,10 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
     @Override
     public Model importModel(BbModel model) {
-        Object2ObjectOpenHashMap<UUID, Node> nodeMap = this.nodeMap(model);
-        Reference2ObjectOpenHashMap<UUID, Pose> defaultPose = this.defaultPose(model, nodeMap);
-        Object2ObjectOpenHashMap<String, Animation> animations = this.animations(model, nodeMap);
-        Reference2ObjectOpenHashMap<UUID, Variant> variants = this.variants(model);
+        var nodeMap = this.nodeMap(model);
+        var defaultPose = this.defaultPose(model, nodeMap);
+        var animations = this.animations(model, nodeMap);
+        var variants = this.variants(model);
 
         Model result = new Model(nodeMap, defaultPose, variants, animations, this.size(model));
 

@@ -3,7 +3,8 @@ package de.tomalbrc.bil.file.extra.interpolation;
 import org.joml.Vector3f;
 
 public class LinerInterpolator implements Interpolator {
-    public Vector3f interpolate(float progress, Vector3f[] points) {
-        return points[0].lerp(points[1], progress, new Vector3f());
+    @Override
+    public Vector3f interpolate(float t, Vector3f beforePlus, Vector3f before, Vector3f after, Vector3f afterPlus) {
+        return before.lerp(after, t, new Vector3f());
     }
 }

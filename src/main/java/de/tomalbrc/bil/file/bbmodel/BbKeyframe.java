@@ -3,17 +3,18 @@ package de.tomalbrc.bil.file.bbmodel;
 import com.google.gson.annotations.SerializedName;
 import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
+import de.tomalbrc.bil.file.extra.interpolation.Interpolation;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.MolangExpression;
-import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class BbKeyframe {
+public class BbKeyframe implements Comparable {
     public Channel channel;
     @SerializedName("data_points")
     public List<Map<String, DataPointValue>> dataPoints;
@@ -21,17 +22,26 @@ public class BbKeyframe {
     public UUID uuid;
     public float time;
     public int color;
-    public String interpolation;
+
+    public Interpolation interpolation;
     @SerializedName("bezier_linked")
     public boolean bezierLinked;
     @SerializedName("bezier_left_time")
-    public List<Float> bezierLeftTime;
+    public Vector3f bezierLeftTime;
     @SerializedName("bezier_left_value")
-    public List<Float> bezierLeftValue;
+    public Vector3f bezierLeftValue;
     @SerializedName("bezier_right_time")
-    public List<Float> bezierRightTime;
+    public Vector3f bezierRightTime;
     @SerializedName("bezier_right_value")
-    public List<Float> bezierRightValue;
+    public Vector3f bezierRightValue;
+
+    @Override
+    public int compareTo(@NotNull Object o) {
+        if (o instanceof BbKeyframe other) {
+            return other.time > this.time ? -1 : this.time == other.time ? 0 : 1;
+        }
+        return 0;
+    }
 
     public enum Channel {
         position,

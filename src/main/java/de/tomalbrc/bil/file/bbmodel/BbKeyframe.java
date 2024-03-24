@@ -46,7 +46,11 @@ public class BbKeyframe implements Comparable {
     public enum Channel {
         position,
         rotation,
-        scale
+        scale,
+        timeline, // bbmodel
+        sound, // bbmodel
+        variants, // ajmodel
+        commands // ajmodel
     }
 
     public Vector3f getVector3f(int index, BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
@@ -59,24 +63,28 @@ public class BbKeyframe implements Comparable {
 
     static public class DataPointValue {
         private float value;
-        private String expression;
+        private String stringValue;
         private MolangExpression molangExpression;
 
         public void setValue(float value) {
             this.value = value;
         }
 
-        public void setExpression(String expression) {
-            this.expression = expression;
+        public void setStringValue(String stringValue) {
+            this.stringValue = stringValue;
+        }
+
+        public String getStringValue() {
+            return this.stringValue;
         }
 
         public float getValue(BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
-            if (this.expression == null)
+            if (this.stringValue == null)
                 return this.value;
 
-            if (this.expression.trim().length() <= 2) {
-                this.value = Float.parseFloat(this.expression.trim());
-                this.expression = null;
+            if (this.stringValue.trim().length() <= 2) {
+                this.value = Float.parseFloat(this.stringValue.trim());
+                this.stringValue = null;
                 return this.value;
             }
 
@@ -84,9 +92,9 @@ public class BbKeyframe implements Comparable {
             // would be better to post-process the expressions as string,
             // for the placeholder substitution
             if (this.molangExpression == null) {
-                String modifiedExpression = this.expression;
+                String modifiedExpression = this.stringValue;
                 if (placeholders != null)
-                    modifiedExpression = placeholders.substituteVariables(this.expression);
+                    modifiedExpression = placeholders.substituteVariables(this.stringValue);
 
                 try {
                     this.molangExpression = BIL.COMPILER.compile(modifiedExpression);

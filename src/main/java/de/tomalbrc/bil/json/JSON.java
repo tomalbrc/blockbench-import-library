@@ -14,7 +14,7 @@ import java.util.UUID;
 public class JSON {
     public static final GsonBuilder GENERIC_BUILDER = new GsonBuilder()
             // Reference equality
-            .registerTypeAdapter(UUID.class, new ReferenceUuidDeserializer())
+            .registerTypeAdapter(UUID.class, new CachedUuidDeserializer())
 
             // Custom deserializers
             .registerTypeAdapter(Matrix4f.class, new Matrix4fDeserializer())

@@ -19,9 +19,11 @@ public record Frame(
 
         @Nullable Variant variant,
         @Nullable Commands commands,
-        @Nullable SoundEvent soundEffect,
-        boolean requiresUpdates
+        @Nullable SoundEvent soundEffect
 ) {
+    public boolean requiresUpdates() {
+        return this.variant != null || this.commands != null || this.soundEffect != null;
+    }
 
     public void runEffects(AbstractAnimationHolder holder) {
         CommandDispatcher<CommandSourceStack> dispatcher = holder.getServer().getCommands().getDispatcher();

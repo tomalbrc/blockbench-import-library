@@ -22,6 +22,7 @@ public class BbModelLoader implements ModelLoader {
             .registerTypeAdapter(BbOutliner.ChildEntry.class, new ChildEntryDeserializer())
             .registerTypeAdapter(BbKeyframe.DataPointValue.class, new DataPointValueDeserializer())
             .registerTypeAdapter(BbVariablePlaceholders.class, new BbVariablePlaceholdersDeserializer())
+            .setLenient()
             .create();
 
     private void rescaleUV(Vector2i res, BbElement element) {
@@ -91,7 +92,7 @@ public class BbModelLoader implements ModelLoader {
 
             this.postProcess(model);
 
-            Model newModel = new BbModelImporter().importModel(model);
+            Model newModel = new BbModelImporter(model).importModel();
             return newModel;
         } catch (Throwable throwable) {
             throw new JsonParseException("Failed to parse: " + name, throwable);

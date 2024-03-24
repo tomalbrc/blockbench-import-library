@@ -12,8 +12,15 @@ import java.util.UUID;
 /**
  * The purpose of this deserializer is to reuse matching UUIDs, so that we can use reference equality.
  */
-public class ReferenceUuidDeserializer implements JsonDeserializer<UUID> {
+public class CachedUuidDeserializer implements JsonDeserializer<UUID> {
     private static final Object2ObjectOpenHashMap<String, UUID> UUID_CACHE = new Object2ObjectOpenHashMap<>();
+
+    public static UUID get(String name) {
+        return UUID_CACHE.get(name);
+    }
+    public static UUID put(String name, UUID uuid) {
+        return UUID_CACHE.put(name, uuid);
+    }
 
     @Override
     public UUID deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
@@ -23,7 +30,11 @@ public class ReferenceUuidDeserializer implements JsonDeserializer<UUID> {
             return uuid;
         }
 
-        uuid = UUID.fromString(string);
+        try {
+            uuid = UUID.fromString(string);
+        } catch (IllegalArgumentException exception) {
+            uuid = UUID.randomUUID();
+        }
         UUID_CACHE.put(string, uuid);
         return uuid;
     }

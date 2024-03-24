@@ -21,5 +21,6 @@ public class BbAnimation {
     public String startDelay;
     @SerializedName("loop_delay")
     public String loopDelay;
+
     public Map<UUID, BbAnimator> animators;
 }

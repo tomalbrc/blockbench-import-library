@@ -8,6 +8,7 @@ public class BbAnimator {
     public List<BbKeyframe> keyframes;
 
     public enum Type {
-        bone
+        bone,
+        effect
     }
 }

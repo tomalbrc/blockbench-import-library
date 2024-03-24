@@ -1,9 +1,5 @@
 package de.tomalbrc.bil.file.extra.interpolation;
 
-import de.tomalbrc.bil.file.extra.interpolation.Interpolator;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.util.Mth;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 public class CatmullRomInterpolator implements Interpolator {

@@ -1,7 +1,10 @@
 package de.tomalbrc.bil.file.extra;
 
 import com.google.gson.Gson;
-import de.tomalbrc.bil.file.bbmodel.*;
+import de.tomalbrc.bil.file.bbmodel.BbElement;
+import de.tomalbrc.bil.file.bbmodel.BbFace;
+import de.tomalbrc.bil.file.bbmodel.BbModel;
+import de.tomalbrc.bil.file.bbmodel.BbTexture;
 import de.tomalbrc.bil.json.ElementSerializer;
 import de.tomalbrc.bil.json.FaceSerializer;
 import de.tomalbrc.bil.json.JSON;
@@ -10,7 +13,10 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class BbResourcePackGenerator {
     static Gson gson = JSON.GENERIC_BUILDER

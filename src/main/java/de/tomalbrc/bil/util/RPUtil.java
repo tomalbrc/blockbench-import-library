@@ -1,12 +1,8 @@
 package de.tomalbrc.bil.util;
 
 import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
-import it.unimi.dsi.fastutil.objects.Object2ByteArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 

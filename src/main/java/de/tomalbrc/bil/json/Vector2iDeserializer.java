@@ -2,7 +2,6 @@ package de.tomalbrc.bil.json;
 
 import com.google.gson.*;
 import org.joml.Vector2i;
-import org.joml.Vector3f;
 
 import java.lang.reflect.Type;
 

@@ -1,6 +1,9 @@
 package de.tomalbrc.bil.json;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Type;

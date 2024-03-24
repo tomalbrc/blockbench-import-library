@@ -3,8 +3,6 @@ package de.tomalbrc.bil.core.model;
 import com.mojang.math.MatrixUtil;
 import org.joml.*;
 
-import java.util.UUID;
-
 public record Pose(
         Vector3f translation,
         Vector3f scale,

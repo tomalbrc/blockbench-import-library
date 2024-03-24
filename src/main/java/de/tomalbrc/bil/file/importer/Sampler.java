@@ -2,7 +2,6 @@ package de.tomalbrc.bil.file.importer;
 
 import de.tomalbrc.bil.file.bbmodel.BbKeyframe;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
-import de.tomalbrc.bil.file.extra.interpolation.Interpolation;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import org.apache.commons.lang3.tuple.Triple;

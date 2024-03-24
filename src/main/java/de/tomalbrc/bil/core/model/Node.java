@@ -1,11 +1,9 @@
 package de.tomalbrc.bil.core.model;
 
-import de.tomalbrc.bil.core.holder.wrapper.DisplayWrapper;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.joml.*;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public record Node(

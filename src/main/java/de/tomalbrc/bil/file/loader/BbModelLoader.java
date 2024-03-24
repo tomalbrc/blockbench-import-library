@@ -2,21 +2,20 @@ package de.tomalbrc.bil.file.loader;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 import de.tomalbrc.bil.file.importer.BbModelImporter;
+import de.tomalbrc.bil.json.BbVariablePlaceholdersDeserializer;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
-import de.tomalbrc.bil.core.model.Model;
-import de.tomalbrc.bil.json.BbVariablePlaceholdersDeserializer;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Map;
 
 public class BbModelLoader implements ModelLoader {
     static Gson GSON = JSON.GENERIC_BUILDER

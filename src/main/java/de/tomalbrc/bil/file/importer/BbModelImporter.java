@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class BbModelImporter implements ModelImporter<BbModel> {
     protected final BbModel model;

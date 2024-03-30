@@ -1,6 +1,5 @@
 package de.tomalbrc.bil.file.extra;
 
-import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.file.bbmodel.BbElement;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
 import de.tomalbrc.bil.file.bbmodel.BbOutliner;

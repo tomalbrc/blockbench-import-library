@@ -3,7 +3,6 @@ package de.tomalbrc.bil.file.loader;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
-import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;

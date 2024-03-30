@@ -11,7 +11,6 @@ import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.util.RPUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 

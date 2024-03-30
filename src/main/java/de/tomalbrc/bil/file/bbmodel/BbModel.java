@@ -7,10 +7,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 public class BbModel {
     public BbMeta meta;
 

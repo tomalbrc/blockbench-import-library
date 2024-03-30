@@ -239,17 +239,17 @@ public class AnimationComponent extends ComponentBase implements Animator {
 
         private void onFramesFinished() {
             switch (this.animation.loopMode()) {
-                case once -> {
+                case ONCE -> {
                     if (this.state == State.FINISHED_RESET_DEFAULT) {
                         this.state = State.FINISHED;
                     } else {
                         this.state = State.FINISHED_RESET_DEFAULT;
                     }
                 }
-                case hold -> {
+                case HOLD -> {
                     this.state = State.FINISHED;
                 }
-                case loop -> {
+                case LOOP -> {
                     this.resetFrameCounter(true);
                     this.looped = true;
                 }

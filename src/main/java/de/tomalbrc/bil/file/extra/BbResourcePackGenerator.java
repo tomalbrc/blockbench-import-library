@@ -9,10 +9,13 @@ import de.tomalbrc.bil.json.ElementSerializer;
 import de.tomalbrc.bil.json.FaceSerializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.util.RPUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
@@ -43,16 +46,16 @@ public class BbResourcePackGenerator {
         }
 
         public byte[] getBytes() {
-            return gson.toJson(this).getBytes();
+            return gson.toJson(this).getBytes(StandardCharsets.UTF_8);
         }
     }
 
-    public static ResourceLocation makePart(BbModel model, String partName, List<BbElement> elements, List<BbTexture> textures) {
+    public static ResourceLocation makePart(BbModel model, String partName, List<BbElement> elements, Int2ObjectOpenHashMap<BbTexture> textures) {
         String id = BbResourcePackGenerator.normalizedModelId(model);
 
         Map<String, ResourceLocation> textureMap = new Object2ObjectLinkedOpenHashMap<>();
-        for (BbTexture texture: model.textures) {
-            textureMap.put(texture.id, new ResourceLocation("bil:item/" + id + "/" + texture.name));
+        for (var entry: textures.int2ObjectEntrySet()) {
+            textureMap.put(String.valueOf(entry.getIntKey()), new ResourceLocation("bil:item/" + id + "/" + entry.getValue().name));
         }
 
         GeneratedModel generatedModel = new GeneratedModel(textureMap, elements);
@@ -76,6 +79,6 @@ public class BbResourcePackGenerator {
         String id = model.modelIdentifier != null && !model.modelIdentifier.isEmpty() ? model.modelIdentifier : model.name.trim().replace(" ", "_");
         id = id.trim().replace(" ", "_");
         id = id.replace("-", "_");
-        return id;
+        return id.toLowerCase();
     }
 }

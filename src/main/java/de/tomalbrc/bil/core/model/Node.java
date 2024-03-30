@@ -1,5 +1,6 @@
 package de.tomalbrc.bil.core.model;
 
+import com.google.gson.annotations.SerializedName;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.joml.*;
@@ -17,8 +18,10 @@ public record Node(
         PolymerModelData modelData
 ) {
     public enum NodeType {
-        bone,
-        locator
+        @SerializedName("bone")
+        BONE,
+        @SerializedName("locator")
+        LOCATOR
     }
 
     public static final class Transform {

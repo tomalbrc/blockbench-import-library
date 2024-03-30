@@ -3,8 +3,11 @@ package de.tomalbrc.bil.file.loader;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
+import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.file.bbmodel.*;
+import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
+import de.tomalbrc.bil.file.importer.AjModelImporter;
 import de.tomalbrc.bil.file.importer.BbModelImporter;
 import de.tomalbrc.bil.json.BbVariablePlaceholdersDeserializer;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
@@ -35,35 +38,40 @@ public class BbModelLoader implements ModelLoader {
         }
     }
 
-    private void inflaceElement(BbElement element) {
+    private void inflateElement(BbElement element) {
         element.from.sub(element.inflate, element.inflate, element.inflate);
         element.to.add(element.inflate, element.inflate, element.inflate);
     }
 
     private void postProcess(BbModel model) {
         for (BbElement element: model.elements) {
-            this.rescaleUV(model.resolution, element);
-            this.inflaceElement(element);
+            if (element.type != BbElement.ElementType.CUBE) continue;
 
-            BbOutliner parent = model.getParent(element);
+            this.rescaleUV(model.resolution, element);
+            this.inflateElement(element);
+
+            BbOutliner parent = BbModelUtils.getParent(model, element);
             element.from.sub(parent.origin);
             element.to.sub(parent.origin);
         }
 
-        for (BbOutliner parent: model.modelOutliner()) {
+        for (BbOutliner parent: BbModelUtils.modelOutliner(model)) {
             Vector3f min = new Vector3f(), max = new Vector3f();
-            // find max for scale (aj compat)
+            // find max for scale (aj compatibility)
             for (var childEntry: parent.children) {
                 if (!childEntry.isNode()) {
-                    BbElement element = model.getElement(childEntry.uuid);
-                    min.min(element.from);
-                    max.max(element.to);
+                    BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
+                    if (element.type == BbElement.ElementType.CUBE) {
+                        min.min(element.from);
+                        max.max(element.to);
+                    }
                 }
             }
 
             for (var childEntry: parent.children) {
                 if (!childEntry.isNode()) {
-                    BbElement element = model.getElement(childEntry.uuid);
+                    BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
+                    if (element.type != BbElement.ElementType.CUBE) continue;
 
                     var diff = min.sub(max, new Vector3f()).absolute();
                     float m = diff.get(diff.maxComponent());
@@ -92,7 +100,13 @@ public class BbModelLoader implements ModelLoader {
 
             this.postProcess(model);
 
-            Model newModel = new BbModelImporter(model).importModel();
+            Model newModel = null;
+            if (model.ajMeta != null) {
+                newModel = new AjModelImporter(model).importModel();
+            } else {
+                newModel = new BbModelImporter(model).importModel();
+            }
+
             return newModel;
         } catch (Throwable throwable) {
             throw new JsonParseException("Failed to parse: " + name, throwable);

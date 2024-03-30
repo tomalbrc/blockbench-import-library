@@ -2,6 +2,7 @@ package de.tomalbrc.bil.file.importer;
 
 import de.tomalbrc.bil.core.model.*;
 import de.tomalbrc.bil.file.bbmodel.*;
+import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
@@ -12,6 +13,7 @@ import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +26,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -32,15 +35,17 @@ import org.joml.Vector3fc;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BbModelImporter implements ModelImporter<BbModel> {
-    private final BbModel model;
+    protected final BbModel model;
     public BbModelImporter(BbModel model) {
         this.model = model;
     }
 
-    private Object2ObjectOpenHashMap<UUID, Node> makeNodeMap() {
+    protected Object2ObjectOpenHashMap<UUID, Node> makeNodeMap() {
         Object2ObjectOpenHashMap<UUID, Node> nodeMap = new Object2ObjectOpenHashMap<>();
         ObjectArraySet<BbTexture> textures = new ObjectArraySet<>();
 
@@ -55,7 +60,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
-    void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap, ObjectArraySet<BbTexture> textures) {
+    protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap, ObjectArraySet<BbTexture> textures) {
         for (BbOutliner.ChildEntry x: children) {
             if (x.isNode()) {
                 BbOutliner outliner = x.outliner;
@@ -63,16 +68,9 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
                 if (outliner.hasModel() && outliner.export && !outliner.isHitbox()) {
                     // process model
-                    List<BbElement> elements = new ObjectArrayList<>();
-                    for (BbElement element: model.elements) {
-                        if (outliner.hasUuidChild(element.uuid)) {
-                            elements.add(element);
-                        }
-                    }
+                    List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner);
 
-                    String modelName = outliner.name;
-
-                    ResourceLocation location = BbResourcePackGenerator.makePart(model, modelName, elements, model.textures);
+                    ResourceLocation location = BbResourcePackGenerator.makePart(model, outliner.name.toLowerCase(Locale.US), elements, this.makeDefaultTextureMap());
                     textures.addAll(model.textures);
 
                     modelData = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
@@ -87,7 +85,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = new Node(Node.NodeType.bone, parent, tr, outliner.name, outliner.uuid, this.createBoneDisplay(modelData), modelData);
+                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, this.createBoneDisplay(modelData), modelData);
                 nodeMap.put(outliner.uuid, node);
 
                 // children
@@ -117,14 +115,14 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return element;
     }
 
-    private Quaternionf createQuaternion(Vector3f eulerAngles) {
+    protected Quaternionf createQuaternion(Vector3f eulerAngles) {
         return new Quaternionf()
                 .rotateZ(Mth.DEG_TO_RAD * eulerAngles.z)
                 .rotateY(Mth.DEG_TO_RAD * eulerAngles.y)
                 .rotateX(Mth.DEG_TO_RAD * eulerAngles.x);
     }
 
-    private Reference2ObjectOpenHashMap<UUID, Pose> defaultPose(Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
+    protected Reference2ObjectOpenHashMap<UUID, Pose> defaultPose(Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         Reference2ObjectOpenHashMap<UUID, Pose> res = new Reference2ObjectOpenHashMap<>();
 
         for (var entry: nodeMap.entrySet()) {
@@ -136,12 +134,12 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return res;
     }
 
-    private Reference2ObjectOpenHashMap<UUID, Variant> variants() {
-        Reference2ObjectOpenHashMap<UUID, Variant> res = new Reference2ObjectOpenHashMap<>();
-        return res;
+    @NotNull
+    protected Reference2ObjectOpenHashMap<UUID, Variant> variants() {
+        return new Reference2ObjectOpenHashMap<>();
     }
 
-    private List<Node> nodePath(Node child) {
+    protected List<Node> nodePath(Node child) {
         List<Node> nodePath = new ObjectArrayList<>();
         while (child != null) {
             nodePath.add(0, child);
@@ -150,7 +148,8 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return nodePath;
     }
 
-    private Reference2ObjectOpenHashMap<UUID, Pose> poses(BbAnimation animation, Object2ObjectOpenHashMap<UUID, Node> nodeMap, MolangEnvironment environment, float time) throws MolangRuntimeException {
+    @NotNull
+    protected Reference2ObjectOpenHashMap<UUID, Pose> poses(BbAnimation animation, Object2ObjectOpenHashMap<UUID, Node> nodeMap, MolangEnvironment environment, float time) throws MolangRuntimeException {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
 
         for (var entry: nodeMap.entrySet()) {
@@ -184,40 +183,24 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return poses;
     }
 
-    private Frame.Variant frameVariant(BbAnimation anim, float t) {
-        // Needs custom aj loader to load variant list
-//        UUID effectsUUID = CachedUuidDeserializer.get("effects");
-//        if (effectsUUID != null && anim.animators.containsKey(effectsUUID)) {
-//            BbAnimator animator = anim.animators.get(effectsUUID);
-//            if (animator.type == BbAnimator.Type.effect) {
-//                for (BbKeyframe kf : animator.keyframes) {
-//                    // todo: custom AjModelLoader
-//                    if (Math.abs(kf.time-t) < 0.15f && (kf.channel == BbKeyframe.Channel.variants)) { // todo: snap based on "snapping" in anim
-//                        UUID key = CachedUuidDeserializer.get(kf.dataPoints.get(0).get("variant").getStringValue());
-//                        var cond = kf.dataPoints.get(0).containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.get(0).get("executeCondition").getStringValue()) : null;
-//                        return new Frame.Variant(key, cond);
-//                    }
-//                }
-//            }
-//        }
+    @Nullable
+    protected Frame.Variant frameVariant(BbAnimation anim, float t) {
         return null;
     }
 
-    private Frame.Commands frameCommands(BbAnimation anim, float t) {
+    @Nullable
+    protected Frame.Commands frameCommands(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
-                // "commands" and "executeCondition" and Channel.commands for animatedjava support
-                // todo: custom AjModelLoader
-                float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
-                if (difference == t && (kf.channel == BbKeyframe.Channel.commands || kf.channel == BbKeyframe.Channel.timeline)) {
-                    String key = kf.channel == BbKeyframe.Channel.timeline ? "script" : "commands";
-                    var script = kf.dataPoints.get(0).get(key).getStringValue();
+                float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
+                if (difference == t && kf.channel == BbKeyframe.Channel.timeline) {
+                    String key = "script";
+                    String script = kf.dataPoints.get(0).get(key).getStringValue();
                     if (!script.isEmpty()) {
                         var cmds = CommandParser.parse(kf.dataPoints.get(0).get(key).getStringValue());
-                        var cond = kf.dataPoints.get(0).containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.get(0).get("executeCondition").getStringValue()) : null;
-                        return new Frame.Commands(cmds, cond);
+                        return new Frame.Commands(cmds, null);
                     }
                 }
             }
@@ -225,15 +208,15 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return null;
     }
 
-    private SoundEvent frameSound(BbAnimation anim, float t) {
+    @Nullable
+    protected SoundEvent frameSound(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
-                float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
+                float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound) {
-                    var key = kf.dataPoints.get(0).containsKey("sound") ? "sound" : "effect"; // "sound" for animatedjava models
-                    var event = BuiltInRegistries.SOUND_EVENT.get(new ResourceLocation(kf.dataPoints.get(0).get(key).getStringValue()));
+                    SoundEvent event = BuiltInRegistries.SOUND_EVENT.get(new ResourceLocation(kf.dataPoints.get(0).get("effect").getStringValue()));
                     return event;
                 }
             }
@@ -241,16 +224,24 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return null;
     }
 
+    protected Animation.LoopMode convertLoopMode(BbAnimation.LoopMode loopMode) {
+        return switch (loopMode) {
+            case ONCE -> Animation.LoopMode.ONCE;
+            case HOLD -> Animation.LoopMode.HOLD;
+            case LOOP -> Animation.LoopMode.LOOP;
+        };
+    }
 
-    private Object2ObjectOpenHashMap<String, Animation> animations(Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
+    @NotNull
+    protected Object2ObjectOpenHashMap<String, Animation> animations(Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         Object2ObjectOpenHashMap<String, Animation> res = new Object2ObjectOpenHashMap<>();
         float step = 0.05f;
 
-        model.animations.parallelStream().forEach(anim -> {
+        this.model.animations.parallelStream().forEach(anim -> {
             try {
-                //List<Frame> frames = new ObjectArrayList<>();
                 int frameCount = Math.round(anim.length / step);
                 Frame[] frames = new Frame[frameCount];
+
                 for (int i = 0; i < frameCount; i++) {
                     float time = i * step;
 
@@ -269,7 +260,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 int loopDelay = (int) (anim.loopDelay != null && NumberUtils.isParsable(anim.loopDelay) ? NumberUtils.createFloat(anim.loopDelay).floatValue() : 0);
 
                 ReferenceOpenHashSet<UUID> affectedBones = new ReferenceOpenHashSet<>();
-                Animation animation = new Animation(frames, startDelay, loopDelay, frameCount, anim.loop, affectedBones, false);
+                Animation animation = new Animation(frames, startDelay, loopDelay, frameCount, this.convertLoopMode(anim.loop), affectedBones, false);
 
                 res.put(anim.name, animation);
             } catch (MolangRuntimeException e) {
@@ -280,6 +271,13 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return res;
     }
 
+    protected Int2ObjectOpenHashMap<BbTexture> makeDefaultTextureMap() {
+        Int2ObjectOpenHashMap<BbTexture> textureMap = new Int2ObjectOpenHashMap<>();
+        for (BbTexture e: model.textures) textureMap.put(e.id, e); // gen default textureMap
+        return textureMap;
+    }
+
+    @NotNull
     private Vec2 size() {
         // TODO: read from element or outliner
         return new Vec2(0.5f,1.f);
@@ -293,7 +291,6 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         var variants = this.variants();
 
         Model result = new Model(nodeMap, defaultPose, variants, animations, this.size());
-
         return result;
     }
 }

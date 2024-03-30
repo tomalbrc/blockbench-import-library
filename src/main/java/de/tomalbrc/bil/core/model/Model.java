@@ -6,6 +6,7 @@ import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Intermediate/internal model representation

@@ -8,7 +8,7 @@ import java.util.UUID;
 public class BbAnimation {
     public UUID uuid;
     public String name;
-    public de.tomalbrc.bil.core.model.Animation.LoopMode loop;
+    public LoopMode loop;
     public boolean override;
     public float length;
     public int snapping;
@@ -23,4 +23,13 @@ public class BbAnimation {
     public String loopDelay;
 
     public Map<UUID, BbAnimator> animators;
+
+    public enum LoopMode {
+        @SerializedName("once")
+        ONCE,
+        @SerializedName("hold")
+        HOLD,
+        @SerializedName("loop")
+        LOOP
+    }
 }

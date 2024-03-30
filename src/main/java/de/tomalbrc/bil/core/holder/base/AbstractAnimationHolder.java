@@ -61,14 +61,14 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         for (Node node : this.model.nodeMap().values()) {
             Pose defaultPose = this.model.defaultPose().get(node.uuid());
             switch (node.type()) {
-                case bone -> {
+                case BONE -> {
                     ItemDisplayElement bone = node.display();
                     if (bone != null) {
                         bones.add(Bone.of(bone, node, defaultPose));
                         this.addElement(bone);
                     }
                 }
-                case locator -> {
+                case LOCATOR -> {
                     this.locatorMap.put(node.name(), Locator.of(node, defaultPose));
                 }
             }

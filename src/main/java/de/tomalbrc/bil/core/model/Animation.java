@@ -20,6 +20,8 @@ public record Animation(
     }
 
     public enum LoopMode {
-        once, hold, loop
+        ONCE,
+        HOLD,
+        LOOP
     }
 }

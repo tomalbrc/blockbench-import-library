@@ -9,7 +9,7 @@ public class BbTexture {
     public String name;
     public String folder;
     public String namespace;
-    public String id;
+    public int id;
     public int width;
     public int height;
     @SerializedName("uv_width")

@@ -26,13 +26,4 @@ public interface VariantController {
      * Applies the given variant to the intermediate of the entity.
      */
     void setVariant(UUID variantUuid);
-
-    default boolean isCurrentVariant(String variantName) {
-        Variant current = this.getCurrentVariant();
-        return current != null && current.name().equals(variantName);
-    }
-
-    default boolean isDefaultVariant() {
-        return this.getCurrentVariant() == null;
-    }
 }

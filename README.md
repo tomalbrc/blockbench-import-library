@@ -2,27 +2,30 @@
 
 Library to make importing Blockbench models easy, automatically creates item models and textures and hosts them via polymer autohost
 
-## Features
+## Main Features
 
 - Import Generic Blockbench (bbmodel) or AnimatedJava (ajmodel) files with animations
 - Resourcepack generation (Item model and texture)
 - Supports Molang expressions for animations in keyframes, queries supported at the moment: `q.anim_time` and `q.life_time`
 - Items with CustomModelData are used to display the bones using Item Displays
-- "Virtual" Item Display entities - low performance impact on the server as only packets are sent the clients
+- "Virtual" Item Display entities - low performance impact on the server as only packets are sent to the clients
 - Async updates of Item Display transformations
 - Supports bones larger than javas' 3x3x3 item model size restrictions
 
-#### Support for most various Blockbench features:
-- Locators: Can be used to listen for pose updates on a specific part of the model. These listeners
-  can be used to add extra animated objects to the model, such as particles and other entities.
+#
+#### Support for various Blockbench features:
 - Effect keyframes: Commands can be run and sounds be played using effects
 - Animation loop modes, interpolations, start and loop delays, etc.
 
-#### Extensions for AnimatedJava (todo):
-- Variants: Ability to instantly switch between different models and textures.
+#
+#### Extensions for AnimatedJava:
+- Variants (todo): Ability to instantly switch between different models and textures.
 - Bone blacklists
 - Effect keyframes: Additionally supports variant effects, additionally, effects can be played conditionally
+- Locators: Can be used to listen for pose updates on a specific part of the model. These listeners
+  can be used to add extra animated objects to the model, such as particles and other entities.
 
+#
 #### Out of the box support for many vanilla mob features:
 - Vanilla accurate hitboxes visible in F3+B, using interactions.
 - The ability to ride on top of the mob, without visually lagging behind.
@@ -42,8 +45,6 @@ Library to make importing Blockbench models easy, automatically creates item mod
 - Support for AnimatedJava variants
 - Multiple hitboxes
 - Multiple rider (for entities), currently only 1 is supported
-- Start and loop delays
-
 
 - Particle effects?
 

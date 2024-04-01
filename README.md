@@ -1,4 +1,4 @@
-# bbmodel import library
+# blockbench import library
 
 Library to make importing Blockbench models easy, automatically creates item models and textures and hosts them via polymer autohost
 

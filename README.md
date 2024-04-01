@@ -19,7 +19,7 @@ Library to make importing Blockbench models easy, automatically creates item mod
 
 #
 #### Extensions for AnimatedJava:
-- Variants (todo): Ability to instantly switch between different models and textures.
+- Variants: Ability to instantly switch between different models and textures.
 - Bone blacklists
 - Effect keyframes: Additionally supports variant effects, additionally, effects can be played conditionally
 - Locators: Can be used to listen for pose updates on a specific part of the model. These listeners
@@ -42,7 +42,6 @@ Library to make importing Blockbench models easy, automatically creates item mod
 - Handle pre/post values for keyframes
 - Dynamic Animations for dynamic animation speed, right now all animations are pre-rendered during import
 - Per-player animations; Show animations to only a single player or a group of players. Right now all animations are played globally, visible for all players
-- Support for AnimatedJava variants
 - Multiple hitboxes
 - Multiple rider (for entities), currently only 1 is supported
 
@@ -53,7 +52,6 @@ Library to make importing Blockbench models easy, automatically creates item mod
 Models can be loaded using `BbModelLoader`
 
 It is recommended to store the resulting `Model` in memory, as loading a bbmodel may take some time!
-
 
 
 ![docs/img/org.png](docs/img/org.png)

@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "id": "bil",
   "version": "${version}",
-  "name": "blockbench-import-lib",
+  "name": "blockbench-import-library",
   "description": "",
   "authors": [],
   "contact": {
-    "repo": "https://github.com/tomalbrc/blockbench-import-lib"
+    "repo": "https://github.com/tomalbrc/blockbench-import-library"
   },
   "license": "All-Rights-Reserved",
   "icon": "assets/bil/icon.png",

@@ -71,7 +71,11 @@ public class ModelCommand {
     }
 
     private static int spawnModel(CommandSourceStack source, String path) throws CommandSyntaxException {
-        return spawnModel(source, () -> new BbModelLoader().load(path), path);
+        if (path.startsWith("http") || path.startsWith("https")) {
+
+        }
+
+        return spawnModel(source, () -> new BbModelLoader().loadResource(path), path);
     }
 
     private static int spawnModel(CommandSourceStack source, Supplier<Model> supplier, String path) throws CommandSyntaxException {

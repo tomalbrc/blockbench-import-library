@@ -84,34 +84,13 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, this.createBoneDisplay(modelData), modelData);
+                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelData);
                 nodeMap.put(outliner.uuid, node);
 
                 // children
                 createBones(node, outliner, outliner.children, nodeMap, textures);
             }
         }
-    }
-
-    @Nullable
-    protected ItemDisplayElement createBoneDisplay(PolymerModelData modelData) {
-        if (modelData == null)
-            return null;
-
-        ItemDisplayElement element = new ItemDisplayElement();
-        element.setModelTransformation(ItemDisplayContext.HEAD);
-        element.setInvisible(true);
-        element.setInterpolationDuration(2);
-        element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
-
-        ItemStack itemStack = new ItemStack(modelData.item());
-        itemStack.getOrCreateTag().putInt("CustomModelData", modelData.value());
-        if (modelData.item() instanceof DyeableLeatherItem dyeableItem) {
-            dyeableItem.setColor(itemStack, -1);
-        }
-
-        element.setItem(itemStack);
-        return element;
     }
 
     protected Quaternionf createQuaternion(Vector3f eulerAngles) {
@@ -236,7 +215,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         Object2ObjectOpenHashMap<String, Animation> res = new Object2ObjectOpenHashMap<>();
         float step = 0.05f;
 
-        this.model.animations.parallelStream().forEach(anim -> {
+        if (this.model.animations != null) this.model.animations.parallelStream().forEach(anim -> {
             try {
                 int frameCount = Math.round(anim.length / step);
                 Frame[] frames = new Frame[frameCount];

@@ -10,11 +10,16 @@ import de.tomalbrc.bil.core.holder.wrapper.Locator;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -57,12 +62,33 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         }
     }
 
+    @Nullable
+    protected ItemDisplayElement createBoneDisplay(PolymerModelData modelData) {
+        if (modelData == null)
+            return null;
+
+        ItemDisplayElement element = new ItemDisplayElement();
+        element.setModelTransformation(ItemDisplayContext.HEAD);
+        element.setInvisible(true);
+        element.setInterpolationDuration(2);
+        element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
+
+        ItemStack itemStack = new ItemStack(modelData.item());
+        itemStack.getOrCreateTag().putInt("CustomModelData", modelData.value());
+        if (modelData.item() instanceof DyeableLeatherItem dyeableItem) {
+            dyeableItem.setColor(itemStack, -1);
+        }
+
+        element.setItem(itemStack);
+        return element;
+    }
+
     protected void setupElements(List<Bone> bones) {
         for (Node node : this.model.nodeMap().values()) {
             Pose defaultPose = this.model.defaultPose().get(node.uuid());
             switch (node.type()) {
                 case BONE -> {
-                    ItemDisplayElement bone = node.display();
+                    ItemDisplayElement bone = this.createBoneDisplay(node.modelData());
                     if (bone != null) {
                         bones.add(Bone.of(bone, node, defaultPose));
                         this.addElement(bone);

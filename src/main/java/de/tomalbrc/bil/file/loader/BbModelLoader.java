@@ -12,6 +12,7 @@ import de.tomalbrc.bil.json.BbVariablePlaceholdersDeserializer;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
@@ -42,7 +43,7 @@ public class BbModelLoader implements ModelLoader {
         element.to.add(element.inflate, element.inflate, element.inflate);
     }
 
-    private void postProcess(BbModel model) {
+    protected void postProcess(BbModel model) {
         for (BbElement element: model.elements) {
             if (element.type != BbElement.ElementType.CUBE) continue;
 
@@ -89,36 +90,29 @@ public class BbModelLoader implements ModelLoader {
     }
 
     @Override
-    public Model load(String name, InputStream input) throws JsonParseException {
+    public Model load(InputStream input, @Nullable String name) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
             BbModel model = GSON.fromJson(reader, BbModel.class);
 
-            if (model.modelIdentifier == null) {
+            if (name != null && !name.isEmpty()) {
                 model.modelIdentifier = name;
             }
 
             this.postProcess(model);
 
-            Model newModel = null;
-            if (model.ajMeta != null) {
-                newModel = new AjModelImporter(model).importModel();
-            } else {
-                newModel = new BbModelImporter(model).importModel();
-            }
-
-            return newModel;
+            return new BbModelImporter(model).importModel();
         } catch (Throwable throwable) {
             throw new JsonParseException("Failed to parse: " + name, throwable);
         }
     }
 
-    public Model load(String name) throws IllegalArgumentException, JsonParseException {
-        String path = String.format("/bbmodel/%s.bbmodel", name);
+    public Model loadResource(String name) throws IllegalArgumentException, JsonParseException {
+        String path = String.format("/model/%s.bbmodel", name);
         InputStream input = BbModelLoader.class.getResourceAsStream(path);
         if (input == null) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }
 
-        return this.load(name, input);
+        return this.load(input, name);
     }
 }

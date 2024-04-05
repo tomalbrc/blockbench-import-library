@@ -1,6 +1,6 @@
 plugins {
     id 'fabric-loom' version '1.5-SNAPSHOT'
-    id 'com.github.johnrengelman.shadow' version "7.1.2"
+    id 'com.github.johnrengelman.shadow' version "8.1.1"
     id 'maven-publish'
 }
 
@@ -39,18 +39,21 @@ dependencies {
 
     // Molang
     implementation("gg.moonflower:molang-compiler:${project.molang_compiler_version}")
-    shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}")
+    shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}") {
+        exclude group: "org.ow2.asm", module: "asm-tree"
+    }
 }
 
 shadowJar {
     configurations = [project.configurations.shade]
-    relocate 'gg.moonflower.molangcompiler', 'de.tomalbrc.bil.lib.molangcompiler'
+    archiveClassifier.set("shadow")
 }
 
-artifacts {
-    archives jar
-    archives shadowJar
+remapJar {
+    dependsOn(shadowJar)
+    input.set(shadowJar.archivePath)
 }
+
 
 processResources {
     inputs.property "version", project.version
@@ -82,9 +85,7 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
+
     withSourcesJar()
 }
 
@@ -98,15 +99,18 @@ jar {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                classifier "sources"
+                builtBy remapSourcesJar
+            }
         }
     }
 
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
+        mavenLocal()
     }
 }

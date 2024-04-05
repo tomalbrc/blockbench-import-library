@@ -47,8 +47,8 @@ public class BbKeyframe implements Comparable {
         position,
         rotation,
         scale,
-        timeline, // bbmodel
-        sound, // bbmodel
+        timeline, // model
+        sound, // model
         variants, // ajmodel
         commands // ajmodel
     }

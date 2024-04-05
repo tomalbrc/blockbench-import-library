@@ -11,10 +11,8 @@ public record Node(
         NodeType type,
         Node parent,
         Transform transform,
-
         String name,
         UUID uuid,
-        ItemDisplayElement display,
         PolymerModelData modelData
 ) {
     public enum NodeType {

@@ -133,12 +133,10 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         for (var entry: nodeMap.entrySet()) {
             if (entry.getValue().modelData() != null) {
                 Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
-                boolean requiresFrame = false;
                 List<Node> nodePath = nodePath(entry.getValue());
 
                 for (var node : nodePath) {
                     BbAnimator animator = animation.animators.get(node.uuid());
-                    requiresFrame |= animator != null;
 
                     Vector3fc origin = node.transform().origin();
 
@@ -154,8 +152,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                     matrix4f.scale(triple.getRight());
                 }
 
-                if (requiresFrame)
-                    poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+                poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
             }
         }
         return poses;

@@ -70,6 +70,8 @@ class Sampler {
         }
 
         if (pos == null) pos = new Vector3f();
+        else pos.mul(-1,1,-1);
+
         if (rot == null) rot = new Vector3f();
         if (scale == null) scale = new Vector3f(1, 1, 1);
 

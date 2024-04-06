@@ -26,4 +26,14 @@ public interface VariantController {
      * Applies the given variant to the intermediate of the entity.
      */
     void setVariant(UUID variantUuid);
+
+    /**
+     * Returns true if the current variant is the default variant
+     */
+    boolean isDefaultVariant();
+
+    /**
+     * Returns true is the name of the current variant equals to variantName
+     */
+    boolean isCurrent(String variantName);
 }

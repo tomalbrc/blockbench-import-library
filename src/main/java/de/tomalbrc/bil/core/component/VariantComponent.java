@@ -35,6 +35,16 @@ public class VariantComponent extends ComponentBase implements VariantController
     }
 
     @Override
+    public boolean isDefaultVariant() {
+        return this.currentVariant == null;
+    }
+
+    @Override
+    public boolean isCurrent(String variantName) {
+        return this.currentVariant != null && this.currentVariant.name().equals(variantName);
+    }
+
+    @Override
     public void setVariant(String variantName) {
         if (this.getCurrentVariant() != null && this.getCurrentVariant().name().equals(variantName)) {
             return;

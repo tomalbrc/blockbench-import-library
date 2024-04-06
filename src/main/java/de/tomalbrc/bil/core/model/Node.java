@@ -2,7 +2,6 @@ package de.tomalbrc.bil.core.model;
 
 import com.google.gson.annotations.SerializedName;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.joml.*;
 
 import java.util.UUID;

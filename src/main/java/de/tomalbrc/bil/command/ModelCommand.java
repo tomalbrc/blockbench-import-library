@@ -16,6 +16,7 @@ import de.tomalbrc.bil.api.VariantController;
 import de.tomalbrc.bil.core.extra.ModelEntity;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Variant;
+import de.tomalbrc.bil.file.loader.AjModelLoader;
 import de.tomalbrc.bil.file.loader.BbModelLoader;
 import de.tomalbrc.bil.util.Utils;
 import net.minecraft.commands.CommandSourceStack;
@@ -71,8 +72,9 @@ public class ModelCommand {
     }
 
     private static int spawnModel(CommandSourceStack source, String path) throws CommandSyntaxException {
-        if (path.startsWith("http") || path.startsWith("https")) {
-
+        if (path.endsWith("ajmodel")) {
+            var newPath = path.replace(".ajmodel", "");
+            return spawnModel(source, () -> new AjModelLoader().loadResource(newPath), newPath);
         }
 
         return spawnModel(source, () -> new BbModelLoader().loadResource(path), path);

@@ -6,7 +6,6 @@ import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
-import de.tomalbrc.bil.file.importer.AjModelImporter;
 import de.tomalbrc.bil.file.importer.BbModelImporter;
 import de.tomalbrc.bil.json.BbVariablePlaceholdersDeserializer;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;

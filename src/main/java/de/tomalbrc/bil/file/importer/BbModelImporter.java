@@ -8,8 +8,6 @@ import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
@@ -19,9 +17,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.DyeableLeatherItem;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -133,10 +128,12 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         for (var entry: nodeMap.entrySet()) {
             if (entry.getValue().modelData() != null) {
                 Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
+                boolean requiresFrame = time == 0;
                 List<Node> nodePath = nodePath(entry.getValue());
 
                 for (var node : nodePath) {
                     BbAnimator animator = animation.animators.get(node.uuid());
+                    requiresFrame |= animator != null;
 
                     Vector3fc origin = node.transform().origin();
 
@@ -152,7 +149,8 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                     matrix4f.scale(triple.getRight());
                 }
 
-                poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+                if (requiresFrame)
+                    poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
             }
         }
         return poses;

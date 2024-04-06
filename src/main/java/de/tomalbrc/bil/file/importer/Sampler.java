@@ -35,8 +35,10 @@ class Sampler {
         }
 
         if (before == null) {
-            return null; // Can't interpolate
-        } else if (after == null) {
+            return after != null ?
+                    after.getVector3f(0, placeholders, environment) : null; // Can't interpolate
+        }
+        else if (after == null) {
             return before.getVector3f(0, placeholders, environment);
         }
 

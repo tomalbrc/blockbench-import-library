@@ -1,0 +1,25 @@
+name: gradle-ci
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3.5.2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3.11.0
+        with:
+          distribution: 'adopt'
+          java-version: 17
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+      - name: Build artifacts
+        run: ./gradlew build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: Nylon
+          path: build/libs

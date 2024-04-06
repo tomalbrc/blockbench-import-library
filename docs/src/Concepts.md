@@ -1,6 +1,7 @@
 # Concepts:
 
-I will try to give a short summary of the concepts used in this library;
+I will try to give a short summary of the concepts used in this library;\
+As a TLDR of sorts
 
 ## AnimatedHolder
 

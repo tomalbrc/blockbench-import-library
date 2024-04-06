@@ -11,7 +11,7 @@ Models in mod resources are referenced by identifier, in format `namespace:path`
 
 Add the `.bbmodel` or `.ajmodel` file - the model - to `/resources/model/<namespace>/<path>.json`. 
 This is the file that will be parsed by BIL on the server and a resourcepack will be generated.
-The models will have to be loaded before the world is loaded, otherwise the resourcepack generatio has to be started manually again on order for the models to be available in the resourcepack
+The models will have to be loaded before the world is loaded, otherwise the resourcepack generation has to be started manually again on order for the models to be available in the resourcepack
 
 ## Notes
 - Head bones of mobs should have their names starting with `head`, so BIL can recognize it for head rotations.

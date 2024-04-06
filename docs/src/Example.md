@@ -4,8 +4,8 @@ import ...
 
 public class Snake extends Monster implements AnimatedEntity {
     public static final ResourceLocation ID = Util.id("snake");
-    public static final Model MODEL = AjModelLoader.load(ID);
-    private final EntityHolder<Snake> holder;
+    public static final Model MODEL = AjModelLoader.load(ID); // For .ajmodel files, use AjModelLoader, otherwise BbModelLoader
+    private final EntityHolder<Snake> holder; // use a BIL based ElementHolder subclass specifically for entities 
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
@@ -29,8 +29,8 @@ public class Snake extends Monster implements AnimatedEntity {
         this.moveControl = new MoveControl(this);
         this.jumpControl = new JumpControl(this);
 
-        this.holder = new LivingEntityHolder<>(this, MODEL);
-        EntityAttachment.ofTicking(this.holder, this);
+        this.holder = new LivingEntityHolder<>(this, MODEL); // create a holder for living entities, for head rotations and other features
+        EntityAttachment.ofTicking(this.holder, this); // attach the holder to this entity using a polymer EntityAttachment
     }
 
     @Override
@@ -51,8 +51,8 @@ public class Snake extends Monster implements AnimatedEntity {
         super.tick();
 
         if (this.tickCount % 2 == 0) {
-            AnimationHelper.updateWalkAnimation(this, this.holder);
-            AnimationHelper.updateHurtVariant(this, this.holder);
+            AnimationHelper.updateWalkAnimation(this, this.holder); // util methods, see below
+            AnimationHelper.updateHurtVariant(this, this.holder); // util methods
         }
     }
 
@@ -92,7 +92,7 @@ public class AnimationHelper {
     }
 
     public static void updateHurtVariant(LivingEntity entity, AnimatedHolder holder) {
-        updateHurtColor(entity, holder);
+        updateHurtColor(entity, holder); // if you are using animated java, you could change to a different variant or use a color like we do here 
     }
 
     public static void updateHurtColor(LivingEntity entity, AnimatedHolder holder) {

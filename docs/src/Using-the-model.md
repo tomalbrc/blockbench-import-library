@@ -3,8 +3,8 @@ To load a model file into the actual game, you can use the utility methods in th
 Models required in mods should be retrieved by ID, but it's also possible to load files from the server.\
 Note that these models are **not** cached by BIL. They are safe to reuse and should be cached when possible
 ```java
-public static final Model MODEL_FROM_ID = AjLoader.require(new ResourceLocation("namespace", "path"));
-public static final Model MODEL_FROM_FILEPATH = AjLoader.require("config/models/example.json");
+public static final Model MODEL_FROM_ID = BbModelLoader.load(new ResourceLocation("namespace", "path"));
+public static final Model MODEL_FROM_FILEPATH = BbModelLoader.load("file/path/example.bbmodel");
 ```
 These `Model` objects can be used with BIL's custom implementations of Polymer's ElementHolder.\
 Anything extending `AbstractAnimatedHolder` supports it.
@@ -18,7 +18,7 @@ You just have to implement `AnimatedEntity` and initialize an `EntityHolder` in 
 ```java
 public class RedstoneGolem extends Monster implements AnimatedEntity {
     public static final ResourceLocation ID = new ResourceLocation("bil", "redstone_golem");
-    public static final Model MODEL = BbModelLoader.loadResource(ID);
+    public static final Model MODEL = BbModelImporter.load(ID);
     private final EntityHolder<RedstoneGolem> holder;
 
     public RedstoneGolem(EntityType<? extends Monster> type, Level level) {

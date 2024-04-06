@@ -23,6 +23,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec2;
@@ -72,12 +73,14 @@ public class ModelCommand {
     }
 
     private static int spawnModel(CommandSourceStack source, String path) throws CommandSyntaxException {
+        ResourceLocation resource = new ResourceLocation(path);
         if (path.endsWith("ajmodel")) {
             var newPath = path.replace(".ajmodel", "");
-            return spawnModel(source, () -> new AjModelLoader().loadResource(newPath), newPath);
+            var newResource = new ResourceLocation(newPath);
+            return spawnModel(source, () -> new AjModelLoader().loadResource(newResource), newPath);
         }
 
-        return spawnModel(source, () -> new BbModelLoader().loadResource(path), path);
+        return spawnModel(source, () -> new BbModelLoader().loadResource(resource), path);
     }
 
     private static int spawnModel(CommandSourceStack source, Supplier<Model> supplier, String path) throws CommandSyntaxException {

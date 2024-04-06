@@ -4,10 +4,9 @@ import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
 import de.tomalbrc.bil.file.importer.AjModelImporter;
+import net.minecraft.resources.ResourceLocation;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 
 public class AjModelLoader extends BbModelLoader {
     @Override
@@ -27,13 +26,25 @@ public class AjModelLoader extends BbModelLoader {
         }
     }
     @Override
-    public Model loadResource(String name) throws IllegalArgumentException, JsonParseException {
-        String path = String.format("/model/%s.ajmodel", name);
+    public Model loadResource(ResourceLocation resourceLocation) throws IllegalArgumentException, JsonParseException {
+        String path = String.format("/model/%s/%s.ajmodel", resourceLocation.getNamespace(), resourceLocation.getPath());
         InputStream input = BbModelLoader.class.getResourceAsStream(path);
         if (input == null) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }
 
-        return this.load(input, name);
+        return this.load(input, resourceLocation.getPath());
+    }
+
+    static public Model load(ResourceLocation resourceLocation) {
+        return new AjModelLoader().loadResource(resourceLocation);
+    }
+
+    static public Model load(String path) {
+        try (InputStream input = new FileInputStream(path)) {
+            return new AjModelLoader().load(input, path);
+        } catch (IOException exception) {
+            throw new IllegalArgumentException("Model doesn't exist: " + path);
+        }
     }
 }

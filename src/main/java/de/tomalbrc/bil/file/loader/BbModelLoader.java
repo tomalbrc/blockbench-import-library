@@ -11,13 +11,12 @@ import de.tomalbrc.bil.json.BbVariablePlaceholdersDeserializer;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 
 public class BbModelLoader implements ModelLoader {
     static Gson GSON = JSON.GENERIC_BUILDER
@@ -105,13 +104,26 @@ public class BbModelLoader implements ModelLoader {
         }
     }
 
-    public Model loadResource(String name) throws IllegalArgumentException, JsonParseException {
-        String path = String.format("/model/%s.bbmodel", name);
+    @Override
+    public Model loadResource(ResourceLocation resourceLocation) throws IllegalArgumentException, JsonParseException {
+        String path = String.format("/model/%s/%s.bbmodel", resourceLocation.getNamespace(), resourceLocation.getPath());
         InputStream input = BbModelLoader.class.getResourceAsStream(path);
         if (input == null) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }
 
-        return this.load(input, name);
+        return this.load(input, resourceLocation.getPath());
+    }
+
+    static public Model load(ResourceLocation resourceLocation) {
+        return new BbModelLoader().loadResource(resourceLocation);
+    }
+
+    static public Model load(String path) {
+        try (InputStream input = new FileInputStream(path)) {
+            return new BbModelLoader().load(input, path);
+        } catch (IOException exception) {
+            throw new IllegalArgumentException("Model doesn't exist: " + path);
+        }
     }
 }

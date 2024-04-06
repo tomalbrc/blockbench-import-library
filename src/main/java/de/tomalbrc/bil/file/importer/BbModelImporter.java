@@ -42,10 +42,11 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     protected Object2ObjectOpenHashMap<UUID, Node> makeNodeMap() {
         Object2ObjectOpenHashMap<UUID, Node> nodeMap = new Object2ObjectOpenHashMap<>();
         ObjectArraySet<BbTexture> textures = new ObjectArraySet<>();
+        textures.addAll(model.textures);
 
         for (BbOutliner.ChildEntry entry: model.outliner) {
             if (entry.isNode()) {
-                createBones(null, null, model.outliner, nodeMap, textures);
+                createBones(null, null, model.outliner, nodeMap);
             }
         }
 
@@ -54,7 +55,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
-    protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap, ObjectArraySet<BbTexture> textures) {
+    protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         for (BbOutliner.ChildEntry x: children) {
             if (x.isNode()) {
                 BbOutliner outliner = x.outliner;
@@ -65,7 +66,6 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                     List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner);
 
                     ResourceLocation location = BbResourcePackGenerator.makePart(model, outliner.name.toLowerCase(Locale.US), elements, this.makeDefaultTextureMap());
-                    textures.addAll(model.textures);
 
                     modelData = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
                 }
@@ -83,7 +83,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 nodeMap.put(outliner.uuid, node);
 
                 // children
-                createBones(node, outliner, outliner.children, nodeMap, textures);
+                createBones(node, outliner, outliner.children, nodeMap);
             }
         }
     }

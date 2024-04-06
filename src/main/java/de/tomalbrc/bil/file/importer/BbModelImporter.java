@@ -229,8 +229,8 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 }
 
                 // todo: cleanup!
-                int startDelay = (int) (anim.startDelay != null && NumberUtils.isParsable(anim.startDelay) ? NumberUtils.createFloat(anim.startDelay).floatValue() : 0);
-                int loopDelay = (int) (anim.loopDelay != null && NumberUtils.isParsable(anim.loopDelay) ? NumberUtils.createFloat(anim.loopDelay).floatValue() : 0);
+                int startDelay = (int) (NumberUtils.isParsable(anim.startDelay) ? NumberUtils.createFloat(anim.startDelay) : 0);
+                int loopDelay = (int) (NumberUtils.isParsable(anim.loopDelay) ? NumberUtils.createFloat(anim.loopDelay) : 0);
 
                 ReferenceOpenHashSet<UUID> affectedBones = new ReferenceOpenHashSet<>();
                 Animation animation = new Animation(frames, startDelay, loopDelay, frameCount, this.convertLoopMode(anim.loop), affectedBones, false);
@@ -246,7 +246,11 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
     protected Int2ObjectOpenHashMap<BbTexture> makeDefaultTextureMap() {
         Int2ObjectOpenHashMap<BbTexture> textureMap = new Int2ObjectOpenHashMap<>();
-        for (BbTexture e: model.textures) textureMap.put(e.id, e); // gen default textureMap
+        ObjectArrayList<BbTexture> textures = model.textures;
+        for (int i = 0, texturesSize = textures.size(); i < texturesSize; i++) {
+            BbTexture texture = textures.get(i);
+            textureMap.put(i, texture); // gen default textureMap
+        }
         return textureMap;
     }
 

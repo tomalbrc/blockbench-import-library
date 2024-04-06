@@ -1,6 +1,21 @@
-# blockbench import library
+# bbmodel import library
 
 Library to make importing Blockbench models easy, automatically creates item models and textures and hosts them via polymer autohost
+
+## Setup
+
+
+```
+repositories {
+    maven { url "https://maven.tomalbrc.de" }
+}
+
+dependencies {
+    modImplementation include("de.tomalbrc:blockbench-import-library:[TAG]")
+}
+```
+
+[You can find the documentation here](https://tomalbrc.de/projects/bil/docs)
 
 ## Main Features
 
@@ -58,6 +73,6 @@ It is recommended to store the resulting `Model` in memory, as loading a bbmodel
 
 ---
 
-This project is the continuation / uses code from the [nylon](https://github.com/Provim-Gaming/nylon) library for the animated java 0.4 json exporter
+This project is the continuation of my old project nylon and uses code from the animation engine: [nylon - library for the animated java 0.4 json exporter](https://github.com/Provim-Gaming/nylon)
 
 You can find the original license in LICENSE.nylon

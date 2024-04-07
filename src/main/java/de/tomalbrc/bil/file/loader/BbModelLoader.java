@@ -19,7 +19,7 @@ import org.joml.Vector3f;
 import java.io.*;
 
 public class BbModelLoader implements ModelLoader {
-    static Gson GSON = JSON.GENERIC_BUILDER
+    protected static Gson GSON = JSON.GENERIC_BUILDER
             .registerTypeAdapter(BbOutliner.ChildEntry.class, new ChildEntryDeserializer())
             .registerTypeAdapter(BbKeyframe.DataPointValue.class, new DataPointValueDeserializer())
             .registerTypeAdapter(BbVariablePlaceholders.class, new BbVariablePlaceholdersDeserializer())

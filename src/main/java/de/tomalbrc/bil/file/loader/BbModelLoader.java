@@ -92,9 +92,9 @@ public class BbModelLoader implements ModelLoader {
         try (Reader reader = new InputStreamReader(input)) {
             BbModel model = GSON.fromJson(reader, BbModel.class);
 
-            if (name != null && !name.isEmpty()) {
-                model.modelIdentifier = name;
-            }
+            if (name != null && !name.isEmpty()) model.modelIdentifier = name;
+            if (model.modelIdentifier == null) model.modelIdentifier = model.name;
+            model.modelIdentifier = ModelLoader.normalizedModelId(model.modelIdentifier);
 
             this.postProcess(model);
 

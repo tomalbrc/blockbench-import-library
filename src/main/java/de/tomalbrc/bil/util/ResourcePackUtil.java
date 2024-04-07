@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class RPUtil {
+public class ResourcePackUtil {
     private static ConcurrentHashMap<ResourceLocation, byte[]> data = new ConcurrentHashMap<>();
 
     public static byte[] add(ResourceLocation location, byte[] bytes) {

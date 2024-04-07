@@ -8,13 +8,11 @@ import de.tomalbrc.bil.file.bbmodel.BbTexture;
 import de.tomalbrc.bil.json.ElementSerializer;
 import de.tomalbrc.bil.json.FaceSerializer;
 import de.tomalbrc.bil.json.JSON;
-import de.tomalbrc.bil.util.RPUtil;
+import de.tomalbrc.bil.util.ResourcePackUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
@@ -25,59 +23,24 @@ public class BbResourcePackGenerator {
             .registerTypeAdapter(BbFace.class, new FaceSerializer())
             .registerTypeAdapter(BbElement.class, new ElementSerializer())
             .create();
+
+    static ResourcePackItemModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackItemModel.DisplayTransform(new Vector3f(0,180,0), null, null); // default BIL model transform
+
     static String BASE64_PNG_PREFIX = "data:image/png;base64,";
     static String MODEL_DIR = ":assets/bil/models/item/";
     static String TEXTURE_DIR = ":assets/bil/textures/item/";
 
-    static class GeneratedModel {
-        record Display(DisplayTransform head) {
-            record DisplayTransform(Vector3f rotation){}
-        };
-        private final Map<String, ResourceLocation> textures;
-        private final List<BbElement> elements;
+    public static ResourceLocation addModelPart(BbModel model, String partName, ResourcePackItemModel resourcePackItemModel) {
+        ResourceLocation modelResourceLocation = new ResourceLocation(MODEL_DIR + model.modelIdentifier + "/" + partName + ".json");
+        ResourcePackUtil.add(modelResourceLocation, resourcePackItemModel.getBytes());
 
-        private final Display display;
-
-        GeneratedModel(Map<String, ResourceLocation> textures, List<BbElement> elements) {
-            this.textures = textures;
-            this.elements = elements;
-            this.display = new Display(new Display.DisplayTransform(new Vector3f(0,180,0)));
-        }
-
-        public byte[] getBytes() {
-            return gson.toJson(this).getBytes(StandardCharsets.UTF_8);
-        }
-    }
-
-    public static ResourceLocation makePart(BbModel model, String partName, List<BbElement> elements, Int2ObjectOpenHashMap<BbTexture> textures) {
-        String id = BbResourcePackGenerator.normalizedModelId(model);
-
-        Map<String, ResourceLocation> textureMap = new Object2ObjectLinkedOpenHashMap<>();
-        for (var entry: textures.int2ObjectEntrySet()) {
-            textureMap.put(String.valueOf(entry.getIntKey()), new ResourceLocation("bil:item/" + id + "/" + entry.getValue().name));
-        }
-
-        GeneratedModel generatedModel = new GeneratedModel(textureMap, elements);
-
-        ResourceLocation modelResource = new ResourceLocation(MODEL_DIR + id + "/" + partName + ".json");
-        RPUtil.add(modelResource, generatedModel.getBytes());
-
-        return new ResourceLocation("bil:item/" + id + "/" + partName);
+        return new ResourceLocation("bil:item/" + model.modelIdentifier + "/" + partName);
     }
 
     public static void makeTextures(BbModel model, Collection<BbTexture> textures) {
-        String id = BbResourcePackGenerator.normalizedModelId(model);
-
-        for (BbTexture texture: textures) {
+        for (BbTexture texture : textures) {
             byte[] texData = Base64.getDecoder().decode(texture.source.replace(BASE64_PNG_PREFIX, ""));
-            RPUtil.add(new ResourceLocation(TEXTURE_DIR + id + "/" + texture.name + ".png"), texData);
+            ResourcePackUtil.add(new ResourceLocation(TEXTURE_DIR + model.modelIdentifier + "/" + texture.name + ".png"), texData);
         }
-    }
-
-    static private String normalizedModelId(BbModel model) {
-        String id = model.modelIdentifier != null && !model.modelIdentifier.isEmpty() ? model.modelIdentifier : model.name.trim().replace(" ", "_");
-        id = id.trim().replace(" ", "_");
-        id = id.replace("-", "_");
-        return id.toLowerCase();
     }
 }

@@ -10,4 +10,10 @@ import java.io.InputStream;
 public interface ModelLoader {
     Model load(InputStream input, @Nullable String path) throws JsonParseException;
     Model loadResource(ResourceLocation resourceLocation) throws IllegalArgumentException, JsonParseException;
+
+    static String normalizedModelId(String id) {
+        id = id.trim().replace(" ", "_");
+        id = id.replace("-", "_");
+        return id.toLowerCase();
+    }
 }

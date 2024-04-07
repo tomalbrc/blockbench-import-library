@@ -6,6 +6,7 @@ import de.tomalbrc.bil.file.ajmodel.AjVariant;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
+import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import de.tomalbrc.bil.util.command.ParsedCommand;
@@ -77,7 +78,12 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                             }
                         }
 
-                        ResourceLocation location = BbResourcePackGenerator.makePart(model, String.format("%s_%s", outliner.name.toLowerCase(), variant.name().toLowerCase()), elements, textureMap);
+                        ResourcePackItemModel.Builder builder = new ResourcePackItemModel.Builder(model.modelIdentifier)
+                                .withTextures(textureMap)
+                                .withElements(elements)
+                                .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
+
+                        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.name.toLowerCase(), variant.name().toLowerCase()), builder.build());
                         PolymerModelData modelData = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
                         models.put(outliner.uuid, modelData);
                     }

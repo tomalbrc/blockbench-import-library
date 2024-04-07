@@ -4,6 +4,7 @@ import de.tomalbrc.bil.core.model.*;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
+import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
@@ -30,7 +31,6 @@ import org.joml.Vector3fc;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 public class BbModelImporter implements ModelImporter<BbModel> {
@@ -55,19 +55,26 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
+    protected PolymerModelData generateModel(BbOutliner outliner) {
+        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner);
+
+        ResourcePackItemModel.Builder builder = new ResourcePackItemModel.Builder(model.modelIdentifier)
+                .withTextures(this.makeDefaultTextureMap())
+                .withElements(elements)
+                .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
+
+        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, outliner.name.toLowerCase(), builder.build());
+        return PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
+    }
+
     protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
-        for (BbOutliner.ChildEntry x: children) {
-            if (x.isNode()) {
-                BbOutliner outliner = x.outliner;
+        for (BbOutliner.ChildEntry entry: children) {
+            if (entry.isNode()) {
+                BbOutliner outliner = entry.outliner;
                 PolymerModelData modelData = null;
 
                 if (outliner.hasModel() && outliner.export && !outliner.isHitbox()) {
-                    // process model
-                    List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner);
-
-                    ResourceLocation location = BbResourcePackGenerator.makePart(model, outliner.name.toLowerCase(Locale.US), elements, this.makeDefaultTextureMap());
-
-                    modelData = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
+                    modelData = this.generateModel(outliner);
                 }
 
                 Vector3f localPos = parentOutliner != null ? outliner.origin.sub(parentOutliner.origin, new Vector3f()) : new Vector3f(outliner.origin);

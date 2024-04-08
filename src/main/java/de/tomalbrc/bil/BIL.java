@@ -2,13 +2,11 @@ package de.tomalbrc.bil;
 
 import com.mojang.logging.LogUtils;
 import de.tomalbrc.bil.command.BILCommand;
-import de.tomalbrc.bil.file.loader.BbModelLoader;
 import de.tomalbrc.bil.util.ResourcePackUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import gg.moonflower.molangcompiler.api.MolangCompiler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 
 public class BIL implements ModInitializer {
@@ -23,10 +21,5 @@ public class BIL implements ModInitializer {
         });
 
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(ResourcePackUtil::addAdditional);
-
-        BbModelLoader.load(new ResourceLocation("bil:rana"));
-        BbModelLoader.load(new ResourceLocation("bil:alex"));
-        BbModelLoader.load(new ResourceLocation("bil:fatass"));
-        BbModelLoader.load(new ResourceLocation("bil:dragon"));
     }
 }

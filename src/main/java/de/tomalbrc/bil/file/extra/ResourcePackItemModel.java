@@ -18,12 +18,13 @@ public class ResourcePackItemModel {
 
     public static ResourcePackItemModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackItemModel.DisplayTransform(new Vector3f(0,180,0), null, null); // default BIL model transform
 
+    private final String parent;
     private final Map<String, ResourceLocation> textures;
     private final List<BbElement> elements;
-
     private final Map<String, DisplayTransform> display;
 
-    ResourcePackItemModel(Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
+    ResourcePackItemModel(String parent, Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
+        this.parent = parent;
         this.textures = textures;
         this.elements = elements;
         if (transformMap == null) {
@@ -40,6 +41,9 @@ public class ResourcePackItemModel {
 
     public static class Builder {
         final String modelId;
+
+        String parent = null;
+
         Map<String, ResourceLocation> textureMap = null;
         List<BbElement> elements = null;
 
@@ -47,6 +51,11 @@ public class ResourcePackItemModel {
 
         public Builder(String modelId) {
             this.modelId = modelId;
+        }
+
+        public Builder withParent(String parent) {
+            this.parent = parent;
+            return this;
         }
 
         public Builder withTextures(Int2ObjectOpenHashMap<BbTexture> intTextureMap) {
@@ -71,7 +80,7 @@ public class ResourcePackItemModel {
 
 
         public ResourcePackItemModel build() {
-            return new ResourcePackItemModel(this.textureMap, this.elements, this.transformMap);
+            return new ResourcePackItemModel(this.parent, this.textureMap, this.elements, this.transformMap);
         }
 
     }

@@ -10,7 +10,7 @@ import org.joml.Vector3f;
 import java.util.Iterator;
 import java.util.List;
 
-class Sampler {
+public class Sampler {
     private static Vector3f interpolateKeyframeChannelAt(Iterator<BbKeyframe> iterator, BbVariablePlaceholders placeholders, MolangEnvironment environment, float time) throws MolangRuntimeException {
         // Find the closest keyframes before and after the target time, including those before "before" and after "after"
         BbKeyframe before = null;
@@ -70,8 +70,6 @@ class Sampler {
         }
 
         if (pos == null) pos = new Vector3f();
-        else pos.mul(-1,1,-1);
-
         if (rot == null) rot = new Vector3f();
         if (scale == null) scale = new Vector3f(1, 1, 1);
 

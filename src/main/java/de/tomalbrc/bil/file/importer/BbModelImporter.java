@@ -149,7 +149,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                             Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
                     Quaternionf localRot = node.transform().rotation().mul(createQuaternion(triple.getMiddle().mul(-1, -1, 1)), new Quaternionf());
-                    Vector3f localPos = triple.getLeft().div(16).add(origin);
+                    Vector3f localPos = triple.getLeft().mul(-1,1,1).div(16).add(origin);
 
                     matrix4f.translate(localPos);
                     matrix4f.rotate(localRot);

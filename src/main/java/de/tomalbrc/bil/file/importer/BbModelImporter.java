@@ -150,7 +150,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             List<Node> nodePath = nodePath(entry.getValue());
 
             for (var node : nodePath) {
-                BbAnimator animator = animation.animators.get(node.uuid());
+                BbAnimator animator = animation.animators != null ? animation.animators.get(node.uuid()) : null;
                 requiresFrame |= animator != null;
 
                 Vector3fc origin = node.transform().origin();

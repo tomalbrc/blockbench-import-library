@@ -10,16 +10,11 @@ public class BbOutliner {
     public String name;
     public Vector3f origin = new Vector3f();
     public Vector3f rotation = new Vector3f();
-    public int color;
-    public String nbt;
     public UUID uuid;
     public boolean export;
     @SerializedName("mirror_uv")
     public boolean mirrorUv;
-    @SerializedName("is_open")
-    public boolean isOpen;
-    public boolean locked;
-    public boolean visibility;
+
     public int autouv;
 
     // AnimatedJava compat hack, not part of file format

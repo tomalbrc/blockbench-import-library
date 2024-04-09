@@ -8,7 +8,7 @@
   "contact": {
     "repo": "https://github.com/tomalbrc/blockbench-import-library"
   },
-  "license": "All-Rights-Reserved",
+  "license": "LGPL-3.0-only",
   "icon": "assets/bil/icon.png",
   "environment": "server",
   "entrypoints": {

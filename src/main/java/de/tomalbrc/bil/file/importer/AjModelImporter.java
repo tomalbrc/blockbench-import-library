@@ -66,7 +66,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                     }
 
                     if (!outliner.isHitbox() && affected) {
-                        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner);
+                        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
 
                         Int2ObjectOpenHashMap<BbTexture> textureMap = new Int2ObjectOpenHashMap<>();
                         if (variant.textureMap() == null || variant.textureMap().isEmpty()) {

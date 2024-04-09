@@ -56,7 +56,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     }
 
     protected PolymerModelData generateModel(BbOutliner outliner) {
-        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner);
+        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
 
         ResourcePackItemModel.Builder builder = new ResourcePackItemModel.Builder(model.modelIdentifier)
                 .withTextures(this.makeDefaultTextureMap())
@@ -88,6 +88,18 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
                 Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelData);
                 nodeMap.put(outliner.uuid, node);
+
+                List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
+                for (BbElement locator : locatorElements) {
+                    Vector3f localPos2 = locator.position.sub(outliner.origin, new Vector3f());
+
+                    var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(locator.rotation), 1);
+                    locatorTransform.mul(node.transform());
+
+                    Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, locator.name, locator.uuid, null);
+                    nodeMap.put(locator.uuid, locatorNode);
+                }
+
 
                 // children
                 createBones(node, outliner, outliner.children, nodeMap);
@@ -133,32 +145,30 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
 
         for (var entry: nodeMap.entrySet()) {
-            if (entry.getValue().modelData() != null) {
-                Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
-                boolean requiresFrame = time == 0;
-                List<Node> nodePath = nodePath(entry.getValue());
+            Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
+            boolean requiresFrame = time == 0;
+            List<Node> nodePath = nodePath(entry.getValue());
 
-                for (var node : nodePath) {
-                    BbAnimator animator = animation.animators.get(node.uuid());
-                    requiresFrame |= animator != null;
+            for (var node : nodePath) {
+                BbAnimator animator = animation.animators.get(node.uuid());
+                requiresFrame |= animator != null;
 
-                    Vector3fc origin = node.transform().origin();
+                Vector3fc origin = node.transform().origin();
 
-                    var triple = animator == null ?
-                            Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
-                            Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
+                var triple = animator == null ?
+                        Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
+                        Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
-                    Quaternionf localRot = node.transform().rotation().mul(createQuaternion(triple.getMiddle().mul(-1, -1, 1)), new Quaternionf());
-                    Vector3f localPos = triple.getLeft().mul(-1,1,1).div(16).add(origin);
+                Quaternionf localRot = node.transform().rotation().mul(createQuaternion(triple.getMiddle().mul(-1, -1, 1)), new Quaternionf());
+                Vector3f localPos = triple.getLeft().mul(-1,1,1).div(16).add(origin);
 
-                    matrix4f.translate(localPos);
-                    matrix4f.rotate(localRot);
-                    matrix4f.scale(triple.getRight());
-                }
-
-                if (requiresFrame)
-                    poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+                matrix4f.translate(localPos);
+                matrix4f.rotate(localRot);
+                matrix4f.scale(triple.getRight());
             }
+
+            if (requiresFrame)
+                poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
         }
         return poses;
     }

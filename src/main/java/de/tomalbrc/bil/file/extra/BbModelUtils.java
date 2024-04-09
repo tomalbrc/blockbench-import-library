@@ -77,10 +77,10 @@ public class BbModelUtils {
         return null;
     }
 
-    public static List<BbElement> elementsForOutliner(BbModel model, BbOutliner outliner) {
+    public static List<BbElement> elementsForOutliner(BbModel model, BbOutliner outliner, BbElement.ElementType elementType) {
         List<BbElement> elements = new ObjectArrayList<>();
         for (BbElement element: model.elements) {
-            if (outliner.hasUuidChild(element.uuid) && element.type == BbElement.ElementType.CUBE) {
+            if (outliner.hasUuidChild(element.uuid) && element.type == elementType) {
                 elements.add(element);
             }
         }

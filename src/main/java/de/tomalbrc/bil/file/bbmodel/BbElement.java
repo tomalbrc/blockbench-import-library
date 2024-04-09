@@ -25,6 +25,7 @@ public class BbElement {
     public int color;
     public float inflate;
     public Vector3f origin;
+    public Vector3f position; // used by locators
     public Object2ObjectOpenHashMap<String, BbFace> faces;
     public ElementType type;
     public UUID uuid;

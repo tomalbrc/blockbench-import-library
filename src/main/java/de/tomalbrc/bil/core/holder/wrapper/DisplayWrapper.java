@@ -3,6 +3,8 @@ package de.tomalbrc.bil.core.holder.wrapper;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
+import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
 
 public class DisplayWrapper<T extends DisplayElement> extends AbstractWrapper {
     private final T element;
@@ -24,5 +26,14 @@ public class DisplayWrapper<T extends DisplayElement> extends AbstractWrapper {
 
     public boolean isHead() {
         return this.isHead;
+    }
+
+    public void startInterpolationIfDirty() {
+        SimpleDataTracker simpleDataTracker = (SimpleDataTracker)this.element().getDataTracker();
+        if (simpleDataTracker.getEntry(DisplayTrackedData.TRANSLATION).isDirty() ||
+                simpleDataTracker.getEntry(DisplayTrackedData.LEFT_ROTATION).isDirty() ||
+                simpleDataTracker.getEntry(DisplayTrackedData.SCALE).isDirty() ||
+                simpleDataTracker.getEntry(DisplayTrackedData.RIGHT_ROTATION).isDirty())
+            this.element().startInterpolation();
     }
 }

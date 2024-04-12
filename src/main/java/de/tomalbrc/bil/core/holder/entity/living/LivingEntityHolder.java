@@ -1,5 +1,6 @@
 package de.tomalbrc.bil.core.holder.entity.living;
 
+import com.mojang.math.Axis;
 import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.core.element.CollisionElement;
 import de.tomalbrc.bil.core.holder.entity.EntityHolder;
@@ -60,7 +61,6 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
 
     @Override
     public void updateElement(DisplayWrapper<?> display, @Nullable Pose pose) {
-        display.element().setYaw(this.parent.yBodyRot);
         if (pose == null) {
             this.applyPose(display.getLastPose(), display);
         } else {
@@ -111,9 +111,9 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         }
 
         display.element().setTranslation(translation.sub(0, this.dimensions.height - 0.01f, 0));
-        display.element().setRightRotation(pose.readOnlyRightRotation());
+        display.element().setRightRotation(Axis.YP.rotationDegrees(parent.getYRot()).mul(pose.readOnlyRightRotation()));
 
-        display.element().startInterpolationIfDirty();
+        display.startInterpolationIfDirty();
     }
 
     @Override

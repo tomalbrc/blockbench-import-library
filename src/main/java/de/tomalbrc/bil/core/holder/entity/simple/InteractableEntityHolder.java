@@ -44,7 +44,6 @@ public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends
 
     @Override
     public void updateElement(DisplayWrapper<?> display, @Nullable Pose pose) {
-        display.element().setYaw(this.parent.getYRot());
         display.element().setPitch(this.parent.getXRot());
         if (pose == null) {
             this.applyPose(display.getLastPose(), display);

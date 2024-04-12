@@ -36,7 +36,7 @@ public class LivingEntityHolderWithRideOffset<T extends LivingEntity & AnimatedE
     }
 
     protected float getRideOffset() {
-        return this.parent.getBbHeight() + this.parent.getMyRidingOffset(this.parent);
+        return (float) (this.parent.getBbHeight() + this.parent.getMyRidingOffset());
     }
 
     @Override

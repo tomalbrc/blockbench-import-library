@@ -12,7 +12,6 @@ import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
@@ -71,7 +70,6 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         element.setModelTransformation(ItemDisplayContext.HEAD);
         element.setInvisible(true);
         element.setInterpolationDuration(2);
-        element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
 
         ItemStack itemStack = new ItemStack(modelData.item());
         itemStack.getOrCreateTag().putInt("CustomModelData", modelData.value());
@@ -164,7 +162,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         display.element().setLeftRotation(pose.readOnlyLeftRotation());
         display.element().setRightRotation(pose.readOnlyRightRotation());
 
-        display.element().startInterpolationIfDirty();
+        display.startInterpolationIfDirty();
     }
 
     @Override

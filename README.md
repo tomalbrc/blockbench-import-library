@@ -15,8 +15,6 @@ dependencies {
 }
 ```
 
-[You can find the documentation here](https://tomalbrc.de/projects/bil/docs)
-
 ## Main Features
 
 - Import Generic Blockbench (bbmodel) or AnimatedJava (ajmodel) files with animations
@@ -51,6 +49,24 @@ dependencies {
 - The model won't tick if the entity wasn't ticked, reducing server and network load.
 - Uses the display entities culling boxes to reduce client lag.
 
+## Commands
+
+- `/bil model create id<.ajmodel>|filepath <model>`
+  > Spawns a model ingame based on mob identifier or a file path (from server root folder) to the model json file. These models are not saved and are mostly intended for testing. If you want load an .ajmodel file, make sure to append `.ajmodel` to either the id or file path.
+  
+- `/bil model <targets> animation|variant|scale <args>`
+  > Modifies the model of any entity selected in <targets> that has a custom model. Allows you to temporarily change the scale of the model, update the variant and play / pause / stop animations. This is also mostly intended for testing and playing with the models.
+
+## Usage
+
+Models can be loaded using `BbModelLoader` or `AjModelLoader` classes, they provide static `load` methods for resources and files.
+
+It is recommended to store the resulting `Model` in memory, as loading a bbmodel may take some time!
+
+#### [You can find the documentation here](https://tomalbrc.de/projects/bil/docs)
+
+![docs/img/org.png](docs/img/org.png)
+
 ## Roadmap
 
 ### 1.x
@@ -67,16 +83,7 @@ dependencies {
 - Multiple rider (for entities), currently only 1 is supported
 - Multiple hitboxes (requires the same changes as multiple rider support)
 - Particle effects (?)
-
-## Usage
-
-Models can be loaded using `BbModelLoader`
-
-It is recommended to store the resulting `Model` in memory, as loading a bbmodel may take some time!
-
-
-![docs/img/org.png](docs/img/org.png)
-
+  
 ---
 
 This project is the continuation of my old project nylon and uses code from the animation engine: [nylon - library for the animated java 0.4 json exporter](https://github.com/Provim-Gaming/nylon)

@@ -1,6 +1,8 @@
 ### Welcome to the blockbench-import-library (BIL) wiki!
 
-BIL is a library to help create serverside content with custom models and animations, without requiring client mods.
+Documentation for version 1.1.6 and above.
+
+blockbench-import-library (short BIL) is a library to help create serverside content with custom models and animations, without requiring client mods.
 
 Custom Models and textures will be generated automatically - the resulting resourcepack is hosted through polymer autohost, no need to handle resourcepacks yourself!
 

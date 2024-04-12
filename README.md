@@ -51,16 +51,22 @@ dependencies {
 - The model won't tick if the entity wasn't ticked, reducing server and network load.
 - Uses the display entities culling boxes to reduce client lag.
 
-## Todo
+## Roadmap
 
-- Bezier support for keyframes
+### 1.x
+
+- Bone modifier for more dynamic animations
 - Handle pre/post values for keyframes
+- mcmeta generation for animated textures
+- Bezier support for keyframes
+
+### 2.x
+
 - Dynamic Animations for dynamic animation speed, right now all animations are pre-rendered during import
 - Per-player animations; Show animations to only a single player or a group of players. Right now all animations are played globally, visible for all players
-- Multiple hitboxes
 - Multiple rider (for entities), currently only 1 is supported
-
-- Particle effects?
+- Multiple hitboxes (requires the same changes as multiple rider support)
+- Particle effects (?)
 
 ## Usage
 

@@ -167,7 +167,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 matrix4f.scale(triple.getRight());
             }
 
-            if (requiresFrame)
+            if (requiresFrame||true)
                 poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
         }
         return poses;
@@ -229,7 +229,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
         if (this.model.animations != null) this.model.animations.parallelStream().forEach(anim -> {
             try {
-                int frameCount = Math.round(anim.length / step);
+                int frameCount = Math.round(anim.length / step) + 1;
                 Frame[] frames = new Frame[frameCount];
 
                 for (int i = 0; i < frameCount; i++) {

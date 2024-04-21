@@ -38,9 +38,13 @@ dependencies {
     modRuntimeOnly("eu.pb4:polymer-autohost:${project.polymer_version}")
 
     // Molang
-    implementation("gg.moonflower:molang-compiler:${project.molang_compiler_version}")
-    shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}") {
+    implementation shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}") {
         exclude group: "org.ow2.asm", module: "asm-tree"
+    }
+
+    // Permission API
+    modImplementation shade('me.lucko:fabric-permissions-api:0.2-SNAPSHOT') {
+        exclude group: 'net.fabricmc', module: 'fabric-loader'
     }
 }
 

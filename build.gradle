@@ -42,6 +42,9 @@ dependencies {
     shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}") {
         exclude group: "org.ow2.asm", module: "asm-tree"
     }
+
+    // Permission API
+    modImplementation include('me.lucko:fabric-permissions-api:0.2-SNAPSHOT')
 }
 
 shadowJar {

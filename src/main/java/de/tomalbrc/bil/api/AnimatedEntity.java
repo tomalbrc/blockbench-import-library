@@ -3,6 +3,7 @@ package de.tomalbrc.bil.api;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.pb4.polymer.virtualentity.api.tracker.EntityTrackedData;
+import eu.pb4.polymer.virtualentity.mixin.SlimeEntityAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -27,7 +28,7 @@ public interface AnimatedEntity extends PolymerEntity {
 
     @Override
     default EntityType<?> getPolymerEntityType(ServerPlayer player) {
-        return EntityType.BLOCK_DISPLAY;
+        return EntityType.SLIME;
     }
 
     @Override
@@ -39,6 +40,8 @@ public interface AnimatedEntity extends PolymerEntity {
 
         data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.SHADOW_RADIUS, this.getShadowRadius()));
 
+        data.add(SynchedEntityData.DataValue.create(SlimeEntityAccessor.getSLIME_SIZE(), 0));
+        data.add(SynchedEntityData.DataValue.create(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX)));
         data.add(SynchedEntityData.DataValue.create(EntityTrackedData.SILENT, true));
         data.add(SynchedEntityData.DataValue.create(EntityTrackedData.NO_GRAVITY, true));
         data.add(SynchedEntityData.DataValue.create(EntityTrackedData.NAME_VISIBLE, false));

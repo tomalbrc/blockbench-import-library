@@ -81,37 +81,36 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
     }
 
     @Override
-    protected void applyPose(Pose pose, DisplayWrapper<?> display) {
-        Vector3f translation = pose.translation();
-        boolean isHead = display.isHead();
-        boolean isDead = this.parent.deathTime > 0;
-
-        if (isHead || isDead) {
-            Quaternionf bodyRotation = new Quaternionf();
-            if (isDead) {
-                bodyRotation.rotateZ(-this.deathAngle * Mth.HALF_PI);
-                translation.rotate(bodyRotation);
-            }
-
-            if (isHead) {
-                bodyRotation.rotateY(Mth.DEG_TO_RAD * -Mth.rotLerp(0.5f, this.parent.yHeadRotO - this.parent.yBodyRotO, this.parent.yHeadRot - this.parent.yBodyRot));
-                bodyRotation.rotateX(Mth.DEG_TO_RAD * Mth.lerp(0.5f, this.parent.xRotO, this.parent.getXRot()));
-            }
-
-            display.element().setLeftRotation(bodyRotation.mul(pose.readOnlyLeftRotation()));
-        } else {
-            display.element().setLeftRotation(pose.readOnlyLeftRotation());
+    public void applyPose(Pose pose, DisplayWrapper<?> display) {
+        Quaternionf bodyRotation = Axis.YP.rotationDegrees(-Mth.rotLerp(1.f, this.parent.yBodyRotO, this.parent.yBodyRot));
+        if (this.parent.deathTime > 0) {
+            bodyRotation.mul(Axis.ZP.rotation(-this.deathAngle * Mth.HALF_PI));
         }
 
-        if (this.entityScale != 1F) {
+        Vector3f scale = pose.scale();
+        Vector3f translation = pose.translation().rotate(bodyRotation);
+        if (this.scale != 1.0f) {
+            translation.mul(this.scale);
+            scale.mul(this.scale);
+        }
+        translation.add(0, -this.dimensions.height*0.75f + 0.01f, 0);
+
+        if (display.isHead()) {
+            bodyRotation.mul(Axis.YP.rotation((float) -Math.toRadians(Mth.rotLerp(0.5f, this.parent.yHeadRotO - this.parent.yBodyRotO, this.parent.yHeadRot - this.parent.yBodyRot))));
+            bodyRotation.mul(Axis.XP.rotation((float) Math.toRadians(Mth.rotLerp(0.5f, this.parent.getXRot(), this.parent.xRotO))));
+        }
+
+        if (this.entityScale != 1.f) {
             translation.mul(this.entityScale);
-            display.element().setScale(pose.scale().mul(this.entityScale));
+            display.element().setScale(scale.mul(this.entityScale));
         } else {
-            display.element().setScale(pose.readOnlyScale());
+            display.element().setScale(scale);
         }
 
-        display.element().setTranslation(translation.sub(0, this.dimensions.height - 0.01f, 0));
-        display.element().setRightRotation(Axis.YP.rotationDegrees(parent.getYRot()).mul(pose.readOnlyRightRotation()));
+        // Update data tracker values
+        display.element().setTranslation(translation.mul(this.entityScale));
+        display.element().setRightRotation(bodyRotation.mul(pose.leftRotation()));
+        display.element().setLeftRotation(pose.rightRotation().mul(Axis.YP.rotationDegrees(0.f)));
 
         display.startInterpolationIfDirty();
     }

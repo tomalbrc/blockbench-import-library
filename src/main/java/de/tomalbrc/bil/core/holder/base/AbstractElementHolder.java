@@ -46,7 +46,7 @@ public abstract class AbstractElementHolder extends ElementHolder {
     }
 
     @Override
-    public final boolean startWatching(ServerGamePacketListenerImpl player) {
+    public boolean startWatching(ServerGamePacketListenerImpl player) {
         if (!this.isDataLoaded) {
             this.isDataLoaded = true;
             this.onDataLoaded();

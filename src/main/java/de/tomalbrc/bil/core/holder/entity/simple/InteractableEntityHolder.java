@@ -66,7 +66,7 @@ public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends
         display.element().setLeftRotation(pose.leftRotation());
         display.element().setRightRotation(pose.rightRotation());
 
-        display.element().startInterpolation();
+        display.element().startInterpolationIfDirty();
     }
 
     @Override

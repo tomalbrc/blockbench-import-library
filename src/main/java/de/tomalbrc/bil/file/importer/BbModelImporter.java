@@ -143,7 +143,6 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @NotNull
     protected Reference2ObjectOpenHashMap<UUID, Pose> poses(BbAnimation animation, Object2ObjectOpenHashMap<UUID, Node> nodeMap, MolangEnvironment environment, float time) throws MolangRuntimeException {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
-
         for (var entry: nodeMap.entrySet()) {
             Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
             boolean requiresFrame = time == 0;
@@ -159,7 +158,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                         Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
                         Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
-                Quaternionf localRot = node.transform().rotation().mul(createQuaternion(triple.getMiddle().mul(-1, -1, 1)), new Quaternionf());
+                Quaternionf localRot = createQuaternion(triple.getMiddle().mul(-1, -1, 1)).mul(node.transform().rotation());
                 Vector3f localPos = triple.getLeft().mul(-1,1,1).div(16).add(origin);
 
                 matrix4f.translate(localPos);
@@ -227,7 +226,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         Object2ObjectOpenHashMap<String, Animation> res = new Object2ObjectOpenHashMap<>();
         float step = 0.05f;
 
-        if (this.model.animations != null) this.model.animations.parallelStream().forEach(anim -> {
+        if (this.model.animations != null) this.model.animations.stream().forEach(anim -> {
             try {
                 int frameCount = Math.round(anim.length / step) + 1;
                 Frame[] frames = new Frame[frameCount];

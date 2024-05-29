@@ -117,8 +117,8 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
 
     protected void updateCullingBox() {
         float scale = this.getScale();
-        float width = scale * (this.dimensions.width * 2);
-        float height = scale * (this.dimensions.height + 1);
+        float width = scale * (this.dimensions.width() * 2);
+        float height = scale * (this.dimensions.height() + 1);
 
         for (Bone bone : this.bones) {
             bone.element().setDisplaySize(width, height);

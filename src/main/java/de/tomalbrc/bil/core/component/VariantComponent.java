@@ -29,7 +29,7 @@ public class VariantComponent extends ComponentBase implements VariantController
         if (this.currentVariant != null) {
             this.currentVariant = null;
             for (Bone bone : this.holder.getBones()) {
-                bone.updateModelData(bone.node().modelData().value());
+                bone.updateModelData(bone.node().modelData().asComponent());
             }
         }
     }
@@ -83,7 +83,7 @@ public class VariantComponent extends ComponentBase implements VariantController
             UUID uuid = bone.node().uuid();
             PolymerModelData modelData = variant.models().get(uuid);
             if (modelData != null && variant.isAffected(uuid)) {
-                bone.updateModelData(modelData.value());
+                bone.updateModelData(modelData.asComponent());
             }
         }
     }

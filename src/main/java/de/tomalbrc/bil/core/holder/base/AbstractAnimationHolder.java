@@ -16,12 +16,16 @@ import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.DyedItemColor;
 import org.jetbrains.annotations.Nullable;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 public abstract class AbstractAnimationHolder extends AbstractElementHolder implements AnimatedHolder {
@@ -74,10 +78,8 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
 
         ItemStack itemStack = new ItemStack(modelData.item());
-        itemStack.getOrCreateTag().putInt("CustomModelData", modelData.value());
-        if (modelData.item() instanceof DyeableLeatherItem dyeableItem) {
-            dyeableItem.setColor(itemStack, -1);
-        }
+        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, modelData.asComponent());
+        itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(-1, false));
 
         element.setItem(itemStack);
         return element;

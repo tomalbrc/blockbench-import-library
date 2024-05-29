@@ -4,7 +4,10 @@ import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.DyedItemColor;
 
 public class Bone extends DisplayWrapper<ItemDisplayElement> {
     private final ItemStack item;
@@ -37,15 +40,15 @@ public class Bone extends DisplayWrapper<ItemDisplayElement> {
     }
 
     public void updateColor(int color) {
-        this.item.getOrCreateTagElement("display").putInt("color", color);
+        this.item.set(DataComponents.DYED_COLOR, new DyedItemColor(color, false));
 
         if (!this.invisible) {
             this.setTrackedItem(this.item);
         }
     }
 
-    public void updateModelData(int customModelData) {
-        this.item.getOrCreateTag().putInt("CustomModelData", customModelData);
+    public void updateModelData(CustomModelData customModelData) {
+        this.item.set(DataComponents.CUSTOM_MODEL_DATA, customModelData);
 
         if (!this.invisible) {
             this.setTrackedItem(this.item);

@@ -52,6 +52,7 @@ dependencies {
 shadowJar {
     configurations = [project.configurations.shade]
     exclude('META-INF/**')
+    exclude('net/**')
     archiveClassifier.set("shadow")
 }
 

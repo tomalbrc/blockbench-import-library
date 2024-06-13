@@ -19,6 +19,7 @@ repositories {
     maven { url 'https://maven.draylar.dev/releases' }
     maven { url 'https://maven.nucleoid.xyz' }
     maven { url 'https://maven.blamejared.com' }
+    mavenCentral()
     mavenLocal()
 }
 
@@ -43,13 +44,14 @@ dependencies {
     }
 
     // Permission API
-    modImplementation shade('me.lucko:fabric-permissions-api:0.2-SNAPSHOT') {
-        exclude group: 'net.fabricmc', module: 'fabric-loader'
+    modImplementation shade('me.lucko:fabric-permissions-api:0.3.1') {
+        exclude group: "net.fabricmc", module: "fabric-loader"
     }
 }
 
 shadowJar {
     configurations = [project.configurations.shade]
+    exclude('META-INF/**')
     archiveClassifier.set("shadow")
 }
 

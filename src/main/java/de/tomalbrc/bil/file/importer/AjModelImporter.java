@@ -21,7 +21,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -52,18 +51,13 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                     continue;
 
                 // generate more models
-                @Nullable
                 var affectedBones = this.affectedBones(variant);
 
-                @NotNull
                 Reference2ObjectOpenHashMap<UUID, PolymerModelData> models = new Reference2ObjectOpenHashMap<>();
 
                 for (BbOutliner outliner : BbModelUtils.modelOutliner(model)) {
-                    boolean affected = true;
-                    if (affectedBones != null) {
-                        affected = affectedBones.contains(outliner.uuid) && variant.affectedBonesIsAWhitelist() ||
-                                !variant.affectedBonesIsAWhitelist() && !affectedBones.contains(outliner.uuid);
-                    }
+                    boolean affected = affectedBones.contains(outliner.uuid) && variant.affectedBonesIsAWhitelist() ||
+                            !variant.affectedBonesIsAWhitelist() && !affectedBones.contains(outliner.uuid);
 
                     if (!outliner.isHitbox() && affected) {
                         List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
@@ -93,7 +87,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             }
             return res;
         }
-        return null;
+        return new Reference2ObjectOpenHashMap<>();
     }
 
     @Override
@@ -144,6 +138,10 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound && kf.dataPoints.get(0).containsKey("sound")) {
                     SoundEvent event = BuiltInRegistries.SOUND_EVENT.get(new ResourceLocation(kf.dataPoints.get(0).get("sound").getStringValue()));
                     return event;
+                }
+                else {
+                    // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key
+                    super.frameSound(anim, t);
                 }
             }
         }

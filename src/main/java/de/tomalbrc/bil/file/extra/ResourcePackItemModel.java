@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.file.extra;
 
 import de.tomalbrc.bil.file.bbmodel.BbElement;
+import de.tomalbrc.bil.file.bbmodel.BbFace;
 import de.tomalbrc.bil.file.bbmodel.BbTexture;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -80,7 +81,14 @@ public class ResourcePackItemModel {
 
 
         public ResourcePackItemModel build() {
-            return new ResourcePackItemModel(this.parent, this.textureMap, this.elements, this.transformMap);
+            Map<String, ResourceLocation> optimizedTextureMap = new Object2ObjectLinkedOpenHashMap<>();
+            for (BbElement element : this.elements) {
+                for (Map.Entry<String, BbFace> stringBbFaceEntry : element.faces.entrySet()) {
+                    String n = String.valueOf(stringBbFaceEntry.getValue().texture);
+                    optimizedTextureMap.put(n, this.textureMap.get(n));
+                }
+            }
+            return new ResourcePackItemModel(this.parent, optimizedTextureMap, this.elements, this.transformMap);
         }
 
     }

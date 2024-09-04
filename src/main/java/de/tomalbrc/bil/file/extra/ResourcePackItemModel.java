@@ -82,7 +82,7 @@ public class ResourcePackItemModel {
 
         public ResourcePackItemModel build() {
             Map<String, ResourceLocation> optimizedTextureMap = new Object2ObjectLinkedOpenHashMap<>();
-            for (BbElement element : this.elements) {
+            if (this.elements != null) for (BbElement element : this.elements) {
                 for (Map.Entry<String, BbFace> stringBbFaceEntry : element.faces.entrySet()) {
                     String n = String.valueOf(stringBbFaceEntry.getValue().texture);
                     optimizedTextureMap.put(n, this.textureMap.get(n));

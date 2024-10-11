@@ -12,6 +12,6 @@ import java.lang.reflect.Type;
 public record RegistryDeserializer<T>(Registry<T> registry) implements JsonDeserializer<T> {
     @Override
     public T deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
-        return this.registry.get(ResourceLocation.parse(element.getAsString()));
+        return this.registry.get(ResourceLocation.parse(element.getAsString())).orElseThrow().value();
     }
 }

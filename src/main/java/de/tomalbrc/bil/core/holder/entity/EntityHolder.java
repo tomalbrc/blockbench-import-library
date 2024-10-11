@@ -69,7 +69,7 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
         IntList passengers = new IntArrayList();
         this.addDirectPassengers(passengers);
 
-        if (passengers.size() > 0) {
+        if (!passengers.isEmpty()) {
             consumer.accept(VirtualEntityUtils.createRidePacket(this.parent.getId(), passengers));
         }
     }
@@ -100,7 +100,7 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
 
     @Override
     public CommandSourceStack createCommandSourceStack() {
-        return this.parent.createCommandSourceStack();
+        return this.parent.createCommandSourceStackForNameResolution(this.level);
     }
 
     @Override

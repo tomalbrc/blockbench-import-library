@@ -10,13 +10,13 @@ import de.tomalbrc.bil.core.holder.wrapper.Locator;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -67,7 +67,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
     }
 
     @Nullable
-    protected ItemDisplayElement createBoneDisplay(PolymerModelData modelData) {
+    protected ItemDisplayElement createBoneDisplay(ResourceLocation modelData) {
         if (modelData == null)
             return null;
 
@@ -77,8 +77,8 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         element.setInterpolationDuration(2);
         element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
 
-        ItemStack itemStack = new ItemStack(modelData.item());
-        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, modelData.asComponent());
+        ItemStack itemStack = new ItemStack(Items.LEATHER_HORSE_ARMOR);
+        itemStack.set(DataComponents.ITEM_MODEL, modelData);
         itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(-1, false));
 
         element.setItem(itemStack);

@@ -7,8 +7,6 @@ import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
 import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
@@ -18,7 +16,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Triple;
@@ -55,7 +52,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
-    protected PolymerModelData generateModel(BbOutliner outliner) {
+    protected ResourceLocation getModelPath(BbOutliner outliner) {
         List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
 
         ResourcePackItemModel.Builder builder = new ResourcePackItemModel.Builder(model.modelIdentifier)
@@ -63,18 +60,17 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 .withElements(elements)
                 .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
-        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, outliner.name.toLowerCase(), builder.build());
-        return PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
+        return BbResourcePackGenerator.addModelPart(model, outliner.name.toLowerCase(), builder.build());
     }
 
     protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         for (BbOutliner.ChildEntry entry: children) {
             if (entry.isNode()) {
                 BbOutliner outliner = entry.outliner;
-                PolymerModelData modelData = null;
+                ResourceLocation modelData = null;
 
                 if (outliner.hasModel() && outliner.export && !outliner.isHitbox()) {
-                    modelData = this.generateModel(outliner);
+                    modelData = this.getModelPath(outliner);
                 }
 
                 Vector3f localPos = parentOutliner != null ? outliner.origin.sub(parentOutliner.origin, new Vector3f()) : new Vector3f(outliner.origin);

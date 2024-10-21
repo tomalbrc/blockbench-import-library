@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.core.model;
 
 import com.google.gson.annotations.SerializedName;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.*;
 
 import java.util.UUID;
@@ -12,7 +12,7 @@ public record Node(
         Transform transform,
         String name,
         UUID uuid,
-        PolymerModelData modelData
+        ResourceLocation modelData
 ) {
     public enum NodeType {
         @SerializedName("bone")

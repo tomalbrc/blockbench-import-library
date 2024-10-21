@@ -10,7 +10,6 @@ import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import de.tomalbrc.bil.util.command.ParsedCommand;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -53,7 +52,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                 // generate more models
                 var affectedBones = this.affectedBones(variant);
 
-                Reference2ObjectOpenHashMap<UUID, PolymerModelData> models = new Reference2ObjectOpenHashMap<>();
+                Reference2ObjectOpenHashMap<UUID, ResourceLocation> models = new Reference2ObjectOpenHashMap<>();
 
                 for (BbOutliner outliner : BbModelUtils.modelOutliner(model)) {
                     boolean affected = affectedBones.contains(outliner.uuid) && variant.affectedBonesIsAWhitelist() ||
@@ -78,8 +77,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                                 .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
                         ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.name.toLowerCase(), variant.name().toLowerCase()), builder.build());
-                        PolymerModelData modelData = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
-                        models.put(outliner.uuid, modelData);
+                        models.put(outliner.uuid, location);
                     }
                 }
 

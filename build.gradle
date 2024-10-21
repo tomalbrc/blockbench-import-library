@@ -16,11 +16,11 @@ configurations {
 }
 
 repositories {
-    maven { url 'https://maven.draylar.dev/releases' }
+    mavenLocal()
     maven { url 'https://maven.nucleoid.xyz' }
     maven { url 'https://maven.blamejared.com' }
+    maven { url 'https://maven.draylar.dev/releases' }
     mavenCentral()
-    mavenLocal()
 }
 
 dependencies {

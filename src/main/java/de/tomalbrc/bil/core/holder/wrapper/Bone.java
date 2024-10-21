@@ -5,6 +5,7 @@ import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.DyedItemColor;
@@ -47,8 +48,8 @@ public class Bone extends DisplayWrapper<ItemDisplayElement> {
         }
     }
 
-    public void updateModelData(CustomModelData customModelData) {
-        this.item.set(DataComponents.CUSTOM_MODEL_DATA, customModelData);
+    public void updateModelData(ResourceLocation model) {
+        this.item.set(DataComponents.ITEM_MODEL, model);
 
         if (!this.invisible) {
             this.setTrackedItem(this.item);

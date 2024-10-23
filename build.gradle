@@ -17,10 +17,10 @@ configurations {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven { url 'https://maven.nucleoid.xyz' }
     maven { url 'https://maven.blamejared.com' }
     maven { url 'https://maven.draylar.dev/releases' }
-    mavenCentral()
 }
 
 dependencies {
@@ -44,7 +44,7 @@ dependencies {
     }
 
     // Permission API
-    modImplementation shade('me.lucko:fabric-permissions-api:0.3.1') {
+    modImplementation shade('me.lucko:fabric-permissions-api:0.3.2-SNAPSHOT') {
         exclude group: "net.fabricmc", module: "fabric-loader"
     }
 }

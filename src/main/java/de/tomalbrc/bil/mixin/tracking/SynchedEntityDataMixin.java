@@ -3,6 +3,7 @@ package de.tomalbrc.bil.mixin.tracking;
 import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SyncedDataHolder;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
@@ -16,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class SynchedEntityDataMixin {
     @Shadow
     @Final
-    private Entity entity;
+    private SyncedDataHolder entity;
 
     @Inject(
             method = "set(Lnet/minecraft/network/syncher/EntityDataAccessor;Ljava/lang/Object;Z)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;onSyncedDataUpdated(Lnet/minecraft/network/syncher/EntityDataAccessor;)V",
+                    target = "Lnet/minecraft/network/syncher/SyncedDataHolder;onSyncedDataUpdated(Lnet/minecraft/network/syncher/EntityDataAccessor;)V",
                     shift = At.Shift.AFTER
             )
     )

@@ -13,6 +13,7 @@ import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.tracker.EntityTrackedData;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -43,9 +45,11 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         super(parent, model);
 
         this.hitboxInteraction = InteractionElement.redirect(parent);
+        this.hitboxInteraction.setSendPositionUpdates(false);
         this.addElement(this.hitboxInteraction);
 
         this.collisionElement = CollisionElement.createWithRedirect(parent);
+        this.collisionElement.setSendPositionUpdates(false);
         this.addElement(this.collisionElement);
     }
 
@@ -110,7 +114,7 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
             display.element().setScale(pose.readOnlyScale());
         }
 
-        display.element().setTranslation(translation.sub(0, this.dimensions.height - 0.01f, 0));
+        display.element().setTranslation(translation.sub(0, this.dimensions.height() - 0.01f, 0));
         display.element().setRightRotation(pose.readOnlyRightRotation());
 
         display.element().startInterpolationIfDirty();
@@ -121,11 +125,11 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         super.startWatchingExtraPackets(player, consumer);
 
         for (var packet : Utils.updateClientInteraction(this.hitboxInteraction, this.dimensions)) {
-            consumer.accept(packet);
+            consumer.accept((Packet<ClientGamePacketListener>) packet);
         }
 
         if (this.parent.canBreatheUnderwater()) {
-            consumer.accept(new ClientboundUpdateMobEffectPacket(this.collisionElement.getEntityId(), new MobEffectInstance(MobEffects.WATER_BREATHING, -1, 0, false, false)));
+            consumer.accept(new ClientboundUpdateMobEffectPacket(this.collisionElement.getEntityId(), new MobEffectInstance(MobEffects.WATER_BREATHING, -1, 0, false, false), false));
         }
 
         consumer.accept(new ClientboundSetPassengersPacket(this.parent));
@@ -166,8 +170,8 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
     @Override
     protected void updateCullingBox() {
         float scale = this.getScale();
-        float width = scale * (this.dimensions.width * 2);
-        float height = -this.dimensions.height - 1;
+        float width = scale * (this.dimensions.width() * 2);
+        float height = -this.dimensions.height() - 1;
 
         for (Bone bone : this.bones) {
             bone.element().setDisplaySize(width, height);
@@ -179,15 +183,15 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         this.updateEntityScale(this.scale);
         super.onDimensionsUpdated(dimensions);
 
-        this.collisionElement.setSize(Utils.toSlimeSize(Math.min(dimensions.width, dimensions.height)));
+        this.collisionElement.setSize(Utils.toSlimeSize(Math.min(dimensions.width(), dimensions.height())));
         this.sendPacket(new ClientboundBundlePacket(Utils.updateClientInteraction(this.hitboxInteraction, dimensions)));
     }
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key, Object object) {
         super.onSyncedDataUpdated(key, object);
-        if (key.equals(Constants.DATA_EFFECT_COLOR)) {
-            this.collisionElement.getDataTracker().set(Constants.DATA_EFFECT_COLOR, (int) object);
+        if (key.equals(Constants.DATA_EFFECT_PARTICLES)) {
+            this.collisionElement.getDataTracker().set(Constants.DATA_EFFECT_PARTICLES, (List<ParticleOptions>)object);
         }
 
         if (key.equals(EntityTrackedData.NAME_VISIBLE)) {

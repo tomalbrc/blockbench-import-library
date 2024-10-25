@@ -25,16 +25,16 @@ public class BbResourcePackGenerator {
     static String TEXTURE_DIR = ":assets/bil/textures/item/";
 
     public static ResourceLocation addModelPart(BbModel model, String partName, ResourcePackItemModel resourcePackItemModel) {
-        ResourceLocation modelResourceLocation = new ResourceLocation(MODEL_DIR + model.modelIdentifier + "/" + partName + ".json");
+        ResourceLocation modelResourceLocation = ResourceLocation.parse(MODEL_DIR + model.modelIdentifier + "/" + partName + ".json");
         ResourcePackUtil.add(modelResourceLocation, resourcePackItemModel.getBytes());
 
-        return new ResourceLocation("bil:item/" + model.modelIdentifier + "/" + partName);
+        return ResourceLocation.fromNamespaceAndPath("bil", model.modelIdentifier + "/" + partName);
     }
 
     public static void makeTextures(BbModel model, Collection<BbTexture> textures) {
         for (BbTexture texture : textures) {
             byte[] texData = Base64.getDecoder().decode(texture.source.replace(BASE64_PNG_PREFIX, ""));
-            ResourcePackUtil.add(new ResourceLocation(TEXTURE_DIR + model.modelIdentifier + "/" + texture.name + ".png"), texData);
+            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + texture.name + ".png"), texData);
         }
     }
 }

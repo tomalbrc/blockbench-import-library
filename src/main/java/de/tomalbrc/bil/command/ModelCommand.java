@@ -73,10 +73,10 @@ public class ModelCommand {
     }
 
     private static int spawnModel(CommandSourceStack source, String path) throws CommandSyntaxException {
-        ResourceLocation resource = new ResourceLocation(path);
+        ResourceLocation resource = ResourceLocation.parse(path);
         if (path.endsWith("ajmodel")) {
             var newPath = path.replace(".ajmodel", "");
-            var newResource = new ResourceLocation(newPath);
+            var newResource = ResourceLocation.parse(newPath);
             return spawnModel(source, () -> new AjModelLoader().loadResource(newResource), newPath);
         }
 

@@ -7,8 +7,6 @@ import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
 import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
@@ -18,7 +16,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Triple;
@@ -55,7 +52,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
-    protected PolymerModelData generateModel(BbOutliner outliner) {
+    protected ResourceLocation getModelPath(BbOutliner outliner) {
         List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
 
         ResourcePackItemModel.Builder builder = new ResourcePackItemModel.Builder(model.modelIdentifier)
@@ -63,18 +60,17 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 .withElements(elements)
                 .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
-        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, outliner.name.toLowerCase(), builder.build());
-        return PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
+        return BbResourcePackGenerator.addModelPart(model, outliner.name.toLowerCase(), builder.build());
     }
 
     protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         for (BbOutliner.ChildEntry entry: children) {
             if (entry.isNode()) {
                 BbOutliner outliner = entry.outliner;
-                PolymerModelData modelData = null;
+                ResourceLocation modelData = null;
 
                 if (outliner.hasModel() && outliner.export && !outliner.isHitbox()) {
-                    modelData = this.generateModel(outliner);
+                    modelData = this.getModelPath(outliner);
                 }
 
                 Vector3f localPos = parentOutliner != null ? outliner.origin.sub(parentOutliner.origin, new Vector3f()) : new Vector3f(outliner.origin);
@@ -145,12 +141,12 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
         for (var entry: nodeMap.entrySet()) {
             Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
-            boolean requiresFrame = time == 0;
+            //boolean requiresFrame = time == 0;
             List<Node> nodePath = nodePath(entry.getValue());
 
             for (var node : nodePath) {
                 BbAnimator animator = animation.animators != null ? animation.animators.get(node.uuid()) : null;
-                requiresFrame |= animator != null;
+                //requiresFrame |= animator != null;
 
                 Vector3fc origin = node.transform().origin();
 
@@ -166,8 +162,8 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 matrix4f.scale(triple.getRight());
             }
 
-            if (requiresFrame||true)
-                poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+            // TODO: check if frame is required?
+            poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
         }
         return poses;
     }
@@ -205,8 +201,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound) {
-                    SoundEvent event = BuiltInRegistries.SOUND_EVENT.get(new ResourceLocation(kf.dataPoints.get(0).get("effect").getStringValue()));
-                    return event;
+                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("effect").getStringValue())).orElseThrow().value();
                 }
             }
         }
@@ -226,7 +221,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         Object2ObjectOpenHashMap<String, Animation> res = new Object2ObjectOpenHashMap<>();
         float step = 0.05f;
 
-        if (this.model.animations != null) this.model.animations.stream().forEach(anim -> {
+        if (this.model.animations != null) this.model.animations.forEach(anim -> {
             try {
                 int frameCount = Math.round(anim.length / step) + 1;
                 Frame[] frames = new Frame[frameCount];
@@ -283,7 +278,6 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         var animations = this.animations(nodeMap);
         var variants = this.variants();
 
-        Model result = new Model(nodeMap, defaultPose, variants, animations, this.size());
-        return result;
+        return new Model(nodeMap, defaultPose, variants, animations, this.size());
     }
 }

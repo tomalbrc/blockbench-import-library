@@ -36,7 +36,7 @@ public class LivingEntityHolderWithRideOffset<T extends LivingEntity & AnimatedE
     }
 
     protected float getRideOffset() {
-        return this.parent.getBbHeight() + this.parent.getMyRidingOffset(this.parent);
+        return (float) (this.parent.getBbHeight() + this.parent.getPassengerRidingPosition(this.parent).y());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class LivingEntityHolderWithRideOffset<T extends LivingEntity & AnimatedE
         super.startWatchingExtraPackets(player, consumer);
 
         for (var packet : Utils.updateClientInteraction(this.rideInteraction, ZERO, this.getRideOffset())) {
-            consumer.accept(packet);
+            consumer.accept((Packet<ClientGamePacketListener>) packet);
         }
     }
 

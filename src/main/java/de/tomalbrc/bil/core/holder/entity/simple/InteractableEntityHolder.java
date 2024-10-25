@@ -36,7 +36,7 @@ public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends
         super.startWatchingExtraPackets(player, consumer);
 
         for (var packet : Utils.updateClientInteraction(this.hitboxInteraction, this.dimensions)) {
-            consumer.accept(packet);
+            consumer.accept((Packet<ClientGamePacketListener>) packet);
         }
 
         consumer.accept(new ClientboundSetPassengersPacket(this.parent));
@@ -63,7 +63,7 @@ public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends
             display.element().setScale(pose.readOnlyScale());
         }
 
-        display.element().setTranslation(translation.sub(0, this.dimensions.height - 0.01f, 0));
+        display.element().setTranslation(translation.sub(0, this.dimensions.height() - 0.01f, 0));
         display.element().setLeftRotation(pose.leftRotation());
         display.element().setRightRotation(pose.rightRotation());
 
@@ -79,8 +79,8 @@ public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends
     @Override
     protected void updateCullingBox() {
         float scale = this.getScale();
-        float width = scale * (this.dimensions.width * 2);
-        float height = -this.dimensions.height - 1;
+        float width = scale * (this.dimensions.width() * 2);
+        float height = -this.dimensions.height() - 1;
 
         for (Bone bone : this.bones) {
             bone.element().setDisplaySize(width, height);

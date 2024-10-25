@@ -10,7 +10,6 @@ import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import de.tomalbrc.bil.util.command.ParsedCommand;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -53,7 +52,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                 // generate more models
                 var affectedBones = this.affectedBones(variant);
 
-                Reference2ObjectOpenHashMap<UUID, PolymerModelData> models = new Reference2ObjectOpenHashMap<>();
+                Reference2ObjectOpenHashMap<UUID, ResourceLocation> models = new Reference2ObjectOpenHashMap<>();
 
                 for (BbOutliner outliner : BbModelUtils.modelOutliner(model)) {
                     boolean affected = affectedBones.contains(outliner.uuid) && variant.affectedBonesIsAWhitelist() ||
@@ -78,8 +77,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                                 .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
                         ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.name.toLowerCase(), variant.name().toLowerCase()), builder.build());
-                        PolymerModelData modelData = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
-                        models.put(outliner.uuid, modelData);
+                        models.put(outliner.uuid, location);
                     }
                 }
 
@@ -136,8 +134,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound && kf.dataPoints.get(0).containsKey("sound")) {
-                    SoundEvent event = BuiltInRegistries.SOUND_EVENT.get(new ResourceLocation(kf.dataPoints.get(0).get("sound").getStringValue()));
-                    return event;
+                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("sound").getStringValue())).orElseThrow().value();
                 }
                 else {
                     // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key

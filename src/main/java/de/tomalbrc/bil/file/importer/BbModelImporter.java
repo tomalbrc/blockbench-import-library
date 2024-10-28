@@ -63,7 +63,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 .withElements(elements)
                 .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
-        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, outliner.name.toLowerCase(), builder.build());
+        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, outliner.uuid.toString(), builder.build());
         return PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
     }
 
@@ -145,12 +145,12 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
         for (var entry: nodeMap.entrySet()) {
             Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
-            boolean requiresFrame = time == 0;
+            //boolean requiresFrame = time == 0;
             List<Node> nodePath = nodePath(entry.getValue());
 
             for (var node : nodePath) {
                 BbAnimator animator = animation.animators != null ? animation.animators.get(node.uuid()) : null;
-                requiresFrame |= animator != null;
+                //requiresFrame |= animator != null;
 
                 Vector3fc origin = node.transform().origin();
 
@@ -166,8 +166,8 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 matrix4f.scale(triple.getRight());
             }
 
-            if (requiresFrame||true)
-                poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+            // TODO: check if frame is required?
+            poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
         }
         return poses;
     }
@@ -205,8 +205,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound) {
-                    SoundEvent event = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("effect").getStringValue()));
-                    return event;
+                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("effect").getStringValue()));
                 }
             }
         }
@@ -226,7 +225,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         Object2ObjectOpenHashMap<String, Animation> res = new Object2ObjectOpenHashMap<>();
         float step = 0.05f;
 
-        if (this.model.animations != null) this.model.animations.stream().forEach(anim -> {
+        if (this.model.animations != null) this.model.animations.forEach(anim -> {
             try {
                 int frameCount = Math.round(anim.length / step) + 1;
                 Frame[] frames = new Frame[frameCount];
@@ -283,7 +282,6 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         var animations = this.animations(nodeMap);
         var variants = this.variants();
 
-        Model result = new Model(nodeMap, defaultPose, variants, animations, this.size());
-        return result;
+        return new Model(nodeMap, defaultPose, variants, animations, this.size());
     }
 }

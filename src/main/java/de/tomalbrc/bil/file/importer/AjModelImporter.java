@@ -77,7 +77,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                                 .withElements(elements)
                                 .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
-                        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.name.toLowerCase(), variant.name().toLowerCase()), builder.build());
+                        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.uuid.toString(), variant.name().toLowerCase()), builder.build());
                         PolymerModelData modelData = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location);
                         models.put(outliner.uuid, modelData);
                     }
@@ -136,8 +136,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound && kf.dataPoints.get(0).containsKey("sound")) {
-                    SoundEvent event = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("sound").getStringValue()));
-                    return event;
+                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("sound").getStringValue()));
                 }
                 else {
                     // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key

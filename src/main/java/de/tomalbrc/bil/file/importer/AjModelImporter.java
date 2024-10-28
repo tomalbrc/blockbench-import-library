@@ -76,7 +76,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                                 .withElements(elements)
                                 .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
-                        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.name.toLowerCase(), variant.name().toLowerCase()), builder.build());
+                        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.uuid.toString(), variant.name().toLowerCase()), builder.build());
                         models.put(outliner.uuid, location);
                     }
                 }

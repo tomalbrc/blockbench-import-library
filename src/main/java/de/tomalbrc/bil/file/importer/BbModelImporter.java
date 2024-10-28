@@ -60,7 +60,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 .withElements(elements)
                 .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
-        return BbResourcePackGenerator.addModelPart(model, outliner.name.toLowerCase(), builder.build());
+        return BbResourcePackGenerator.addModelPart(model, outliner.uuid.toString(), builder.build());
     }
 
     protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {

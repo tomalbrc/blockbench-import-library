@@ -6,6 +6,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.DyedItemColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +15,7 @@ public class Bone extends DisplayWrapper<ItemDisplayElement> {
     private boolean invisible;
 
     public static Bone of(ItemDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
-        return Bone.of(element, node, defaultPose, isHead);
+        return new Bone(element, node, defaultPose, isHead);
     }
 
     public static Bone of(ItemDisplayElement element, @NotNull Node node, Pose defaultPose) {

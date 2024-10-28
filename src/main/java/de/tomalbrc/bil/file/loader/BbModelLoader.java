@@ -49,8 +49,10 @@ public class BbModelLoader implements ModelLoader {
             this.inflateElement(element);
 
             BbOutliner parent = BbModelUtils.getParent(model, element);
-            element.from.sub(parent.origin);
-            element.to.sub(parent.origin);
+            if (parent != null) {
+                element.from.sub(parent.origin);
+                element.to.sub(parent.origin);
+            }
         }
 
         for (BbOutliner parent: BbModelUtils.modelOutliner(model)) {
@@ -59,7 +61,7 @@ public class BbModelLoader implements ModelLoader {
             for (var childEntry: parent.children) {
                 if (!childEntry.isNode()) {
                     BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
-                    if (element.type == BbElement.ElementType.CUBE) {
+                    if (element != null && element.type == BbElement.ElementType.CUBE) {
                         min.min(element.from);
                         max.max(element.to);
                     }
@@ -69,7 +71,7 @@ public class BbModelLoader implements ModelLoader {
             for (var childEntry: parent.children) {
                 if (!childEntry.isNode()) {
                     BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
-                    if (element.type != BbElement.ElementType.CUBE) continue;
+                    if (element == null || element.type != BbElement.ElementType.CUBE) continue;
 
                     var diff = min.sub(max, new Vector3f()).absolute();
                     float m = diff.get(diff.maxComponent());

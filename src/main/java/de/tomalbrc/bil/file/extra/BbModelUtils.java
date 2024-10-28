@@ -28,14 +28,31 @@ public class BbModelUtils {
 
     public static List<BbOutliner> modelOutliner(BbModel model) {
         List<BbOutliner> list = new ObjectArrayList<>();
+        List<BbOutliner.ChildEntry> children = new ObjectArrayList<>();
+
         for (BbOutliner.ChildEntry entry: model.outliner) {
             if (entry.isNode()) {
                 if (entry.outliner.hasModel() && !entry.outliner.isHitbox()) {
                     list.add(entry.outliner);
                 }
                 findModelOutlinerChildren(model, list, entry.outliner);
+            } else {
+                children.add(entry);
             }
         }
+
+        if (!children.isEmpty()) {
+            BbOutliner root = new BbOutliner();
+            root.uuid = UUID.randomUUID();
+            root.export = true;
+            root.children = children;
+            list.add(root);
+
+            BbOutliner.ChildEntry entry = new BbOutliner.ChildEntry();
+            entry.outliner = root;
+            model.outliner.add(entry);
+        }
+
         return list;
     }
 

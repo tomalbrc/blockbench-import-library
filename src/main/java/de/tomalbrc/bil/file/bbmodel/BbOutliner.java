@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class BbOutliner {
-    public String name;
+    public String name = "";
     public Vector3f origin = new Vector3f();
     public Vector3f rotation = new Vector3f();
     public UUID uuid;

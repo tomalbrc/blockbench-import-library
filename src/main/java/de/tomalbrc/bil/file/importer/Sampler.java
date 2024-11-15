@@ -60,9 +60,9 @@ public class Sampler {
         Vector3f scale = null;
 
         if (keyframes != null && !keyframes.isEmpty()) {
-            var pi = keyframes.stream().filter(x -> x.channel == BbKeyframe.Channel.position).sorted().iterator();
-            var ri = keyframes.stream().filter(x -> x.channel == BbKeyframe.Channel.rotation).sorted().iterator();
-            var si = keyframes.stream().filter(x -> x.channel == BbKeyframe.Channel.scale).sorted().iterator();
+            var pi = keyframes.stream().filter(x -> x.channel == BbKeyframe.Channel.POSITION).sorted().iterator();
+            var ri = keyframes.stream().filter(x -> x.channel == BbKeyframe.Channel.ROTATION).sorted().iterator();
+            var si = keyframes.stream().filter(x -> x.channel == BbKeyframe.Channel.SCALE).sorted().iterator();
 
             pos = interpolateKeyframeChannelAt(pi, placeholders, environment, time);
             rot = interpolateKeyframeChannelAt(ri, placeholders, environment, time);

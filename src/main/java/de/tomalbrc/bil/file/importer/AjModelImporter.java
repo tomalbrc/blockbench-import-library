@@ -93,7 +93,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             BbAnimator animator = anim.animators.get(effectsUUID);
             if (animator.type == BbAnimator.Type.effect) {
                 for (BbKeyframe kf : animator.keyframes) {
-                    if (Math.abs(kf.time - t) < 0.15f && kf.channel == BbKeyframe.Channel.variants) { // snap value to 50ms increments
+                    if (Math.abs(kf.time - t) < 0.15f && kf.channel == BbKeyframe.Channel.VARIANTS) { // snap value to 50ms increments
                         UUID key = CachedUuidDeserializer.get(kf.dataPoints.getFirst().get("variant").getStringValue());
                         var cond = kf.dataPoints.getFirst().containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.getFirst().get("executeCondition").getStringValue()) : null;
                         return new Frame.Variant(key, cond);
@@ -111,7 +111,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
-                if (difference == t && kf.channel == BbKeyframe.Channel.commands) {
+                if (difference == t && kf.channel == BbKeyframe.Channel.COMMANDS) {
                     var script = kf.dataPoints.getFirst().get("commands").getStringValue();
                     if (!script.isEmpty()) {
                         ParsedCommand[] cmds = CommandParser.parse(kf.dataPoints.getFirst().get("commands").getStringValue());
@@ -131,7 +131,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
-                if (difference == t && kf.channel == BbKeyframe.Channel.sound && kf.dataPoints.getFirst().containsKey("sound")) {
+                if (difference == t && kf.channel == BbKeyframe.Channel.SOUND && kf.dataPoints.getFirst().containsKey("sound")) {
                     return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.getFirst().get("sound").getStringValue())).orElseThrow().value();
                 } else {
                     // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key

@@ -38,8 +38,25 @@ public class BbKeyframe implements Comparable<BbKeyframe> {
     public Vector3f bezierRightValue;
 
     @Override
-    public int compareTo(@NotNull BbKeyframe o) {
-        return Float.compare(this.time, o.time);
+    public int compareTo(BbKeyframe other) {
+        return Float.compare(this.time, other.time);
+    }
+
+    public enum Channel {
+        @SerializedName("position")
+        POSITION,
+        @SerializedName("rotation")
+        ROTATION,
+        @SerializedName("scale")
+        SCALE,
+        @SerializedName("timeline")
+        TIMELINE, // model
+        @SerializedName("sound")
+        SOUND, // model
+        @SerializedName("variants")
+        VARIANTS, // ajmodel
+        @SerializedName("commands")
+        COMMANDS // ajmodel
     }
 
     public Vector3f getVector3f(int index, BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
@@ -48,17 +65,6 @@ public class BbKeyframe implements Comparable<BbKeyframe> {
                 this.dataPoints.get(index).get("y").getValue(placeholders, environment),
                 this.dataPoints.get(index).get("z").getValue(placeholders, environment)
         );
-    }
-
-    public enum Channel {
-        position,
-        rotation,
-        scale,
-        timeline, // model
-        sound, // model
-        variants, // ajmodel
-        commands, // ajmodel
-        particle // bbmodel ..? maybe bedrock model?
     }
 
     static public class DataPointValue {

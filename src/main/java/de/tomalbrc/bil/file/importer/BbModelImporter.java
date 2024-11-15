@@ -181,7 +181,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
-                if (difference == t && kf.channel == BbKeyframe.Channel.timeline) {
+                if (difference == t && kf.channel == BbKeyframe.Channel.TIMELINE) {
                     String key = "script";
                     String script = kf.dataPoints.getFirst().get(key).getStringValue();
                     if (!script.isEmpty()) {
@@ -222,7 +222,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
-                if (difference == t && kf.channel == BbKeyframe.Channel.sound) {
+                if (difference == t && kf.channel == BbKeyframe.Channel.SOUND) {
                     return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.getFirst().get("effect").getStringValue())).orElseThrow().value();
                 }
             }

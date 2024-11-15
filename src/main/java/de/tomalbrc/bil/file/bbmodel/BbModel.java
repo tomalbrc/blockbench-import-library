@@ -1,18 +1,20 @@
 package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
+import de.tomalbrc.bil.file.ajblueprint.AjBlueprintVariants;
 import de.tomalbrc.bil.file.ajmodel.AjMeta;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
+@SuppressWarnings("unused")
 public class BbModel {
     public BbMeta meta;
 
     @Nullable
     @SerializedName("animated_java")
-    public AjMeta ajMeta;
+    public AjMeta ajMeta; // aj support
 
     public String name;
     @SerializedName("model_identifier")
@@ -25,5 +27,8 @@ public class BbModel {
     public ObjectArrayList<BbAnimation> animations;
 
     @SerializedName("animation_variable_placeholders")
-    public BbVariablePlaceholders animationVariablePlaceholders;
+    public BbVariablePlaceholders animationVariablePlaceholders; // aj support ..?
+
+    // ajblueprint support
+    public AjBlueprintVariants variants;
 }

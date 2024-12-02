@@ -5,6 +5,7 @@ import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
 import de.tomalbrc.bil.file.importer.AjModelImporter;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
 
@@ -42,7 +43,7 @@ public class AjModelLoader extends BbModelLoader {
 
     static public Model load(String path) {
         try (InputStream input = new FileInputStream(path)) {
-            return new AjModelLoader().load(input, path);
+            return new AjModelLoader().load(input, FilenameUtils.getBaseName(path));
         } catch (IOException exception) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }

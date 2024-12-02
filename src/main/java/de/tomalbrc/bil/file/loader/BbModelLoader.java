@@ -12,6 +12,7 @@ import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -123,7 +124,7 @@ public class BbModelLoader implements ModelLoader {
 
     static public Model load(String path) {
         try (InputStream input = new FileInputStream(path)) {
-            return new BbModelLoader().load(input, path);
+            return new BbModelLoader().load(input, FilenameUtils.getBaseName(path));
         } catch (IOException exception) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }

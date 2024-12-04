@@ -9,8 +9,12 @@ import de.tomalbrc.bil.json.ElementSerializer;
 import de.tomalbrc.bil.json.FaceSerializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.util.ResourcePackUtil;
+import eu.pb4.polymer.resourcepack.api.AssetPaths;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import net.minecraft.resources.ResourceLocation;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 
@@ -24,11 +28,26 @@ public class BbResourcePackGenerator {
     static String MODEL_DIR = ":assets/bil/models/item/";
     static String TEXTURE_DIR = ":assets/bil/textures/item/";
 
-    public static ResourceLocation addModelPart(BbModel model, String partName, ResourcePackItemModel resourcePackItemModel) {
+    public static ResourceLocation addModelPart(BbModel model, String partName, ResourcePackModel resourcePackModel) {
         ResourceLocation modelResourceLocation = ResourceLocation.parse(MODEL_DIR + model.modelIdentifier + "/" + partName + ".json");
-        ResourcePackUtil.add(modelResourceLocation, resourcePackItemModel.getBytes());
+        ResourcePackUtil.add(modelResourceLocation, resourcePackModel.getBytes());
 
-        return ResourceLocation.fromNamespaceAndPath("bil", model.modelIdentifier + "/" + partName);
+        return ResourceLocation.fromNamespaceAndPath("bil", "item/" + model.modelIdentifier + "/" + partName);
+    }
+
+    public static ResourceLocation addItemModel(BbModel model, String partName, ResourcePackModel resourcePackModel) {
+        var modelPath = addModelPart(model, partName, resourcePackModel);
+
+        var defaultModel = new BasicItemModel(modelPath);
+        var bytes = new ItemAsset(
+                defaultModel,
+                ItemAsset.Properties.DEFAULT
+        ).toJson().getBytes(StandardCharsets.UTF_8);
+
+        var id = ResourceLocation.fromNamespaceAndPath("bil", partName);
+        ResourcePackUtil.add(ResourceLocation.parse(":" + AssetPaths.itemAsset(id)), bytes);
+
+        return id;
     }
 
     public static void makeTextures(BbModel model, Collection<BbTexture> textures) {

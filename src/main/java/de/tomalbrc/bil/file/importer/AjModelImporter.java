@@ -6,7 +6,7 @@ import de.tomalbrc.bil.file.ajmodel.AjVariant;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
-import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
+import de.tomalbrc.bil.file.extra.ResourcePackModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import de.tomalbrc.bil.util.command.ParsedCommand;
@@ -69,12 +69,12 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                             }
                         }
 
-                        ResourcePackItemModel.Builder builder = new ResourcePackItemModel.Builder(model.modelIdentifier)
+                        ResourcePackModel.Builder builder = new ResourcePackModel.Builder(model.modelIdentifier)
                                 .withTextures(textureMap)
                                 .withElements(elements)
-                                .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
+                                .addDisplayTransform("head", ResourcePackModel.DEFAULT_TRANSFORM);
 
-                        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.uuid.toString(), variant.name().toLowerCase()), builder.build());
+                        ResourceLocation location = BbResourcePackGenerator.addItemModel(model, String.format("%s_%s", outliner.uuid.toString(), variant.name().toLowerCase()), builder.build());
                         models.put(outliner.uuid, location);
                     }
                 }
@@ -94,8 +94,8 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             if (animator.type == BbAnimator.Type.effect) {
                 for (BbKeyframe kf : animator.keyframes) {
                     if (Math.abs(kf.time-t) < 0.15f && kf.channel == BbKeyframe.Channel.variants) { // snap value to 50ms increments
-                        UUID key = CachedUuidDeserializer.get(kf.dataPoints.get(0).get("variant").getStringValue());
-                        var cond = kf.dataPoints.get(0).containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.get(0).get("executeCondition").getStringValue()) : null;
+                        UUID key = CachedUuidDeserializer.get(kf.dataPoints.getFirst().get("variant").getStringValue());
+                        var cond = kf.dataPoints.getFirst().containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.getFirst().get("executeCondition").getStringValue()) : null;
                         return new Frame.Variant(key, cond);
                     }
                 }
@@ -112,10 +112,10 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.commands) {
-                    var script = kf.dataPoints.get(0).get("commands").getStringValue();
+                    var script = kf.dataPoints.getFirst().get("commands").getStringValue();
                     if (!script.isEmpty()) {
-                        ParsedCommand[] cmds = CommandParser.parse(kf.dataPoints.get(0).get("commands").getStringValue());
-                        ParsedCommand[] cond = kf.dataPoints.get(0).containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.get(0).get("executeCondition").getStringValue()) : null;
+                        ParsedCommand[] cmds = CommandParser.parse(kf.dataPoints.getFirst().get("commands").getStringValue());
+                        ParsedCommand[] cond = kf.dataPoints.getFirst().containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.getFirst().get("executeCondition").getStringValue()) : null;
                         return new Frame.Commands(cmds, cond);
                     }
                 }
@@ -131,8 +131,8 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
-                if (difference == t && kf.channel == BbKeyframe.Channel.sound && kf.dataPoints.get(0).containsKey("sound")) {
-                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("sound").getStringValue())).orElseThrow().value();
+                if (difference == t && kf.channel == BbKeyframe.Channel.sound && kf.dataPoints.getFirst().containsKey("sound")) {
+                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.getFirst().get("sound").getStringValue())).orElseThrow().value();
                 }
                 else {
                     // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key

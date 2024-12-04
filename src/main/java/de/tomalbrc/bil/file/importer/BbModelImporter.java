@@ -4,7 +4,7 @@ import de.tomalbrc.bil.core.model.*;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
-import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
+import de.tomalbrc.bil.file.extra.ResourcePackModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
@@ -52,25 +52,25 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
-    protected ResourceLocation getModelPath(BbOutliner outliner) {
+    protected ResourceLocation generateModel(BbOutliner outliner) {
         List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
 
-        ResourcePackItemModel.Builder builder = new ResourcePackItemModel.Builder(model.modelIdentifier)
+        ResourcePackModel.Builder builder = new ResourcePackModel.Builder(model.modelIdentifier)
                 .withTextures(this.makeDefaultTextureMap())
                 .withElements(elements)
-                .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
+                .addDisplayTransform("head", ResourcePackModel.DEFAULT_TRANSFORM);
 
-        return BbResourcePackGenerator.addModelPart(model, outliner.uuid.toString(), builder.build());
+        return BbResourcePackGenerator.addItemModel(model, outliner.uuid.toString(), builder.build());
     }
 
     protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         for (BbOutliner.ChildEntry entry: children) {
             if (entry.isNode()) {
                 BbOutliner outliner = entry.outliner;
-                ResourceLocation modelData = null;
+                ResourceLocation modelPath = null;
 
                 if (outliner.hasModel() && outliner.export && !outliner.isHitbox()) {
-                    modelData = this.getModelPath(outliner);
+                    modelPath = this.generateModel(outliner);
                 }
 
                 Vector3f localPos = parentOutliner != null ? outliner.origin.sub(parentOutliner.origin, new Vector3f()) : new Vector3f(outliner.origin);
@@ -82,7 +82,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelData);
+                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelPath);
                 nodeMap.put(outliner.uuid, node);
 
                 List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
@@ -130,7 +130,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     protected List<Node> nodePath(Node child) {
         List<Node> nodePath = new ObjectArrayList<>();
         while (child != null) {
-            nodePath.add(0, child);
+            nodePath.addFirst(child);
             child = child.parent();
         }
         return nodePath;
@@ -182,9 +182,9 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.timeline) {
                     String key = "script";
-                    String script = kf.dataPoints.get(0).get(key).getStringValue();
+                    String script = kf.dataPoints.getFirst().get(key).getStringValue();
                     if (!script.isEmpty()) {
-                        var cmds = CommandParser.parse(kf.dataPoints.get(0).get(key).getStringValue());
+                        var cmds = CommandParser.parse(kf.dataPoints.getFirst().get(key).getStringValue());
                         return new Frame.Commands(cmds, null);
                     }
                 }
@@ -201,7 +201,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound) {
-                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("effect").getStringValue())).orElseThrow().value();
+                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.getFirst().get("effect").getStringValue())).orElseThrow().value();
                 }
             }
         }

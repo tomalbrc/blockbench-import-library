@@ -13,18 +13,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-public class ResourcePackItemModel {
+public class ResourcePackModel {
     public record DisplayTransform(Vector3f rotation, Vector3f translation, Vector3f scale) {
     }
 
-    public static ResourcePackItemModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackItemModel.DisplayTransform(new Vector3f(0,180,0), null, null); // default BIL model transform
+    public static ResourcePackModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackModel.DisplayTransform(new Vector3f(0,180,0), null, null); // default BIL model transform
 
     private final String parent;
     private final Map<String, ResourceLocation> textures;
     private final List<BbElement> elements;
     private final Map<String, DisplayTransform> display;
 
-    ResourcePackItemModel(String parent, Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
+    ResourcePackModel(String parent, Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
         this.parent = parent;
         this.textures = textures;
         this.elements = elements;
@@ -80,16 +80,16 @@ public class ResourcePackItemModel {
         }
 
 
-        public ResourcePackItemModel build() {
+        public ResourcePackModel build() {
             Map<String, ResourceLocation> optimizedTextureMap = new Object2ObjectLinkedOpenHashMap<>();
-            if (this.elements != null) for (BbElement element : this.elements) {
-                for (Map.Entry<String, BbFace> stringBbFaceEntry : element.faces.entrySet()) {
-                    String n = String.valueOf(stringBbFaceEntry.getValue().texture);
-                    optimizedTextureMap.put(n, this.textureMap.get(n));
+            if (this.elements != null)
+                for (BbElement element : this.elements) {
+                    for (Map.Entry<String, BbFace> bbFaceEntry : element.faces.entrySet()) {
+                        String n = String.valueOf(bbFaceEntry.getValue().texture);
+                        optimizedTextureMap.put(n, this.textureMap.get(n));
+                    }
                 }
-            }
-            return new ResourcePackItemModel(this.parent, optimizedTextureMap, this.elements, this.transformMap);
+            return new ResourcePackModel(this.parent, optimizedTextureMap, this.elements, this.transformMap);
         }
-
     }
 }

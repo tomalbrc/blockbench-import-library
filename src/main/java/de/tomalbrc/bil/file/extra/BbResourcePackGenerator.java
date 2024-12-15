@@ -12,11 +12,14 @@ import de.tomalbrc.bil.util.ResourcePackUtil;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.DyeTintSource;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ItemTintSource;
 import net.minecraft.resources.ResourceLocation;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.List;
 
 public class BbResourcePackGenerator {
     static Gson gson = JSON.GENERIC_BUILDER
@@ -38,7 +41,7 @@ public class BbResourcePackGenerator {
     public static ResourceLocation addItemModel(BbModel model, String partName, ResourcePackModel resourcePackModel) {
         var modelPath = addModelPart(model, partName, resourcePackModel);
 
-        var defaultModel = new BasicItemModel(modelPath);
+        var defaultModel = new BasicItemModel(modelPath, List.of(new DyeTintSource(0xFFFFFF)));
         var bytes = new ItemAsset(
                 defaultModel,
                 ItemAsset.Properties.DEFAULT

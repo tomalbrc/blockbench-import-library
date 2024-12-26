@@ -34,7 +34,8 @@ public class BbResourcePackGenerator {
     public static void makeTextures(BbModel model, Collection<BbTexture> textures) {
         for (BbTexture texture : textures) {
             byte[] texData = Base64.getDecoder().decode(texture.source.replace(BASE64_PNG_PREFIX, ""));
-            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + texture.name + ".png"), texData);
+            var pngSuffix = texture.name.endsWith(".png") ? "" : ".png";
+            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + texture.name + pngSuffix), texData);
         }
     }
 }

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import de.tomalbrc.bil.file.bbmodel.BbElement;
+import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Type;
@@ -48,9 +49,13 @@ public class ElementSerializer implements JsonSerializer<BbElement> {
         obj.add("faces", context.serialize(src.faces));
 
         if (src.origin.length() > 0 || (src.rotation != null && src.rotation.length() > 0.0001f)) {
+            var rotVec = src.rotation;
+            rotVec.x = Mth.abs(rotVec.x) < 0.0001f ? 0 : rotVec.x;
+            rotVec.y = Mth.abs(rotVec.y) < 0.0001f ? 0 : rotVec.y;
+            rotVec.z = Mth.abs(rotVec.z) < 0.0001f ? 0 : rotVec.z;
             JsonObject rot = new JsonObject();
             rot.addProperty("axis", this.getAxis(src.rotation));
-            rot.addProperty("angle", this.getAngle(src.rotation));
+            rot.addProperty("angle", this.getAngle(rotVec));
             rot.add("origin", context.serialize(src.origin));
             obj.add("rotation", rot);
         }

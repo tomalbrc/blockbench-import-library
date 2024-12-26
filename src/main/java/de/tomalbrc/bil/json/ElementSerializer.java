@@ -28,7 +28,7 @@ public class ElementSerializer implements JsonSerializer<BbElement> {
     }
 
     float getAngle(Vector3f v) {
-        if (v != null) {
+        if (v != null && v.length() > 0.0001f) {
             for (int i = 0; i < 3; i++) {
                 if (Math.abs(v.get(i)) > 0) {
                     return v.get(i);
@@ -49,13 +49,9 @@ public class ElementSerializer implements JsonSerializer<BbElement> {
         obj.add("faces", context.serialize(src.faces));
 
         if (src.origin.length() > 0 || (src.rotation != null && src.rotation.length() > 0.0001f)) {
-            var rotVec = src.rotation;
-            rotVec.x = Mth.abs(rotVec.x) < 0.0001f ? 0 : rotVec.x;
-            rotVec.y = Mth.abs(rotVec.y) < 0.0001f ? 0 : rotVec.y;
-            rotVec.z = Mth.abs(rotVec.z) < 0.0001f ? 0 : rotVec.z;
             JsonObject rot = new JsonObject();
             rot.addProperty("axis", this.getAxis(src.rotation));
-            rot.addProperty("angle", this.getAngle(rotVec));
+            rot.addProperty("angle", this.getAngle(src.rotation));
             rot.add("origin", context.serialize(src.origin));
             obj.add("rotation", rot);
         }

@@ -35,7 +35,7 @@ public class BbResourcePackGenerator {
         for (BbTexture texture : textures) {
             byte[] texData = Base64.getDecoder().decode(texture.source.replace(BASE64_PNG_PREFIX, ""));
             var pngSuffix = texture.name.endsWith(".png") ? "" : ".png";
-            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + texture.name + pngSuffix), texData);
+            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + texture.name.toLowerCase() + pngSuffix), texData);
         }
     }
 }

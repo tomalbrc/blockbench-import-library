@@ -97,7 +97,7 @@ public class BbModelLoader implements ModelLoader {
 
             if (name != null && !name.isEmpty()) model.modelIdentifier = name;
             if (model.modelIdentifier == null) model.modelIdentifier = model.name;
-            model.modelIdentifier = ModelLoader.normalizedModelId(FilenameUtils.getBaseName(model.modelIdentifier));
+            model.modelIdentifier = ModelLoader.normalizedModelId(model.modelIdentifier);
 
             this.postProcess(model);
 

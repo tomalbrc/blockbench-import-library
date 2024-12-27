@@ -17,7 +17,7 @@ public class AjModelLoader extends BbModelLoader {
 
             if (name != null && !name.isEmpty()) model.modelIdentifier = name;
             if (model.modelIdentifier == null) model.modelIdentifier = model.name;
-            model.modelIdentifier = ModelLoader.normalizedModelId(FilenameUtils.getBaseName(model.modelIdentifier));
+            model.modelIdentifier = ModelLoader.normalizedModelId(model.modelIdentifier);
 
             this.postProcess(model);
 
@@ -43,7 +43,7 @@ public class AjModelLoader extends BbModelLoader {
 
     static public Model load(String path) {
         try (InputStream input = new FileInputStream(path)) {
-            return new AjModelLoader().load(input, path);
+            return new AjModelLoader().load(input, FilenameUtils.getBaseName(path));
         } catch (IOException exception) {
             throw new IllegalArgumentException("Model doesn't exist: " + path);
         }

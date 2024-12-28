@@ -13,7 +13,7 @@ import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
@@ -91,11 +91,11 @@ public class BbModelLoader implements ModelLoader {
     }
 
     @Override
-    public Model load(InputStream input, @Nullable String name) throws JsonParseException {
+    public Model load(InputStream input, @NotNull String name) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
             BbModel model = GSON.fromJson(reader, BbModel.class);
 
-            if (name != null && !name.isEmpty()) model.modelIdentifier = name;
+            if (!name.isEmpty()) model.modelIdentifier = name;
             if (model.modelIdentifier == null) model.modelIdentifier = model.name;
             model.modelIdentifier = ModelLoader.normalizedModelId(model.modelIdentifier);
 

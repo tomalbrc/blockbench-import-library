@@ -27,7 +27,7 @@ public class BbResourcePackGenerator {
     public static ResourceLocation addModelPart(BbModel model, String partName, ResourcePackItemModel resourcePackItemModel) {
         ResourceLocation modelResourceLocation = ResourceLocation.parse(MODEL_DIR + model.modelIdentifier + "/" + partName + ".json");
         ResourcePackUtil.add(modelResourceLocation, resourcePackItemModel.getBytes());
-        return ResourceLocation.fromNamespaceAndPath("bil", model.modelIdentifier + "/" + partName);
+        return ResourceLocation.fromNamespaceAndPath("bil", "item/" + model.modelIdentifier + "/" + partName);
     }
 
     public static void makeTextures(BbModel model, Collection<BbTexture> textures) {

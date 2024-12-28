@@ -63,7 +63,8 @@ public class ResourcePackModel {
             this.textureMap = new Object2ObjectLinkedOpenHashMap<>();
             if (intTextureMap != null) {
                 for (var entry : intTextureMap.int2ObjectEntrySet()) {
-                    this.textureMap.put(String.valueOf(entry.getIntKey()), ResourceLocation.fromNamespaceAndPath("bil", "item/" + this.modelId + "/" + entry.getValue().name));
+                    var pngSuffix = entry.getValue().name.endsWith(".png") ? entry.getValue().name.substring(0, entry.getValue().name.length()-5) : entry.getValue().name;
+                    this.textureMap.put(String.valueOf(entry.getIntKey()), ResourceLocation.fromNamespaceAndPath("bil", "item/" + this.modelId + "/" + pngSuffix));
                 }
             }
             return this;

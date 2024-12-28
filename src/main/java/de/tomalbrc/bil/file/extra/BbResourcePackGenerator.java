@@ -35,7 +35,7 @@ public class BbResourcePackGenerator {
         ResourceLocation modelResourceLocation = ResourceLocation.parse(MODEL_DIR + model.modelIdentifier + "/" + partName + ".json");
         ResourcePackUtil.add(modelResourceLocation, resourcePackModel.getBytes());
 
-        return ResourceLocation.fromNamespaceAndPath("bil", "item/" + model + "/" + partName);
+        return ResourceLocation.fromNamespaceAndPath("bil", "item/" + model.modelIdentifier + "/" + partName);
     }
 
     public static ResourceLocation addItemModel(BbModel model, String partName, ResourcePackModel resourcePackModel) {

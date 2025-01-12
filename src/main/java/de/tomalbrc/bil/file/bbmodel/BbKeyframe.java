@@ -84,7 +84,7 @@ public class BbKeyframe implements Comparable {
 
             var length = this.stringValue.trim().length();
             if (length <= 2) {
-                if (length == 0)
+                if (length == 0 || this.stringValue.equals("-") || this.stringValue.equals("+") || this.stringValue.equals(".") || this.stringValue.equals(","))
                     return 0;
 
                 this.value = Float.parseFloat(this.stringValue.trim());

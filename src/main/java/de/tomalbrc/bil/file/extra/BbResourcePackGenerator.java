@@ -13,7 +13,6 @@ import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.DyeTintSource;
-import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ItemTintSource;
 import net.minecraft.resources.ResourceLocation;
 
 import java.nio.charset.StandardCharsets;
@@ -60,7 +59,7 @@ public class BbResourcePackGenerator {
             while (str.endsWith(".png")) { // remove all .png extensions if multiple
                 str = str.substring(0, str.length()-4);
             }
-            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str), texData);
+            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png"), texData);
         }
     }
 }

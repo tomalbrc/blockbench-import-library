@@ -11,12 +11,7 @@ public class BbAnimation {
     public LoopMode loop;
     public boolean override;
     public float length;
-    public int snapping;
-    public boolean selected;
-    @SerializedName("anim_time_update")
-    public String animTimeUpdate;
-    @SerializedName("blend_weight")
-    public String blendWeight;
+    public float snapping;
     @SerializedName("start_delay")
     public String startDelay;
     @SerializedName("loop_delay")

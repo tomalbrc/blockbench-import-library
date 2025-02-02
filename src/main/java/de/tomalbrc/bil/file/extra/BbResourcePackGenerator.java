@@ -37,7 +37,7 @@ public class BbResourcePackGenerator {
             while (str.endsWith(".png")) { // remove all .png extensions if multiple
                 str = str.substring(0, str.length()-4);
             }
-            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str), texData);
+            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png"), texData);
         }
     }
 }

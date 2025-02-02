@@ -14,6 +14,7 @@ public interface ModelLoader {
     static String normalizedModelId(String id) {
         id = id.trim().replace(" ", "_");
         id = id.replace("-", "_");
+        id = id.replace("\\", "/");
         return id.toLowerCase();
     }
 }

@@ -14,6 +14,7 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.DyeTintSource;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.io.FilenameUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -55,7 +56,7 @@ public class BbResourcePackGenerator {
     public static void makeTextures(BbModel model, Collection<BbTexture> textures) {
         for (BbTexture texture : textures) {
             byte[] texData = Base64.getDecoder().decode(texture.source.replace(BASE64_PNG_PREFIX, ""));
-            var str = texture.name;
+            var str = FilenameUtils.getBaseName(texture.name.toLowerCase());
             while (str.endsWith(".png")) { // remove all .png extensions if multiple
                 str = str.substring(0, str.length()-4);
             }

@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.io.FilenameUtils;
 import org.joml.Vector3f;
 
 import java.nio.charset.StandardCharsets;
@@ -63,7 +64,7 @@ public class ResourcePackModel {
             this.textureMap = new Object2ObjectLinkedOpenHashMap<>();
             if (intTextureMap != null) {
                 for (var entry : intTextureMap.int2ObjectEntrySet()) {
-                    var str = entry.getValue().name;
+                    var str = FilenameUtils.getBaseName(entry.getValue().name.toLowerCase());
                     while (str.endsWith(".png")) { // remove all .png extensions if multiple
                         str = str.substring(0, str.length()-4);
                     }

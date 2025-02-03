@@ -10,6 +10,7 @@ import de.tomalbrc.bil.json.FaceSerializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.util.ResourcePackUtil;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.io.FilenameUtils;
 
 import java.util.Base64;
 import java.util.Collection;
@@ -33,7 +34,7 @@ public class BbResourcePackGenerator {
     public static void makeTextures(BbModel model, Collection<BbTexture> textures) {
         for (BbTexture texture : textures) {
             byte[] texData = Base64.getDecoder().decode(texture.source.replace(BASE64_PNG_PREFIX, ""));
-            var str = texture.name;
+            var str = FilenameUtils.getBaseName(texture.name.toLowerCase());
             while (str.endsWith(".png")) { // remove all .png extensions if multiple
                 str = str.substring(0, str.length()-4);
             }

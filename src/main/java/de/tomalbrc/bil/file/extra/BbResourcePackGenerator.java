@@ -32,7 +32,7 @@ public class BbResourcePackGenerator {
     static String TEXTURE_DIR = ":assets/bil/textures/item/";
 
     public static ResourceLocation addModelPart(BbModel model, String partName, ResourcePackModel resourcePackModel) {
-        ResourceLocation modelResourceLocation = ResourceLocation.parse(MODEL_DIR + model.modelIdentifier + "/" + partName + ".json");
+        ResourceLocation modelResourceLocation = ResourceLocation.parse(MODEL_DIR + model.modelIdentifier + "/" + partName.toLowerCase() + ".json");
         ResourcePackUtil.add(modelResourceLocation, resourcePackModel.getBytes());
 
         return ResourceLocation.fromNamespaceAndPath("bil", "item/" + model.modelIdentifier + "/" + partName);

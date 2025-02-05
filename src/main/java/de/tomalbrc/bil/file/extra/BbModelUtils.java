@@ -43,7 +43,7 @@ public class BbModelUtils {
 
         if (!children.isEmpty()) {
             BbOutliner root = new BbOutliner();
-            root.uuid = UUID.randomUUID();
+            root.uuid = children.getFirst().uuid;
             root.export = true;
             root.children = children;
             list.add(root);

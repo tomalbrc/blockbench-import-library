@@ -13,6 +13,7 @@ import org.joml.Vector3f;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ResourcePackItemModel {
     public record DisplayTransform(Vector3f rotation, Vector3f translation, Vector3f scale) {
@@ -20,21 +21,19 @@ public class ResourcePackItemModel {
 
     public static ResourcePackItemModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackItemModel.DisplayTransform(new Vector3f(0,180,0), null, null); // default BIL model transform
 
-    private final String parent;
-    private final Map<String, ResourceLocation> textures;
-    private final List<BbElement> elements;
-    private final Map<String, DisplayTransform> display;
+    final String parent;
+    final Map<String, ResourceLocation> textures;
+    final List<BbElement> elements;
+    final Map<String, DisplayTransform> display;
 
     ResourcePackItemModel(String parent, Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
         this.parent = parent;
         this.textures = textures;
-        this.elements = elements;
-        if (transformMap == null) {
-            Object2ObjectArrayMap<String, DisplayTransform> map = new Object2ObjectArrayMap<>();
-            this.display = map;
-        } else {
-            this.display = transformMap;
+        if (this.textures != null && !this.textures.isEmpty() && !this.textures.containsKey("particle")) {
+            this.textures.put("particle", this.textures.values().iterator().next());
         }
+        this.elements = elements;
+        this.display = Objects.requireNonNullElseGet(transformMap, Object2ObjectArrayMap::new);
     }
 
     public byte[] getBytes() {

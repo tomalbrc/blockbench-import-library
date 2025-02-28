@@ -104,7 +104,7 @@ public class BbKeyframe implements Comparable<BbKeyframe> {
                 }
             }
 
-            return this.molangExpression.get(environment);
+            return environment.resolve(this.molangExpression);
         }
     }
 }

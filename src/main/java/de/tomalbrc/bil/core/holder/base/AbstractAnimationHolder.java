@@ -20,7 +20,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.DyedItemColor;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,9 +93,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
                         this.addElement(bone);
                     }
                 }
-                case LOCATOR -> {
-                    this.locatorMap.put(node.name(), Locator.of(node, defaultPose));
-                }
+                case LOCATOR -> this.locatorMap.put(node.name(), Locator.of(node, defaultPose));
             }
         }
     }

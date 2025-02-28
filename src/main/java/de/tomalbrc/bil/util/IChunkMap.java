@@ -4,10 +4,6 @@ import de.tomalbrc.bil.core.holder.base.AbstractElementHolder;
 import net.minecraft.server.level.ChunkMap;
 
 public interface IChunkMap {
-    void bil$scheduleAsyncTick(AbstractElementHolder holder);
-
-    void bil$blockUntilAsyncTickFinished();
-
     static void scheduleAsyncTick(AbstractElementHolder holder) {
         IChunkMap chunkMap = (IChunkMap) holder.getLevel().getChunkSource().chunkMap;
         chunkMap.bil$scheduleAsyncTick(holder);
@@ -17,4 +13,8 @@ public interface IChunkMap {
         IChunkMap chunkMap = (IChunkMap) map;
         chunkMap.bil$blockUntilAsyncTickFinished();
     }
+
+    void bil$scheduleAsyncTick(AbstractElementHolder holder);
+
+    void bil$blockUntilAsyncTickFinished();
 }

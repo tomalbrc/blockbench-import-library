@@ -14,7 +14,7 @@ public class ResourcePackUtil {
     }
 
     public static void addAdditional(ResourcePackBuilder resourcePackBuilder) {
-        for (var entry: data.entrySet()) {
+        for (var entry : data.entrySet()) {
             resourcePackBuilder.addData(entry.getKey().getPath(), entry.getValue());
         }
     }

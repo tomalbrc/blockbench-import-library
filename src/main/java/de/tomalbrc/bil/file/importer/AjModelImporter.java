@@ -97,7 +97,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             BbAnimator animator = anim.animators.get(effectsUUID);
             if (animator.type == BbAnimator.Type.effect) {
                 for (BbKeyframe kf : animator.keyframes) {
-                    if (Math.abs(kf.time-t) < 0.15f && kf.channel == BbKeyframe.Channel.variants) { // snap value to 50ms increments
+                    if (Math.abs(kf.time - t) < 0.15f && kf.channel == BbKeyframe.Channel.variants) { // snap value to 50ms increments
                         UUID key = CachedUuidDeserializer.get(kf.dataPoints.get(0).get("variant").getStringValue());
                         var cond = kf.dataPoints.get(0).containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.get(0).get("executeCondition").getStringValue()) : null;
                         return new Frame.Variant(key, cond);
@@ -137,8 +137,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound && kf.dataPoints.get(0).containsKey("sound")) {
                     return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("sound").getStringValue()));
-                }
-                else {
+                } else {
                     // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key
                     super.frameSound(anim, t);
                 }

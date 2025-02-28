@@ -11,6 +11,18 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 
 public class AjModelLoader extends BbModelLoader {
+    static public Model load(ResourceLocation resourceLocation) {
+        return new AjModelLoader().loadResource(resourceLocation);
+    }
+
+    static public Model load(String path) {
+        try (InputStream input = new FileInputStream(path)) {
+            return new AjModelLoader().load(input, FilenameUtils.getBaseName(path));
+        } catch (IOException exception) {
+            throw new IllegalArgumentException("Model doesn't exist: " + path);
+        }
+    }
+
     @Override
     public Model load(InputStream input, @NotNull String name) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
@@ -27,6 +39,7 @@ public class AjModelLoader extends BbModelLoader {
             throw new JsonParseException("Failed to parse: " + name, throwable);
         }
     }
+
     @Override
     public Model loadResource(ResourceLocation resourceLocation) throws IllegalArgumentException, JsonParseException {
         String path = String.format("/model/%s/%s.ajmodel", resourceLocation.getNamespace(), resourceLocation.getPath());
@@ -36,17 +49,5 @@ public class AjModelLoader extends BbModelLoader {
         }
 
         return this.load(input, resourceLocation.getPath());
-    }
-
-    static public Model load(ResourceLocation resourceLocation) {
-        return new AjModelLoader().loadResource(resourceLocation);
-    }
-
-    static public Model load(String path) {
-        try (InputStream input = new FileInputStream(path)) {
-            return new AjModelLoader().load(input, FilenameUtils.getBaseName(path));
-        } catch (IOException exception) {
-            throw new IllegalArgumentException("Model doesn't exist: " + path);
-        }
     }
 }

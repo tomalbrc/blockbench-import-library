@@ -19,5 +19,7 @@ public enum Interpolation {
         this.interpolator = interpolator;
     }
 
-    public Interpolator get() { return interpolator; }
+    public Interpolator get() {
+        return interpolator;
+    }
 }

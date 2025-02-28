@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class BbKeyframe implements Comparable {
+public class BbKeyframe implements Comparable<BbKeyframe> {
     public Channel channel;
     @SerializedName("data_points")
     public List<Map<String, DataPointValue>> dataPoints;
@@ -36,11 +36,16 @@ public class BbKeyframe implements Comparable {
     public Vector3f bezierRightValue;
 
     @Override
-    public int compareTo(@NotNull Object o) {
-        if (o instanceof BbKeyframe other) {
-            return other.time > this.time ? -1 : this.time == other.time ? 0 : 1;
-        }
-        return 0;
+    public int compareTo(@NotNull BbKeyframe other) {
+        return Float.compare(this.time, other.time);
+    }
+
+    public Vector3f getVector3f(int index, BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
+        return new Vector3f(
+                this.dataPoints.get(index).get("x").getValue(placeholders, environment),
+                this.dataPoints.get(index).get("y").getValue(placeholders, environment),
+                this.dataPoints.get(index).get("z").getValue(placeholders, environment)
+        );
     }
 
     public enum Channel {
@@ -53,14 +58,6 @@ public class BbKeyframe implements Comparable {
         commands // ajmodel
     }
 
-    public Vector3f getVector3f(int index, BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
-        return new Vector3f(
-                this.dataPoints.get(index).get("x").getValue(placeholders, environment),
-                this.dataPoints.get(index).get("y").getValue(placeholders, environment),
-                this.dataPoints.get(index).get("z").getValue(placeholders, environment)
-        );
-    }
-
     static public class DataPointValue {
         private float value;
         private String stringValue;
@@ -70,12 +67,12 @@ public class BbKeyframe implements Comparable {
             this.value = value;
         }
 
-        public void setStringValue(String stringValue) {
-            this.stringValue = stringValue;
-        }
-
         public String getStringValue() {
             return this.stringValue;
+        }
+
+        public void setStringValue(String stringValue) {
+            this.stringValue = stringValue;
         }
 
         public float getValue(BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
@@ -102,7 +99,7 @@ public class BbKeyframe implements Comparable {
 
                 try {
                     this.molangExpression = BIL.COMPILER.compile(modifiedExpression);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }

@@ -27,8 +27,20 @@ public class BbModelLoader implements ModelLoader {
             .setLenient()
             .create();
 
+    static public Model load(ResourceLocation resourceLocation) {
+        return new BbModelLoader().loadResource(resourceLocation);
+    }
+
+    static public Model load(String path) {
+        try (InputStream input = new FileInputStream(path)) {
+            return new BbModelLoader().load(input, FilenameUtils.getBaseName(path));
+        } catch (IOException exception) {
+            throw new IllegalArgumentException("Model doesn't exist: " + path);
+        }
+    }
+
     private void rescaleUV(Vector2i res, BbElement element) {
-        for (var entry: element.faces.entrySet()) {
+        for (var entry : element.faces.entrySet()) {
             // re-map uv based on resolution
             BbFace face = entry.getValue();
             for (int i = 0; i < face.uv.size(); i++) {
@@ -43,7 +55,7 @@ public class BbModelLoader implements ModelLoader {
     }
 
     protected void postProcess(BbModel model) {
-        for (BbElement element: model.elements) {
+        for (BbElement element : model.elements) {
             if (element.type != BbElement.ElementType.CUBE) continue;
 
             this.rescaleUV(model.resolution, element);
@@ -56,10 +68,10 @@ public class BbModelLoader implements ModelLoader {
             }
         }
 
-        for (BbOutliner parent: BbModelUtils.modelOutliner(model)) {
+        for (BbOutliner parent : BbModelUtils.modelOutliner(model)) {
             Vector3f min = new Vector3f(), max = new Vector3f();
             // find max for scale (aj compatibility)
-            for (var childEntry: parent.children) {
+            for (var childEntry : parent.children) {
                 if (!childEntry.isNode()) {
                     BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
                     if (element != null && element.type == BbElement.ElementType.CUBE) {
@@ -69,7 +81,7 @@ public class BbModelLoader implements ModelLoader {
                 }
             }
 
-            for (var childEntry: parent.children) {
+            for (var childEntry : parent.children) {
                 if (!childEntry.isNode()) {
                     BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
                     if (element == null || element.type != BbElement.ElementType.CUBE) continue;
@@ -81,10 +93,10 @@ public class BbModelLoader implements ModelLoader {
                     // for animation + default pose later, to allow for larger models
                     parent.scale = 1.f / scale;
 
-                    element.from.mul(scale).add(8,8,8);
-                    element.to.mul(scale).add(8,8,8);
+                    element.from.mul(scale).add(8, 8, 8);
+                    element.to.mul(scale).add(8, 8, 8);
 
-                    element.origin.sub(parent.origin).mul(scale).add(8,8,8);
+                    element.origin.sub(parent.origin).mul(scale).add(8, 8, 8);
                 }
             }
         }
@@ -116,17 +128,5 @@ public class BbModelLoader implements ModelLoader {
         }
 
         return this.load(input, resourceLocation.getPath());
-    }
-
-    static public Model load(ResourceLocation resourceLocation) {
-        return new BbModelLoader().loadResource(resourceLocation);
-    }
-
-    static public Model load(String path) {
-        try (InputStream input = new FileInputStream(path)) {
-            return new BbModelLoader().load(input, FilenameUtils.getBaseName(path));
-        } catch (IOException exception) {
-            throw new IllegalArgumentException("Model doesn't exist: " + path);
-        }
     }
 }

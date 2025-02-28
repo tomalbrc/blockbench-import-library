@@ -22,16 +22,8 @@ public class BbOutliner {
 
     public List<ChildEntry> children;
 
-    static public class ChildEntry {
-        public UUID uuid;
-        public BbOutliner outliner;
-        public boolean isNode() {
-            return this.outliner != null;
-        }
-    }
-
     public boolean hasModel() {
-        for (ChildEntry childEntry: this.children) {
+        for (ChildEntry childEntry : this.children) {
             if (!childEntry.isNode())
                 return true;
         }
@@ -39,7 +31,7 @@ public class BbOutliner {
     }
 
     public boolean hasUuidChild(UUID uuid) {
-        for (ChildEntry childEntry: this.children) {
+        for (ChildEntry childEntry : this.children) {
             if (!childEntry.isNode() && childEntry.uuid.equals(uuid))
                 return true;
         }
@@ -47,7 +39,7 @@ public class BbOutliner {
     }
 
     public boolean hasChildOutliner(BbOutliner outliner) {
-        for (ChildEntry childEntry: this.children) {
+        for (ChildEntry childEntry : this.children) {
             if (childEntry.isNode() && childEntry.outliner.uuid.equals(outliner.uuid))
                 return true;
         }
@@ -56,5 +48,14 @@ public class BbOutliner {
 
     public boolean isHitbox() {
         return this.name != null && this.name.equals("hitbox");
+    }
+
+    static public class ChildEntry {
+        public UUID uuid;
+        public BbOutliner outliner;
+
+        public boolean isNode() {
+            return this.outliner != null;
+        }
     }
 }

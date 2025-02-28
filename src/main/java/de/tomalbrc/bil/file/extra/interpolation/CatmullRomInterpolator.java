@@ -3,18 +3,6 @@ package de.tomalbrc.bil.file.extra.interpolation;
 import org.joml.Vector3f;
 
 public class CatmullRomInterpolator implements Interpolator {
-    public Vector3f interpolate(float t, Vector3f beforePlus, Vector3f before, Vector3f after, Vector3f afterPlus) {
-        int i = 0;
-        Vector3f arr[] = new Vector3f[2 + (beforePlus==null?0:1) + (afterPlus==null?0:1)];
-
-        if (beforePlus != null) arr[i++] = beforePlus;
-        arr[i++] = before;
-        arr[i++] = after;
-        if (afterPlus != null) arr[i] = afterPlus;
-
-        return catmullRom((t + (beforePlus != null ? 1 : 0)) / (arr.length - 1), arr);
-    }
-
     private static Vector3f catmullRom(float t, Vector3f... points) {
         final float factor = (points.length - 1) * t;
 
@@ -45,5 +33,17 @@ public class CatmullRomInterpolator implements Interpolator {
 
         // eval cubic polynomial at t using Horner's rule
         return a * t * t * t + b * t * t + v0 * t + p1;
+    }
+
+    public Vector3f interpolate(float t, Vector3f beforePlus, Vector3f before, Vector3f after, Vector3f afterPlus) {
+        int i = 0;
+        Vector3f[] arr = new Vector3f[2 + (beforePlus == null ? 0 : 1) + (afterPlus == null ? 0 : 1)];
+
+        if (beforePlus != null) arr[i++] = beforePlus;
+        arr[i++] = before;
+        arr[i++] = after;
+        if (afterPlus != null) arr[i] = afterPlus;
+
+        return catmullRom((t + (beforePlus != null ? 1 : 0)) / (arr.length - 1), arr);
     }
 }

@@ -35,6 +35,7 @@ import java.util.UUID;
 
 public class BbModelImporter implements ModelImporter<BbModel> {
     protected final BbModel model;
+
     public BbModelImporter(BbModel model) {
         this.model = model;
     }
@@ -44,7 +45,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         ObjectArraySet<BbTexture> textures = new ObjectArraySet<>();
         textures.addAll(model.textures);
 
-        for (BbOutliner.ChildEntry entry: model.outliner) {
+        for (BbOutliner.ChildEntry entry : model.outliner) {
             if (entry.isNode()) {
                 createBones(null, null, model.outliner, nodeMap);
             }
@@ -68,7 +69,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     }
 
     protected void createBones(Node parent, BbOutliner parentOutliner, Collection<BbOutliner.ChildEntry> children, Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
-        for (BbOutliner.ChildEntry entry: children) {
+        for (BbOutliner.ChildEntry entry : children) {
             if (entry.isNode()) {
                 BbOutliner outliner = entry.outliner;
                 PolymerModelData modelData = null;
@@ -117,7 +118,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     protected Reference2ObjectOpenHashMap<UUID, Pose> defaultPose(Object2ObjectOpenHashMap<UUID, Node> nodeMap) {
         Reference2ObjectOpenHashMap<UUID, Pose> res = new Reference2ObjectOpenHashMap<>();
 
-        for (var entry: nodeMap.entrySet()) {
+        for (var entry : nodeMap.entrySet()) {
             var bone = entry.getValue();
             if (bone.modelData() != null)
                 res.put(bone.uuid(), Pose.of(bone.transform().globalTransform().scale(bone.transform().scale())));
@@ -143,7 +144,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @NotNull
     protected Reference2ObjectOpenHashMap<UUID, Pose> poses(BbAnimation animation, Object2ObjectOpenHashMap<UUID, Node> nodeMap, MolangEnvironment environment, float time) throws MolangRuntimeException {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
-        for (var entry: nodeMap.entrySet()) {
+        for (var entry : nodeMap.entrySet()) {
             Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
             //boolean requiresFrame = time == 0;
             List<Node> nodePath = nodePath(entry.getValue());
@@ -159,7 +160,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                         Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
                 Quaternionf localRot = createQuaternion(triple.getMiddle().mul(-1, -1, 1)).mul(node.transform().rotation());
-                Vector3f localPos = triple.getLeft().mul(-1,1,1).div(16).add(origin);
+                Vector3f localPos = triple.getLeft().mul(-1, 1, 1).div(16).add(origin);
 
                 matrix4f.translate(localPos);
                 matrix4f.rotate(localRot);
@@ -272,7 +273,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @NotNull
     private Vec2 size() {
         // TODO: read from element or outliner
-        return new Vec2(0.5f,1.f);
+        return new Vec2(0.5f, 1.f);
     }
 
     @Override

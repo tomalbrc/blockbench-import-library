@@ -21,6 +21,17 @@ public record Frame(
         @Nullable Commands commands,
         @Nullable SoundEvent soundEffect
 ) {
+    private static boolean satisfiesConditions(ParsedCommand[] conditions, CommandDispatcher<CommandSourceStack> dispatcher, CommandSourceStack source) {
+        if (conditions != null) {
+            for (ParsedCommand condition : conditions) {
+                if (condition.execute(dispatcher, source) <= 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public boolean requiresUpdates() {
         return this.variant != null || this.commands != null || this.soundEffect != null;
     }
@@ -57,24 +68,15 @@ public record Frame(
         }
     }
 
-    private static boolean satisfiesConditions(ParsedCommand[] conditions, CommandDispatcher<CommandSourceStack> dispatcher, CommandSourceStack source) {
-        if (conditions != null) {
-            for (ParsedCommand condition : conditions) {
-                if (condition.execute(dispatcher, source) <= 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public record Variant(
             UUID uuid,
             @Nullable ParsedCommand[] conditions
-    ) {}
+    ) {
+    }
 
     public record Commands(
             ParsedCommand[] commands,
             @Nullable ParsedCommand[] conditions
-    ) {}
+    ) {
+    }
 }

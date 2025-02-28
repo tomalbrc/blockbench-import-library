@@ -10,17 +10,17 @@ import it.unimi.dsi.fastutil.objects.ObjectSets;
 public class Locator extends AbstractWrapper {
     private final ObjectSet<LocatorListener> listeners;
 
-    public static Locator of(Node node, Pose defaultPose) {
-        return new Locator(node, defaultPose);
-    }
-
     public Locator(Node node, Pose defaultPose) {
         super(node, defaultPose);
         this.listeners = ObjectSets.synchronize(new ObjectArraySet<>());
     }
 
+    public static Locator of(Node node, Pose defaultPose) {
+        return new Locator(node, defaultPose);
+    }
+
     public boolean requiresUpdate() {
-        return this.listeners.size() > 0;
+        return !this.listeners.isEmpty();
     }
 
     public void updateListeners(AbstractAnimationHolder holder, Pose pose) {

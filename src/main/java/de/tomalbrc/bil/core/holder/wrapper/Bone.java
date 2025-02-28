@@ -14,6 +14,11 @@ public class Bone extends DisplayWrapper<ItemDisplayElement> {
     private final ItemStack item;
     private boolean invisible;
 
+    protected Bone(ItemDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
+        super(element, node, defaultPose, isHead);
+        this.item = element.getItem();
+    }
+
     public static Bone of(ItemDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
         return new Bone(element, node, defaultPose, isHead);
     }
@@ -30,11 +35,6 @@ public class Bone extends DisplayWrapper<ItemDisplayElement> {
         }
 
         return new Bone(element, node, defaultPose, head);
-    }
-
-    protected Bone(ItemDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
-        super(element, node, defaultPose, isHead);
-        this.item = element.getItem();
     }
 
     public void setInvisible(boolean invisible) {

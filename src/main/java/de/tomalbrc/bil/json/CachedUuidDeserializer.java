@@ -18,8 +18,9 @@ public class CachedUuidDeserializer implements JsonDeserializer<UUID> {
     public static UUID get(String name) {
         return UUID_CACHE.get(name);
     }
-    public static UUID put(String name, UUID uuid) {
-        return UUID_CACHE.put(name, uuid);
+
+    public static void put(String name, UUID uuid) {
+        UUID_CACHE.put(name, uuid);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class CachedUuidDeserializer implements JsonDeserializer<UUID> {
         } catch (IllegalArgumentException exception) {
             uuid = UUID.randomUUID();
         }
-        UUID_CACHE.put(string, uuid);
+        put(string, uuid);
         return uuid;
     }
 }

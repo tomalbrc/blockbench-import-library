@@ -16,16 +16,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ResourcePackModel {
-    public record DisplayTransform(Vector3f rotation, Vector3f translation, Vector3f scale) {
-    }
-
-    public static ResourcePackModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackModel.DisplayTransform(new Vector3f(0,180,0), null, null); // default BIL model transform
-
+    public static ResourcePackModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackModel.DisplayTransform(new Vector3f(0, 180, 0), null, null); // default BIL model transform
     final String parent;
     final Map<String, ResourceLocation> textures;
     final List<BbElement> elements;
     final Map<String, DisplayTransform> display;
-
     ResourcePackModel(String parent, Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
         this.parent = parent;
         this.textures = textures;
@@ -38,6 +33,9 @@ public class ResourcePackModel {
 
     public byte[] getBytes() {
         return BbResourcePackGenerator.gson.toJson(this).getBytes(StandardCharsets.UTF_8);
+    }
+
+    public record DisplayTransform(Vector3f rotation, Vector3f translation, Vector3f scale) {
     }
 
     public static class Builder {
@@ -65,7 +63,7 @@ public class ResourcePackModel {
                 for (var entry : intTextureMap.int2ObjectEntrySet()) {
                     var str = FilenameUtils.getBaseName(entry.getValue().name.toLowerCase());
                     while (str.endsWith(".png")) { // remove all .png extensions if multiple
-                        str = str.substring(0, str.length()-4);
+                        str = str.substring(0, str.length() - 4);
                     }
                     this.textureMap.put(String.valueOf(entry.getIntKey()), ResourceLocation.fromNamespaceAndPath("bil", "item/" + this.modelId + "/" + str));
                 }

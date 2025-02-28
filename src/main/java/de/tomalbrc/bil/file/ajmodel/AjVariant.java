@@ -13,5 +13,6 @@ public record AjVariant(UUID uuid,
                         boolean affectedBonesIsAWhitelist,
                         @SerializedName("default") boolean isDefault) {
 
-    public record AffectedBoneEntry(String name, UUID value) {}
+    public record AffectedBoneEntry(String name, UUID value) {
+    }
 }

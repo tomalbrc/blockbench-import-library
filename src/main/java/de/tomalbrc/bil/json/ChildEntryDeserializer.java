@@ -15,8 +15,7 @@ public class ChildEntryDeserializer implements JsonDeserializer<BbOutliner.Child
         var entry = new BbOutliner.ChildEntry();
         if (jsonElement.isJsonObject()) {
             entry.outliner = jsonDeserializationContext.deserialize(jsonElement, BbOutliner.class);
-        }
-        else {
+        } else {
             entry.uuid = jsonDeserializationContext.deserialize(jsonElement, UUID.class);
         }
         return entry;

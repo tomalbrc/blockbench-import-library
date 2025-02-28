@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import de.tomalbrc.bil.file.bbmodel.BbElement;
-import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Type;

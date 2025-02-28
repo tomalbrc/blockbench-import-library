@@ -13,6 +13,11 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.List;
 
 public interface AnimatedEntity extends PolymerEntity {
+    @Nullable
+    static AnimatedEntityHolder getHolder(Object obj) {
+        return obj instanceof AnimatedEntity animatedEntity ? animatedEntity.getHolder() : null;
+    }
+
     AnimatedEntityHolder getHolder();
 
     default float getShadowRadius() {
@@ -44,10 +49,5 @@ public interface AnimatedEntity extends PolymerEntity {
         data.add(SynchedEntityData.DataValue.create(EntityTrackedData.SILENT, true));
         data.add(SynchedEntityData.DataValue.create(EntityTrackedData.NO_GRAVITY, true));
         data.add(SynchedEntityData.DataValue.create(EntityTrackedData.NAME_VISIBLE, false));
-    }
-
-    @Nullable
-    static AnimatedEntityHolder getHolder(Object obj) {
-        return obj instanceof AnimatedEntity animatedEntity ? animatedEntity.getHolder() : null;
     }
 }

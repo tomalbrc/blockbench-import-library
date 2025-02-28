@@ -58,7 +58,7 @@ public class BbResourcePackGenerator {
             byte[] texData = Base64.getDecoder().decode(texture.source.replace(BASE64_PNG_PREFIX, ""));
             var str = FilenameUtils.getBaseName(texture.name.toLowerCase());
             while (str.endsWith(".png")) { // remove all .png extensions if multiple
-                str = str.substring(0, str.length()-4);
+                str = str.substring(0, str.length() - 4);
             }
             ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png"), texData);
         }

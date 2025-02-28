@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class BbModelUtils {
     public static BbElement getElement(BbModel model, UUID uuid) {
-        for (BbElement element: model.elements) {
+        for (BbElement element : model.elements) {
             if (element.uuid == uuid)
                 return element;
         }
@@ -19,7 +19,7 @@ public class BbModelUtils {
     }
 
     public static BbTexture getTexture(BbModel model, UUID uuid) {
-        for (BbTexture element: model.textures) {
+        for (BbTexture element : model.textures) {
             if (element.uuid == uuid)
                 return element;
         }
@@ -30,7 +30,7 @@ public class BbModelUtils {
         List<BbOutliner> list = new ObjectArrayList<>();
         List<BbOutliner.ChildEntry> children = new ObjectArrayList<>();
 
-        for (BbOutliner.ChildEntry entry: model.outliner) {
+        for (BbOutliner.ChildEntry entry : model.outliner) {
             if (entry.isNode()) {
                 if (entry.outliner.hasModel() && !entry.outliner.isHitbox()) {
                     list.add(entry.outliner);
@@ -57,7 +57,7 @@ public class BbModelUtils {
     }
 
     public static void findModelOutlinerChildren(BbModel model, List<BbOutliner> list, BbOutliner x) {
-        for (BbOutliner.ChildEntry child: x.children) {
+        for (BbOutliner.ChildEntry child : x.children) {
             if (child.isNode()) {
                 if (child.outliner.hasModel() && !child.outliner.isHitbox())
                     list.add(child.outliner);
@@ -68,7 +68,7 @@ public class BbModelUtils {
     }
 
     public static BbOutliner getParent(BbModel model, BbElement element) {
-        for (BbOutliner.ChildEntry entry: model.outliner) {
+        for (BbOutliner.ChildEntry entry : model.outliner) {
             if (entry.isNode()) {
                 BbOutliner res = findParent(model, entry.outliner, element);
                 if (res != null)
@@ -82,7 +82,7 @@ public class BbModelUtils {
         if (x.hasUuidChild(element.uuid))
             return x;
 
-        for (BbOutliner.ChildEntry child: x.children) {
+        for (BbOutliner.ChildEntry child : x.children) {
             if (child.isNode() && child.outliner.hasUuidChild(element.uuid)) {
                 return child.outliner;
             } else if (child.isNode()) {
@@ -96,7 +96,7 @@ public class BbModelUtils {
 
     public static List<BbElement> elementsForOutliner(BbModel model, BbOutliner outliner, BbElement.ElementType elementType) {
         List<BbElement> elements = new ObjectArrayList<>();
-        for (BbElement element: model.elements) {
+        for (BbElement element : model.elements) {
             if (outliner.hasUuidChild(element.uuid) && element.type == elementType) {
                 elements.add(element);
             }

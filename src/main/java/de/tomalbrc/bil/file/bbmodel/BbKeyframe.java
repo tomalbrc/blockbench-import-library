@@ -43,6 +43,14 @@ public class BbKeyframe implements Comparable {
         return 0;
     }
 
+    public Vector3f getVector3f(int index, BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
+        return new Vector3f(
+                this.dataPoints.get(index).get("x").getValue(placeholders, environment),
+                this.dataPoints.get(index).get("y").getValue(placeholders, environment),
+                this.dataPoints.get(index).get("z").getValue(placeholders, environment)
+        );
+    }
+
     public enum Channel {
         position,
         rotation,
@@ -51,14 +59,6 @@ public class BbKeyframe implements Comparable {
         sound, // model
         variants, // ajmodel
         commands // ajmodel
-    }
-
-    public Vector3f getVector3f(int index, BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
-        return new Vector3f(
-                this.dataPoints.get(index).get("x").getValue(placeholders, environment),
-                this.dataPoints.get(index).get("y").getValue(placeholders, environment),
-                this.dataPoints.get(index).get("z").getValue(placeholders, environment)
-        );
     }
 
     static public class DataPointValue {
@@ -70,12 +70,12 @@ public class BbKeyframe implements Comparable {
             this.value = value;
         }
 
-        public void setStringValue(String stringValue) {
-            this.stringValue = stringValue;
-        }
-
         public String getStringValue() {
             return this.stringValue;
+        }
+
+        public void setStringValue(String stringValue) {
+            this.stringValue = stringValue;
         }
 
         public float getValue(BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
@@ -102,12 +102,12 @@ public class BbKeyframe implements Comparable {
 
                 try {
                     this.molangExpression = BIL.COMPILER.compile(modifiedExpression);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
 
-            return this.molangExpression.get(environment);
+            return environment.resolve(this.molangExpression);
         }
     }
 }

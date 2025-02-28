@@ -22,7 +22,7 @@ public interface AnimatedEntity extends PolymerEntity {
     }
 
     default int getTeleportDuration() {
-        return 4;
+        return 3;
     }
 
     @Override

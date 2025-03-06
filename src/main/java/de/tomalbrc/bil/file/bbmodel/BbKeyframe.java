@@ -7,6 +7,7 @@ import de.tomalbrc.bil.file.extra.interpolation.Interpolation;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.MolangExpression;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
@@ -83,7 +84,7 @@ public class BbKeyframe implements Comparable {
                 return this.value;
 
             var length = this.stringValue.trim().length();
-            if (length <= 2) {
+            if (length <= 2 || NumberUtils.isParsable(this.stringValue)) {
                 if (length == 0 || this.stringValue.equals("-") || this.stringValue.equals("+") || this.stringValue.equals(".") || this.stringValue.equals(","))
                     return 0;
 

@@ -19,7 +19,8 @@ public record Frame(
 
         @Nullable Variant variant,
         @Nullable Commands commands,
-        @Nullable SoundEvent soundEffect
+        @Nullable SoundEvent soundEffect,
+        @Nullable Particle particleEffect
 ) {
     private static boolean satisfiesConditions(ParsedCommand[] conditions, CommandDispatcher<CommandSourceStack> dispatcher, CommandSourceStack source) {
         if (conditions != null) {
@@ -77,6 +78,14 @@ public record Frame(
     public record Commands(
             ParsedCommand[] commands,
             @Nullable ParsedCommand[] conditions
+    ) {
+    }
+
+    public record Particle(
+            String effect,
+            String locator,
+            ParsedCommand[] script,
+            String file
     ) {
     }
 }

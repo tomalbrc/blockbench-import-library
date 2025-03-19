@@ -195,6 +195,27 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     }
 
     @Nullable
+    protected Frame.Particle frameParticle(BbAnimation anim, float t) {
+        UUID effectsUUID = CachedUuidDeserializer.get("effects");
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+            BbAnimator animator = anim.animators.get(effectsUUID);
+            for (BbKeyframe kf : animator.keyframes) {
+                float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
+                if (difference == t && kf.channel == BbKeyframe.Channel.timeline) {
+                    String key = "script";
+                    var map = kf.dataPoints.getFirst();
+                    String script = map.get(key).getStringValue();
+                    if (!script.isEmpty()) {
+                        var cmds = CommandParser.parse(map.get(key).getStringValue());
+                        return new Frame.Particle(map.get("effect").getStringValue(), map.get("locator").getStringValue(), cmds, map.get("effect").getStringValue());
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
     protected SoundEvent frameSound(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
@@ -237,7 +258,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
                     // pose for bone in list of frames for an animation
                     Reference2ObjectOpenHashMap<UUID, Pose> poses = poses(anim, nodeMap, env, time);
-                    frames[i] = new Frame(time, poses, this.frameVariant(anim, time), this.frameCommands(anim, time), this.frameSound(anim, time));
+                    frames[i] = new Frame(time, poses, this.frameVariant(anim, time), this.frameCommands(anim, time), this.frameSound(anim, time), this.frameParticle(anim, time));
                 }
 
                 // todo: cleanup!

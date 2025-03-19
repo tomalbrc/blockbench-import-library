@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class BbKeyframe implements Comparable {
+@SuppressWarnings("unused")
+public class BbKeyframe implements Comparable<BbKeyframe> {
     public Channel channel;
     @SerializedName("data_points")
     public List<Map<String, DataPointValue>> dataPoints;
@@ -37,11 +38,8 @@ public class BbKeyframe implements Comparable {
     public Vector3f bezierRightValue;
 
     @Override
-    public int compareTo(@NotNull Object o) {
-        if (o instanceof BbKeyframe other) {
-            return other.time > this.time ? -1 : this.time == other.time ? 0 : 1;
-        }
-        return 0;
+    public int compareTo(@NotNull BbKeyframe o) {
+        return Float.compare(this.time, o.time);
     }
 
     public Vector3f getVector3f(int index, BbVariablePlaceholders placeholders, MolangEnvironment environment) throws MolangRuntimeException {
@@ -59,7 +57,8 @@ public class BbKeyframe implements Comparable {
         timeline, // model
         sound, // model
         variants, // ajmodel
-        commands // ajmodel
+        commands, // ajmodel
+        particle // bbmodel ..? maybe bedrock model?
     }
 
     static public class DataPointValue {

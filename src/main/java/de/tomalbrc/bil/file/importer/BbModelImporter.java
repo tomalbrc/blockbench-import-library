@@ -181,7 +181,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @Nullable
     protected Frame.Commands frameCommands(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
@@ -201,7 +201,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @Nullable
     protected SoundEvent frameSound(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments

@@ -93,7 +93,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
     @Override
     protected Frame.Variant frameVariant(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators.containsKey(effectsUUID)) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID)) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             if (animator.type == BbAnimator.Type.effect) {
                 for (BbKeyframe kf : animator.keyframes) {
@@ -111,7 +111,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
     @Override
     protected Frame.Commands frameCommands(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
@@ -131,7 +131,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
     @Override
     protected SoundEvent frameSound(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim

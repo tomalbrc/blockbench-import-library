@@ -87,7 +87,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelData);
+                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelData, outliner.name.startsWith("head"));
                 nodeMap.put(outliner.uuid, node);
 
                 List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
@@ -97,7 +97,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                     var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(locator.rotation), 1);
                     locatorTransform.mul(node.transform());
 
-                    Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, locator.name, locator.uuid, null);
+                    Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, locator.name, locator.uuid, null, false);
                     nodeMap.put(locator.uuid, locatorNode);
                 }
 
@@ -135,7 +135,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     protected List<Node> nodePath(Node child) {
         List<Node> nodePath = new ObjectArrayList<>();
         while (child != null) {
-            nodePath.add(0, child);
+            nodePath.addFirst(child);
             child = child.parent();
         }
         return nodePath;

@@ -27,7 +27,7 @@ public class Bone extends DisplayWrapper<ItemDisplayElement> {
         Node current = node;
         boolean head = false;
         while (current != null) {
-            if (current.name().startsWith("head")) {
+            if (current.headTag()) {
                 head = true;
                 break;
             }

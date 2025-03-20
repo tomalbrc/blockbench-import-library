@@ -12,7 +12,8 @@ public record Node(
         Transform transform,
         String name,
         UUID uuid,
-        PolymerModelData modelData
+        PolymerModelData modelData,
+        boolean headTag
 ) {
     public enum NodeType {
         @SerializedName("bone")

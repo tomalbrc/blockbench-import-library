@@ -16,16 +16,14 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBundlePacket;
-import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
-import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -131,6 +129,10 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
 
         if (this.parent.canBreatheUnderwater()) {
             consumer.accept(new ClientboundUpdateMobEffectPacket(this.collisionElement.getEntityId(), new MobEffectInstance(MobEffects.WATER_BREATHING, -1, 0, false, false), false));
+        }
+
+        if (this.parent instanceof Leashable leashable && leashable.getLeashData() != null && leashable.getLeashHolder() != null) {
+            consumer.accept(new ClientboundSetEntityLinkPacket(this.parent, leashable.getLeashHolder()));
         }
 
         consumer.accept(new ClientboundSetPassengersPacket(this.parent));

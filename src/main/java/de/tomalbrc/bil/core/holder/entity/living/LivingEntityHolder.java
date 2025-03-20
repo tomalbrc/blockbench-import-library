@@ -186,7 +186,7 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         this.updateEntityScale(this.scale);
         super.onDimensionsUpdated(dimensions);
 
-        this.collisionElement.setSize(Utils.toSlimeSize(Math.min(dimensions.width(), dimensions.height())));
+        this.collisionElement.setSize(Math.max(1, Utils.toSlimeSize(Math.min(dimensions.width(), dimensions.height()))));
         this.sendPacket(new ClientboundBundlePacket(Utils.updateClientInteraction(this.hitboxInteraction, dimensions)));
     }
 

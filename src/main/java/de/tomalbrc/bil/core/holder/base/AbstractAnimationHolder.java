@@ -72,7 +72,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         ItemDisplayElement element = new ItemDisplayElement();
         element.setModelTransformation(ItemDisplayContext.HEAD);
         element.setInvisible(true);
-        element.setInterpolationDuration(2);
+        element.setInterpolationDuration(3);
         element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
 
         ItemStack itemStack = new ItemStack(Items.LEATHER_HORSE_ARMOR);

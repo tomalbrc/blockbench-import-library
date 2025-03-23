@@ -51,7 +51,7 @@ public class Bone extends DisplayWrapper<ItemDisplayElement> {
     }
 
     public void updateColor(int color) {
-        this.item.set(DataComponents.DYED_COLOR, new DyedItemColor(color, false));
+        this.item.set(DataComponents.DYED_COLOR, new DyedItemColor(color));
 
         if (!this.invisible) {
             this.setTrackedItem(this.item);

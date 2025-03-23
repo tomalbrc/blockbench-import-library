@@ -91,7 +91,7 @@ public class ModelCommand {
         try {
             Model model = supplier.get();
             ModelEntity entity = new ModelEntity(level, model);
-            entity.moveTo(pos.x, pos.y, pos.z, rot.y, 0F);
+            entity.moveOrInterpolateTo(pos, rot.y, rot.x);
 
             level.addFreshEntity(entity);
             source.sendSuccess(() -> Component.literal("Successfully spawned model!"), false);

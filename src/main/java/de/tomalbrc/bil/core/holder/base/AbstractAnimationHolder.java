@@ -77,7 +77,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
 
         ItemStack itemStack = new ItemStack(Items.LEATHER_HORSE_ARMOR);
         itemStack.set(DataComponents.ITEM_MODEL, modelData);
-        itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(-1, false));
+        itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(-1));
 
         element.setItem(itemStack);
         return element;
@@ -94,9 +94,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
                         this.addElement(bone);
                     }
                 }
-                case LOCATOR -> {
-                    this.locatorMap.put(node.name(), Locator.of(node, defaultPose));
-                }
+                case LOCATOR -> this.locatorMap.put(node.name(), Locator.of(node, defaultPose));
             }
         }
     }

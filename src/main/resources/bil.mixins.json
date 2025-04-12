@@ -4,6 +4,7 @@
   "package": "de.tomalbrc.bil.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "LivingEntityMixin",
     "accessor.LivingEntityAccessor",
     "accessor.ServerCommonPacketListenerImplAccessor",
     "async.ChunkMapMixin",

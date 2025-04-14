@@ -46,6 +46,8 @@ public class ElementSerializer implements JsonSerializer<BbElement> {
         obj.add("from", context.serialize(src.from));
         obj.add("to", context.serialize(src.to));
         obj.add("faces", context.serialize(src.faces));
+        if (src.lightEmission != -1)
+            obj.add("light_emission", context.serialize(src.lightEmission));
 
         if (src.origin.length() > 0 || (src.rotation != null && src.rotation.length() > 0.0001f)) {
             JsonObject rot = new JsonObject();

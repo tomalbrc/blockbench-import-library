@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public class LivingEntityMixin {
     @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z", ordinal = 1))
     private boolean bil$tickWalkAnimation(Level instance, Operation<Boolean> original) {
-        return this instanceof AnimatedEntity;
+        return original.call(instance) || this instanceof AnimatedEntity;
     }
 }

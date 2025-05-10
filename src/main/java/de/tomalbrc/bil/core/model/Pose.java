@@ -7,7 +7,8 @@ public record Pose(
         Vector3f translation,
         Vector3f scale,
         Quaternionf leftRotation,
-        Quaternionf rightRotation
+        Quaternionf rightRotation,
+        Matrix4fc matrix
 ) {
     public static Pose of(Matrix4f matrix4f) {
         Matrix3f matrix3f = new Matrix3f(matrix4f);
@@ -24,7 +25,7 @@ public record Pose(
         Quaternionf leftRotation = triple.getLeft();
         Quaternionf rightRotation = triple.getRight();
 
-        return new Pose(translation, scale, leftRotation, rightRotation);
+        return new Pose(translation, scale, leftRotation, rightRotation, matrix4f);
     }
 
     public Vector3fc readOnlyTranslation() {

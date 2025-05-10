@@ -18,7 +18,7 @@ public class BbModel {
     @SerializedName("model_identifier")
     public String modelIdentifier;
 
-    public Vector2i resolution;
+    public Vector2i resolution; // this was used to rescale uv previously, but turns out using the actual texture size is better.
     public ObjectArrayList<BbElement> elements;
     public ObjectArrayList<BbOutliner.ChildEntry> outliner;
     public ObjectArrayList<BbTexture> textures;

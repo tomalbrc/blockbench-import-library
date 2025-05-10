@@ -15,7 +15,7 @@ public class BbElement {
 
     public Vector3f from;
     public Vector3f to;
-
+    public Boolean shade;
     public Vector3f rotation;
 
     public float inflate;

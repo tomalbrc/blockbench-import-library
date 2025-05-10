@@ -19,6 +19,7 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 import java.io.*;
+import java.util.List;
 
 public class BbModelLoader implements ModelLoader {
     protected static Gson GSON = JSON.GENERIC_BUILDER
@@ -40,11 +41,23 @@ public class BbModelLoader implements ModelLoader {
         }
     }
 
-    private void rescaleUV(Vector2i res, BbElement element) {
+    private void rescaleUV(Vector2i res, List<BbTexture> textures, BbElement element) {
         for (var entry : element.faces.entrySet()) {
-            // re-map uv based on resolution
+            // re-map uv based on texture size
             BbFace face = entry.getValue();
             for (int i = 0; i < face.uv.size(); i++) {
+                BbTexture texture = null;
+                for (BbTexture currentTexture : textures) {
+                    if (currentTexture.id == face.texture) {
+                        texture = currentTexture;
+                        break;
+                    }
+                }
+
+                if (texture != null && texture.width != 0 && texture.height != 0) {
+                    res = new Vector2i(texture.width, texture.height);
+                }
+
                 face.uv.set(i, (face.uv.get(i) * 16.f) / res.get(i % 2));
             }
         }
@@ -59,7 +72,10 @@ public class BbModelLoader implements ModelLoader {
         for (BbElement element : model.elements) {
             if (element.type != BbElement.ElementType.CUBE) continue;
 
-            this.rescaleUV(model.resolution, element);
+            // remove elements without texture
+            element.faces.entrySet().removeIf(entry -> entry.getValue().texture == null);
+
+            this.rescaleUV(model.resolution, model.textures, element);
             this.inflateElement(element);
 
             BbOutliner parent = BbModelUtils.getParent(model, element);

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElementSerializer implements JsonSerializer<BbElement> {
 
-    String getAxis(Vector3f v) {
+    public static String getAxisAsString(Vector3f v) {
         if (v != null) {
             var axis = List.of("x", "y", "z");
             for (int i = 0; i < 3; i++) {
@@ -26,7 +26,7 @@ public class ElementSerializer implements JsonSerializer<BbElement> {
         return "y";
     }
 
-    float getAngle(Vector3f v) {
+    public static float getAngleAsString(Vector3f v) {
         if (v != null && v.length() > 0.0001f) {
             for (int i = 0; i < 3; i++) {
                 if (Math.abs(v.get(i)) > 0) {
@@ -46,13 +46,15 @@ public class ElementSerializer implements JsonSerializer<BbElement> {
         obj.add("from", context.serialize(src.from));
         obj.add("to", context.serialize(src.to));
         obj.add("faces", context.serialize(src.faces));
-        if (src.lightEmission != -1)
-            obj.add("light_emission", context.serialize(src.lightEmission));
+        if (src.lightEmission > 0)
+            obj.addProperty("light_emission", src.lightEmission);
+        if (src.shade != null && src.shade)
+            obj.addProperty("shade", true);
 
         if (src.origin.length() > 0 || (src.rotation != null && src.rotation.length() > 0.0001f)) {
             JsonObject rot = new JsonObject();
-            rot.addProperty("axis", this.getAxis(src.rotation));
-            rot.addProperty("angle", this.getAngle(src.rotation));
+            rot.addProperty("axis", getAxisAsString(src.rotation));
+            rot.addProperty("angle", getAngleAsString(src.rotation));
             rot.add("origin", context.serialize(src.origin));
             obj.add("rotation", rot);
         }

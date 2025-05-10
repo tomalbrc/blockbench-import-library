@@ -17,11 +17,12 @@ import java.util.Objects;
 
 public class ResourcePackModel {
     public static ResourcePackModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackModel.DisplayTransform(new Vector3f(0, 180, 0), null, null); // default BIL model transform
-    final String parent;
-    final Map<String, ResourceLocation> textures;
-    final List<BbElement> elements;
-    final Map<String, DisplayTransform> display;
-    ResourcePackModel(String parent, Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
+    protected final String parent;
+    protected final Map<String, ResourceLocation> textures;
+    protected final List<BbElement> elements;
+    protected final Map<String, DisplayTransform> display;
+
+    public ResourcePackModel(String parent, Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
         this.parent = parent;
         this.textures = textures;
         if (this.textures != null && !this.textures.isEmpty() && !this.textures.containsKey("particle")) {
@@ -39,14 +40,13 @@ public class ResourcePackModel {
     }
 
     public static class Builder {
-        final String modelId;
+        protected final String modelId;
+        protected String parent = null;
 
-        String parent = null;
+        protected Map<String, ResourceLocation> textureMap = null;
+        protected List<BbElement> elements = null;
 
-        Map<String, ResourceLocation> textureMap = null;
-        List<BbElement> elements = null;
-
-        Map<String, DisplayTransform> transformMap = new Object2ObjectArrayMap<>();
+        protected Map<String, DisplayTransform> transformMap = new Object2ObjectArrayMap<>();
 
         public Builder(String modelId) {
             this.modelId = modelId;

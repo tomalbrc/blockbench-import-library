@@ -2,6 +2,7 @@ package de.tomalbrc.bil.file.importer;
 
 import de.tomalbrc.bil.file.bbmodel.BbKeyframe;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
+import de.tomalbrc.bil.file.extra.EasingType;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import org.apache.commons.lang3.tuple.Triple;
@@ -45,8 +46,10 @@ public class Sampler {
             beforeBefore = before;
         }
 
-        float t = (time - before.time) / (after.time - before.time);
-        return before.interpolation.get().interpolate(t,
+        double t = (time - before.time) / (after.time - before.time);
+        if (after != null && after.easing != EasingType.LINEAR) t = after.easing.apply(t, after.easingArgs);
+
+        return before.interpolation.get().interpolate((float) t,
                 beforeBefore == null ? null : beforeBefore.getVector3f(0, placeholders, environment),
                 before == null ? null : before.getVector3f(0, placeholders, environment),
                 after == null ? null : after.getVector3f(0, placeholders, environment),

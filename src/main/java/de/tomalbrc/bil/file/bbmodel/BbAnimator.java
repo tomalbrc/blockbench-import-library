@@ -1,5 +1,7 @@
 package de.tomalbrc.bil.file.bbmodel;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class BbAnimator {
@@ -8,7 +10,9 @@ public class BbAnimator {
     public List<BbKeyframe> keyframes;
 
     public enum Type {
-        bone,
-        effect
+        @SerializedName("bone")
+        BONE,
+        @SerializedName("effect")
+        EFFECT
     }
 }

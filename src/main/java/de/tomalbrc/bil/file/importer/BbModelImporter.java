@@ -54,7 +54,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     }
 
     protected ResourceLocation generateModel(BbOutliner outliner) {
-        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
+        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE_MODEL);
 
         ResourcePackModel.Builder builder = new ResourcePackModel.Builder(model.modelIdentifier)
                 .withTextures(this.makeDefaultTextureMap())
@@ -83,24 +83,69 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelPath, outliner.name.startsWith("head"));
+                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelPath, outliner.name.startsWith("head"), null);
                 nodeMap.put(outliner.uuid, node);
 
-                List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
-                for (BbElement locator : locatorElements) {
-                    Vector3f localPos2 = locator.position.sub(outliner.origin, new Vector3f());
-
-                    var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(locator.rotation), 1);
-                    locatorTransform.mul(node.transform());
-
-                    Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, locator.name, locator.uuid, null, false);
-                    nodeMap.put(locator.uuid, locatorNode);
-                }
-
+                processLocators(nodeMap, outliner, node);
+                processTextDisplays(nodeMap, outliner, node);
+                processBlockDisplays(nodeMap, outliner, node);
+                processItemDisplays(nodeMap, outliner, node);
 
                 // children
                 createBones(node, outliner, outliner.children, nodeMap);
             }
+        }
+    }
+
+    private void processLocators(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
+        for (BbElement element : locatorElements) {
+            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
+
+            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            locatorTransform.mul(node.transform());
+
+            Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, element.name, element.uuid, null, false, null);
+            nodeMap.put(element.uuid, locatorNode);
+        }
+    }
+
+    private void processTextDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.TEXT_DISPLAY);
+        for (BbElement element : locatorElements) {
+            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
+
+            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            locatorTransform.mul(node.transform());
+
+            Node locatorNode = new Node(Node.NodeType.TEXT, node, locatorTransform, element.name, element.uuid, null, false, element);
+            nodeMap.put(element.uuid, locatorNode);
+        }
+    }
+
+    private void processBlockDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.BLOCK_DISPLAY);
+        for (BbElement element : locatorElements) {
+            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
+
+            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            locatorTransform.mul(node.transform());
+
+            Node locatorNode = new Node(Node.NodeType.BLOCK, node, locatorTransform, element.name, element.uuid, null, false, element);
+            nodeMap.put(element.uuid, locatorNode);
+        }
+    }
+
+    private void processItemDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.ITEM_DISPLAY);
+        for (BbElement element : locatorElements) {
+            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
+
+            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            locatorTransform.mul(node.transform());
+
+            Node locatorNode = new Node(Node.NodeType.ITEM, node, locatorTransform, element.name, element.uuid, null, false, element);
+            nodeMap.put(element.uuid, locatorNode);
         }
     }
 
@@ -117,7 +162,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         for (var entry : nodeMap.entrySet()) {
             var bone = entry.getValue();
             if (bone.modelData() != null)
-                res.put(bone.uuid(), Pose.of(bone.transform().globalTransform().scale(bone.transform().scale())));
+                res.put(bone.uuid(), Pose.of(bone.transform().globalTransform().scale(bone.transform().scale(), new Matrix4f())));
         }
 
         return res;
@@ -177,7 +222,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @Nullable
     protected Frame.Commands frameCommands(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
@@ -197,11 +242,11 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @Nullable
     protected Frame.Particle frameParticle(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
-                if (difference == t && kf.channel == BbKeyframe.Channel.timeline) {
+                if (difference == t && kf.channel == BbKeyframe.Channel.TIMELINE) {
                     String key = "script";
                     var map = kf.dataPoints.getFirst();
                     String script = map.get(key).getStringValue();
@@ -218,7 +263,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     @Nullable
     protected SoundEvent frameSound(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments

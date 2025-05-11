@@ -3,14 +3,15 @@ package de.tomalbrc.bil.file.loader;
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
-import de.tomalbrc.bil.file.importer.AjModelImporter;
+import de.tomalbrc.bil.file.importer.AjBlueprintImporter;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
 public class AjBlueprintLoader extends BbModelLoader {
     @Override
-    public Model load(InputStream input, String name) throws JsonParseException {
+    public Model load(InputStream input, @NotNull String name) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
             BbModel model = GSON.fromJson(reader, BbModel.class);
 
@@ -20,7 +21,7 @@ public class AjBlueprintLoader extends BbModelLoader {
 
             this.postProcess(model);
 
-            return new AjModelImporter(model).importModel();
+            return new AjBlueprintImporter(model).importModel();
         } catch (Throwable throwable) {
             throw new JsonParseException("Failed to parse: " + name, throwable);
         }

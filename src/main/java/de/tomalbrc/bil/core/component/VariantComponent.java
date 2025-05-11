@@ -2,7 +2,8 @@ package de.tomalbrc.bil.core.component;
 
 import de.tomalbrc.bil.api.VariantController;
 import de.tomalbrc.bil.core.holder.base.AbstractAnimationHolder;
-import de.tomalbrc.bil.core.holder.wrapper.Bone;
+import de.tomalbrc.bil.core.holder.wrapper.ItemBone;
+import de.tomalbrc.bil.core.holder.wrapper.ModelBone;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Variant;
 import net.minecraft.resources.ResourceLocation;
@@ -28,8 +29,10 @@ public class VariantComponent extends ComponentBase implements VariantController
     public void setDefaultVariant() {
         if (this.currentVariant != null) {
             this.currentVariant = null;
-            for (Bone bone : this.holder.getBones()) {
-                bone.updateModelData(bone.node().modelData());
+            for (int i = 0; i < this.holder.getBones().length; i++) {
+                if (this.holder.getBones()[i] instanceof ItemBone itemBone) {
+                    itemBone.updateModelData(itemBone.node().modelData());
+                }
             }
         }
     }
@@ -79,11 +82,13 @@ public class VariantComponent extends ComponentBase implements VariantController
     }
 
     private void applyVariantToBones(Variant variant) {
-        for (Bone bone : this.holder.getBones()) {
-            UUID uuid = bone.node().uuid();
-            ResourceLocation modelData = variant.models().get(uuid);
-            if (modelData != null && variant.isAffected(uuid)) {
-                bone.updateModelData(modelData);
+        for (int i = 0; i < this.holder.getBones().length; i++) {
+            if (this.holder.getBones()[i] instanceof ModelBone bone) {
+                UUID uuid = bone.node().uuid();
+                ResourceLocation modelData = variant.models().get(uuid);
+                if (modelData != null && variant.isAffected(uuid)) {
+                    bone.updateModelData(modelData);
+                }
             }
         }
     }

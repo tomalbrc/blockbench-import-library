@@ -4,6 +4,7 @@ import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import de.tomalbrc.bil.core.holder.base.AbstractAnimationHolder;
 import de.tomalbrc.bil.core.holder.wrapper.Bone;
+import de.tomalbrc.bil.core.holder.wrapper.ItemBone;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
@@ -120,8 +121,8 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
         float width = scale * (this.dimensions.width() * 2);
         float height = scale * (this.dimensions.height() + 1);
 
-        for (Bone bone : this.bones) {
-            bone.element().setDisplaySize(width, height);
+        for (int i = 0; i < this.bones.length; i++) {
+            bones[i].element().setDisplaySize(width, height);
         }
     }
 
@@ -139,14 +140,14 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
     }
 
     protected void updateInvisibility(boolean isInvisible) {
-        for (Bone bone : this.bones) {
-            bone.setInvisible(isInvisible);
+        for (int i = 0; i < this.bones.length; i++) {
+            if (this.bones[i] instanceof ItemBone itemBone) itemBone.updateColor(color);
         }
     }
 
     protected void updateGlowing(boolean isGlowing) {
-        for (Bone bone : this.bones) {
-            bone.element().setGlowing(isGlowing);
+        for (int i = 0; i < this.bones.length; i++) {
+            bones[i].element().setGlowing(isGlowing);
         }
     }
 
@@ -155,7 +156,7 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
         int[] displays = new int[this.bones.length + this.additionalDisplays.size()];
 
         int index = 0;
-        for (Bone bone : this.bones) {
+        for (Bone<?> bone : this.bones) {
             displays[index++] = bone.element().getEntityId();
         }
 

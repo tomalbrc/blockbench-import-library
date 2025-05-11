@@ -4,18 +4,20 @@ import de.tomalbrc.bil.api.AnimatedHolder;
 import de.tomalbrc.bil.api.Animator;
 import de.tomalbrc.bil.core.component.AnimationComponent;
 import de.tomalbrc.bil.core.component.VariantComponent;
-import de.tomalbrc.bil.core.holder.wrapper.Bone;
-import de.tomalbrc.bil.core.holder.wrapper.DisplayWrapper;
-import de.tomalbrc.bil.core.holder.wrapper.Locator;
+import de.tomalbrc.bil.core.holder.wrapper.*;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
+import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -33,7 +35,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
     protected final VariantComponent variantComponent;
     protected final Object2ObjectOpenHashMap<String, Locator> locatorMap;
 
-    protected Bone[] bones;
+    protected Bone<?>[] bones;
     protected Locator[] locators;
     protected float scale = 1F;
     protected int color = -1;
@@ -48,7 +50,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
 
     @Override
     protected final void initializeElements() {
-        ObjectArrayList<Bone> bones = new ObjectArrayList<>();
+        ObjectArrayList<Bone<?>> bones = new ObjectArrayList<>();
         this.setupElements(bones);
 
         this.locators = new Locator[this.locatorMap.size()];
@@ -83,14 +85,41 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         return element;
     }
 
-    protected void setupElements(List<Bone> bones) {
+    protected void setupElements(List<Bone<?>> bones) {
         for (Node node : this.model.nodeMap().values()) {
             Pose defaultPose = this.model.defaultPose().get(node.uuid());
             switch (node.type()) {
                 case BONE -> {
                     ItemDisplayElement bone = this.createBoneDisplay(node.modelData());
                     if (bone != null) {
-                        bones.add(Bone.of(bone, node, defaultPose));
+                        bones.add(ModelBone.of(bone, node, defaultPose));
+                        this.addElement(bone);
+                    }
+                }
+                case ITEM -> {
+                    if (node.displayDataElement() != null) {
+                        ItemDisplayElement bone = new ItemDisplayElement(BuiltInRegistries.ITEM.getValue(node.displayDataElement().getItem()));
+                        bone.setInterpolationDuration(3);
+                        bone.setTeleportDuration(3);
+                        bones.add(ItemBone.of(bone, node, defaultPose));
+                        this.addElement(bone);
+                    }
+                }
+                case BLOCK -> {
+                    if (node.displayDataElement() != null) {
+                        BlockDisplayElement bone = new BlockDisplayElement(BuiltInRegistries.BLOCK.getValue(node.displayDataElement().getBlock()).defaultBlockState());
+                        bone.setInterpolationDuration(3);
+                        bone.setTeleportDuration(3);
+                        bones.add(BlockBone.of(bone, node, defaultPose));
+                        this.addElement(bone);
+                    }
+                }
+                case TEXT -> {
+                    if (node.displayDataElement() != null) {
+                        TextDisplayElement bone = new TextDisplayElement(Component.literal(node.displayDataElement().getText()));
+                        bone.setInterpolationDuration(3);
+                        bone.setTeleportDuration(3);
+                        bones.add(TextBone.of(bone, node, defaultPose));
                         this.addElement(bone);
                     }
                 }
@@ -101,7 +130,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
 
     @Override
     protected void onDataLoaded() {
-        for (Bone bone : this.bones) {
+        for (Bone<?> bone : this.bones) {
             this.initializeDisplay(bone);
         }
     }
@@ -118,7 +147,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
 
     @Override
     protected void onAsyncTick() {
-        for (Bone bone : this.bones) {
+        for (Bone<?> bone : this.bones) {
             this.updateElement(bone);
         }
 
@@ -169,8 +198,8 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
     public void setColor(int color) {
         if (color != this.color) {
             this.color = color;
-            for (Bone bone : this.bones) {
-                bone.updateColor(color);
+            for (int i = 0; i < this.bones.length; i++) {
+                if (this.bones[i] instanceof ItemBone itemBone) itemBone.updateColor(color);
             }
         }
     }
@@ -205,7 +234,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         this.scale = scale;
     }
 
-    public Bone[] getBones() {
+    public Bone<?>[] getBones() {
         return this.bones;
     }
 

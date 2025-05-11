@@ -1,25 +1,29 @@
 package de.tomalbrc.bil.core.model;
 
-import com.google.gson.annotations.SerializedName;
+import de.tomalbrc.bil.file.bbmodel.BbElement;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 import java.util.UUID;
 
 public record Node(
-        NodeType type,
-        Node parent,
-        Transform transform,
-        String name,
-        UUID uuid,
-        ResourceLocation modelData,
-        boolean headTag
+        @NotNull NodeType type,
+        @NotNull Node parent,
+        @NotNull Transform transform,
+        @NotNull String name,
+        @NotNull UUID uuid,
+        @Nullable ResourceLocation modelData,
+        boolean headTag,
+        @Nullable BbElement displayDataElement
 ) {
     public enum NodeType {
-        @SerializedName("bone")
         BONE,
-        @SerializedName("locator")
-        LOCATOR
+        LOCATOR,
+        ITEM,
+        BLOCK,
+        TEXT
     }
 
     public static final class Transform {
@@ -57,7 +61,7 @@ public record Node(
             return scale;
         }
 
-        public Matrix4f globalTransform() {
+        public Matrix4fc globalTransform() {
             return globalTransform;
         }
     }

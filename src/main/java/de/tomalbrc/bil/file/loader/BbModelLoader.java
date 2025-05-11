@@ -46,16 +46,18 @@ public class BbModelLoader implements ModelLoader {
             // re-map uv based on texture size
             BbFace face = entry.getValue();
             for (int i = 0; i < face.uv.size(); i++) {
-                BbTexture texture = null;
+                int largestWidth = 0;
+                int largestHeight = 0;
                 for (BbTexture currentTexture : textures) {
-                    if (currentTexture.id == face.texture) {
-                        texture = currentTexture;
-                        break;
-                    }
+                    if (currentTexture.width > largestWidth)
+                        largestWidth = currentTexture.width;
+
+                    if (currentTexture.height > largestHeight)
+                        largestHeight = currentTexture.height;
                 }
 
-                if (texture != null && texture.width != 0 && texture.height != 0) {
-                    res = new Vector2i(texture.width, texture.height);
+                if (largestWidth != 0 && largestHeight != 0) {
+                    res = new Vector2i(largestWidth, largestHeight);
                 }
 
                 face.uv.set(i, (face.uv.get(i) * 16.f) / res.get(i % 2));
@@ -70,7 +72,7 @@ public class BbModelLoader implements ModelLoader {
 
     protected void postProcess(BbModel model) {
         for (BbElement element : model.elements) {
-            if (element.type != BbElement.ElementType.CUBE) continue;
+            if (element.type != BbElement.ElementType.CUBE_MODEL) continue;
 
             // remove elements without texture
             element.faces.entrySet().removeIf(entry -> entry.getValue().texture == null);
@@ -91,7 +93,7 @@ public class BbModelLoader implements ModelLoader {
             for (var childEntry : parent.children) {
                 if (!childEntry.isNode()) {
                     BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
-                    if (element != null && element.type == BbElement.ElementType.CUBE) {
+                    if (element != null && element.type == BbElement.ElementType.CUBE_MODEL) {
                         min.min(element.from);
                         max.max(element.to);
                     }
@@ -101,7 +103,7 @@ public class BbModelLoader implements ModelLoader {
             for (var childEntry : parent.children) {
                 if (!childEntry.isNode()) {
                     BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
-                    if (element == null || element.type != BbElement.ElementType.CUBE) continue;
+                    if (element == null || element.type != BbElement.ElementType.CUBE_MODEL) continue;
 
                     var diff = min.sub(max, new Vector3f()).absolute();
                     float m = diff.get(diff.maxComponent());

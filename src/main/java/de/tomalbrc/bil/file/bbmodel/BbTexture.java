@@ -2,6 +2,7 @@ package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.awt.image.BufferedImage;
 import java.util.UUID;
 
 public class BbTexture {
@@ -36,4 +37,6 @@ public class BbTexture {
     public boolean saved;
     public UUID uuid;
     public String source;
+
+    transient public BufferedImage decodedImage;
 }

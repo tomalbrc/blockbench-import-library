@@ -57,7 +57,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                             !variant.affectedBonesIsAWhitelist() && !affectedBones.contains(outliner.uuid);
 
                     if (!outliner.isHitbox() && affected) {
-                        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
+                        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE_MODEL);
 
                         Int2ObjectOpenHashMap<BbTexture> textureMap = new Int2ObjectOpenHashMap<>();
                         if (variant.textureMap() == null || variant.textureMap().isEmpty()) {
@@ -91,7 +91,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID)) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            if (animator.type == BbAnimator.Type.effect) {
+            if (animator.type == BbAnimator.Type.EFFECT) {
                 for (BbKeyframe kf : animator.keyframes) {
                     if (Math.abs(kf.time - t) < 0.15f && kf.channel == BbKeyframe.Channel.VARIANTS) { // snap value to 50ms increments
                         UUID key = CachedUuidDeserializer.get(kf.dataPoints.getFirst().get("variant").getStringValue());
@@ -107,7 +107,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
     @Override
     protected Frame.Commands frameCommands(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
@@ -127,7 +127,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
     @Override
     protected SoundEvent frameSound(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
@@ -135,7 +135,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                     return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.getFirst().get("sound").getStringValue())).orElseThrow().value();
                 } else {
                     // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key
-                    super.frameSound(anim, t);
+                    return super.frameSound(anim, t);
                 }
             }
         }

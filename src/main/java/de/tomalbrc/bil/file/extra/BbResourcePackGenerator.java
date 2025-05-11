@@ -27,7 +27,7 @@ public class BbResourcePackGenerator {
             .registerTypeAdapter(BbElement.class, new ElementSerializer())
             .create();
 
-    static String BASE64_PNG_PREFIX = "data:image/png;base64,";
+    public static String BASE64_PNG_PREFIX = "data:image/png;base64,";
     static String MODEL_DIR = ":assets/bil/models/item/";
     static String TEXTURE_DIR = ":assets/bil/textures/item/";
 

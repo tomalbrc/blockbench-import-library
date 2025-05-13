@@ -2,9 +2,9 @@ package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.awt.image.BufferedImage;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class BbTexture {
     public String path;
     public String name;
@@ -20,8 +20,6 @@ public class BbTexture {
     public boolean particle;
     @SerializedName("layers_enabled")
     public boolean layersEnabled;
-    @SerializedName("sync_to_project")
-    public boolean syncToProject;
     @SerializedName("render_mode")
     public String renderMode;
     @SerializedName("render_sides")
@@ -33,10 +31,6 @@ public class BbTexture {
     @SerializedName("frame_order")
     public String frameOrder;
     public boolean visible;
-    public boolean internal;
-    public boolean saved;
     public UUID uuid;
     public String source;
-
-    transient public BufferedImage decodedImage;
 }

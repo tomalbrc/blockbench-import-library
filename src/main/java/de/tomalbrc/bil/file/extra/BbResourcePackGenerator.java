@@ -35,10 +35,11 @@ public class BbResourcePackGenerator {
         ResourceLocation modelResourceLocation = ResourceLocation.parse(MODEL_DIR + model.modelIdentifier + "/" + partName.toLowerCase() + ".json");
         ResourcePackUtil.add(modelResourceLocation, resourcePackModel.getBytes());
 
-        return ResourceLocation.fromNamespaceAndPath("bil", "item/" + model.modelIdentifier + "/" + partName);
+        return ResourceLocation.fromNamespaceAndPath("bil", "item/" + model.modelIdentifier + "/" + partName.toLowerCase());
     }
 
     public static ResourceLocation addItemModel(BbModel model, String partName, ResourcePackModel resourcePackModel) {
+        partName = model.modelIdentifier + "_" + partName;
         var modelPath = addModelPart(model, partName, resourcePackModel);
 
         var defaultModel = new BasicItemModel(modelPath, List.of(new DyeTintSource(0xFFFFFF)));

@@ -49,11 +49,11 @@ public class BbModelLoader implements ModelLoader {
                 int largestWidth = 0;
                 int largestHeight = 0;
                 for (BbTexture currentTexture : textures) {
-                    if (currentTexture.width > largestWidth)
-                        largestWidth = currentTexture.width;
+                    if (currentTexture.uvWidth > largestWidth)
+                        largestWidth = currentTexture.uvWidth;
 
-                    if (currentTexture.height > largestHeight)
-                        largestHeight = currentTexture.height;
+                    if (currentTexture.uvHeight > largestHeight)
+                        largestHeight = currentTexture.uvHeight;
                 }
 
                 if (largestWidth != 0 && largestHeight != 0) {

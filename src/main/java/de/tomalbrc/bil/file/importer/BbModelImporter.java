@@ -161,8 +161,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
         for (var entry : nodeMap.entrySet()) {
             var bone = entry.getValue();
-            if (bone.modelData() != null)
-                res.put(bone.uuid(), Pose.of(bone.transform().globalTransform().scale(bone.transform().scale(), new Matrix4f())));
+            res.put(bone.uuid(), Pose.of(bone.transform().globalTransform().scale(bone.transform().scale(), new Matrix4f())));
         }
 
         return res;

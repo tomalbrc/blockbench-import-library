@@ -28,7 +28,7 @@ public class ClientboundSetPassengersPacketMixin {
     @Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
     private void bil$modifyRidePacket(Entity entity, CallbackInfo ci) {
         AnimatedEntityHolder holder = AnimatedEntity.getHolder(entity);
-        if (holder != null) {
+        if (holder != null && holder.modifyRidePacket()) {
             this.vehicle = holder.getVehicleId();
 
             if (this.vehicle == holder.getDisplayVehicleId()) {

@@ -69,4 +69,11 @@ public interface AnimatedEntityHolder extends AnimatedHolder {
      * Removes an additional display element from the holder.
      */
     boolean removeAdditionalDisplay(DisplayElement element);
+
+    /**
+     * Whether to modify the ride packet to inject the holders' additional display entities
+     */
+    default boolean modifyRidePacket() {
+        return true;
+    }
 }

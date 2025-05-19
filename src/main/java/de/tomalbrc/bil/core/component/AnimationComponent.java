@@ -167,6 +167,16 @@ public class AnimationComponent extends ComponentBase implements Animator {
         return null;
     }
 
+    @Override
+    public boolean isPlaying(String name) {
+        return this.animationMap.containsKey(name);
+    }
+
+    @Override
+    public boolean hasRunningAnimations() {
+        return !this.animationMap.isEmpty();
+    }
+
     private static class AnimationPlayer implements Comparable<AnimationPlayer> {
         @NotNull
         private final Animation animation;
@@ -246,9 +256,7 @@ public class AnimationComponent extends ComponentBase implements Animator {
                         this.state = State.FINISHED_RESET_DEFAULT;
                     }
                 }
-                case HOLD -> {
-                    this.state = State.FINISHED;
-                }
+                case HOLD -> this.state = State.FINISHED;
                 case LOOP -> {
                     this.resetFrameCounter(true);
                     this.looped = true;

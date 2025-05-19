@@ -227,4 +227,8 @@ public interface Animator {
      * @param name: The name of the animation.
      */
     void stopAnimation(String name);
+
+    boolean isPlaying(String name);
+
+    boolean hasRunningAnimations();
 }

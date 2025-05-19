@@ -16,7 +16,6 @@ configurations {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url 'https://maven.tomalbrc.de' }
     maven { url 'https://maven.nucleoid.xyz' }

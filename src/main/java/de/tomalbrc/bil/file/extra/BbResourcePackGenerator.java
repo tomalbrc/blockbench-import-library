@@ -48,7 +48,7 @@ public class BbResourcePackGenerator {
                 ItemAsset.Properties.DEFAULT
         ).toJson().getBytes(StandardCharsets.UTF_8);
 
-        var id = ResourceLocation.fromNamespaceAndPath("bil", partName);
+        var id = ResourceLocation.fromNamespaceAndPath("bil", model.modelIdentifier + "_" + partName);
         ResourcePackUtil.add(ResourceLocation.parse(":" + AssetPaths.itemAsset(id)), bytes);
 
         return id;

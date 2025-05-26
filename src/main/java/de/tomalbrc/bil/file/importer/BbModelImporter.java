@@ -78,7 +78,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 Quaternionf localRot = createQuaternion(outliner.rotation);
 
                 var tr = new Node.Transform(localPos.div(16), localRot, outliner.scale);
-                if (parent != null)
+                if (parentOutliner != null)
                     tr.mul(parent.transform());
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));

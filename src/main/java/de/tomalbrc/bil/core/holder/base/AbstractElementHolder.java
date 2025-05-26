@@ -2,7 +2,6 @@ package de.tomalbrc.bil.core.holder.base;
 
 import de.tomalbrc.bil.util.IChunkMap;
 import de.tomalbrc.bil.util.Utils;
-import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import net.minecraft.network.protocol.Packet;
@@ -17,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * This class mainly exists to split off ElementHolder logic from the element logic.
  */
-public abstract class AbstractElementHolder extends ElementHolder {
+public abstract class AbstractElementHolder extends NetworkEfficientElementHolder {
     protected final ServerLevel level;
     private ServerGamePacketListenerImpl[] watchingPlayers;
     private boolean elementsInitialized;
@@ -77,17 +76,16 @@ public abstract class AbstractElementHolder extends ElementHolder {
         for (VirtualElement element : this.getElements()) {
             element.tick();
         }
+
+        flushPackets();
     }
 
-    @Override
-    public void sendPacket(Packet<? extends ClientGamePacketListener> packet) {
-        if (this.getServer().isSameThread()) {
-            super.sendPacket(packet);
-        } else {
-            for (ServerGamePacketListenerImpl conn : this.watchingPlayers) {
-                if (conn != null) {
-                    Utils.sendPacketNoFlush(conn, packet);
-                }
+    public void sendPacketDirect(ServerGamePacketListenerImpl player, Packet<? extends ClientGamePacketListener> packet) {
+        if (player != null) {
+            if (this.getServer().isSameThread()) {
+                super.sendPacketDirect(player, packet);
+            } else {
+                Utils.sendPacketNoFlush(player, packet);
             }
         }
     }

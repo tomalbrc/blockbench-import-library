@@ -14,9 +14,9 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 public class NetworkEfficientElementHolder extends ElementHolder {
-    protected static final double FOV = 90 * Mth.DEG_TO_RAD; // assume fov of 180°
-    protected static final double MAX_DISTANCE_SQR = 128*128;
-    protected static final double MIN_DISTANCE_SQR = 16*16;
+    protected static final double FOV = 80 * Mth.DEG_TO_RAD; // assume fov of 160°
+    protected static final double MAX_DISTANCE_SQR = Mth.square(8*16); // 8 chunks, always stop animating
+    protected static final double MIN_DISTANCE_SQR = Mth.square(6*16); // 6 chunks, ignore fov
 
     protected final List<Packet<? super ClientGamePacketListener>> stagedPackets = new ObjectArrayList<>();
 
@@ -44,7 +44,7 @@ public class NetworkEfficientElementHolder extends ElementHolder {
 
 
     protected boolean isInFov(ServerPlayer player) {
-        var dist = player.distanceToSqr(this.getPos());
+        double dist = player.distanceToSqr(this.getPos());
         if (dist > this.getMaxAnimationDistance())
             return false;
         else if (dist <= this.getMinAnimationDistance())
@@ -52,7 +52,17 @@ public class NetworkEfficientElementHolder extends ElementHolder {
 
         Vec3 directionFacing = player.getViewVector(1).normalize();
         Vec3 directionToTarget = this.getPos().subtract(player.position()).normalize();
-        return Math.acos(directionFacing.dot(directionToTarget)) <= this.getFov();
+
+        Vec3 horizontalFacing = new Vec3(directionFacing.x, 0, directionFacing.z).normalize();
+        Vec3 horizontalToTarget = new Vec3(directionToTarget.x, 0, directionToTarget.z).normalize();
+        double horizontalAngle = Math.acos(horizontalFacing.dot(horizontalToTarget));
+        if (horizontalAngle > this.getFov())
+            return false;
+
+        double pitchFacing = Math.asin(directionFacing.y);
+        double pitchTarget = Math.asin(directionToTarget.y);
+        double verticalAngle = Math.abs(pitchFacing - pitchTarget);
+        return verticalAngle <= this.getFov();
     }
 
     protected List<Packet<? super ClientGamePacketListener>> filterForPlayer(List<Packet<? super ClientGamePacketListener>> packetList, ServerGamePacketListenerImpl packetListener) {

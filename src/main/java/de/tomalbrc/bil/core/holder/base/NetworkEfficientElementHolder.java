@@ -6,7 +6,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -15,8 +14,8 @@ import java.util.List;
 
 public class NetworkEfficientElementHolder extends ElementHolder {
     protected static final double FOV = 80 * Mth.DEG_TO_RAD; // assume fov of 160°
-    protected static final double MAX_DISTANCE_SQR = Mth.square(8*16); // 8 chunks, always stop animating
-    protected static final double MIN_DISTANCE_SQR = Mth.square(6*16); // 6 chunks, ignore fov
+    protected static final double MAX_DISTANCE_SQR = Mth.square(9*16); // 8 chunks, always stop animating
+    protected static final double MIN_DISTANCE_SQR = Mth.square(7*16); // 6 chunks, ignore fov
 
     protected final List<Packet<? super ClientGamePacketListener>> stagedPackets = new ObjectArrayList<>();
 
@@ -42,16 +41,15 @@ public class NetworkEfficientElementHolder extends ElementHolder {
         return MIN_DISTANCE_SQR;
     }
 
-
-    protected boolean isInFov(ServerPlayer player) {
-        double dist = player.distanceToSqr(this.getPos());
+    protected boolean isInFov(ServerGamePacketListenerImpl player) {
+        double dist = player.player.distanceToSqr(this.getPos());
         if (dist > this.getMaxAnimationDistance())
             return false;
         else if (dist <= this.getMinAnimationDistance())
             return true;
 
-        Vec3 directionFacing = player.getViewVector(1).normalize();
-        Vec3 directionToTarget = this.getPos().subtract(player.position()).normalize();
+        Vec3 directionFacing = player.player.getViewVector(1).normalize();
+        Vec3 directionToTarget = this.getPos().subtract(player.player.position()).normalize();
 
         Vec3 horizontalFacing = new Vec3(directionFacing.x, 0, directionFacing.z).normalize();
         Vec3 horizontalToTarget = new Vec3(directionToTarget.x, 0, directionToTarget.z).normalize();
@@ -66,7 +64,7 @@ public class NetworkEfficientElementHolder extends ElementHolder {
     }
 
     protected List<Packet<? super ClientGamePacketListener>> filterForPlayer(List<Packet<? super ClientGamePacketListener>> packetList, ServerGamePacketListenerImpl packetListener) {
-        if (!isInFov(packetListener.player)) {
+        if (!isInFov(packetListener)) {
             List<Packet<? super ClientGamePacketListener>> filteredList = new ObjectArrayList<>(packetList);
             filteredList.removeIf(packet -> packet instanceof ClientboundSetEntityDataPacket);
             return filteredList;
@@ -81,15 +79,14 @@ public class NetworkEfficientElementHolder extends ElementHolder {
 
         for (ServerGamePacketListenerImpl player : this.getWatchingPlayers()) {
             if (player != null) {
-                List<Packet<? super ClientGamePacketListener>> playerPackets = filterForPlayer(this.stagedPackets, player);
+                var playerPackets = filterForPlayer(this.stagedPackets, player);
+                var list = playerPackets != this.stagedPackets ? playerPackets : this.stagedPackets;
                 if (playerPackets != this.stagedPackets) {
-                    for (Packet<? super ClientGamePacketListener> packet : playerPackets) {
-                        sendPacketDirect(player, (Packet<? extends ClientGamePacketListener>) packet);
-                    }
-                } else {
-                    for (Packet<?> packet : this.stagedPackets) {
-                        sendPacketDirect(player, (Packet<? extends ClientGamePacketListener>) packet);
-                    }
+                    list = playerPackets;
+                }
+
+                for (var packet : list) {
+                    sendPacketDirect(player, (Packet<? extends ClientGamePacketListener>) packet);
                 }
             }
         }

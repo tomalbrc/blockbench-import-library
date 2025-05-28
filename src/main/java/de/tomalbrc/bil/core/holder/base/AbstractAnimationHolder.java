@@ -72,7 +72,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
             return null;
 
         ItemDisplayElement element = new ItemDisplayElement();
-        element.setModelTransformation(ItemDisplayContext.HEAD);
+        element.setItemDisplayContext(ItemDisplayContext.HEAD);
         element.setInvisible(true);
         element.setInterpolationDuration(3);
         element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);

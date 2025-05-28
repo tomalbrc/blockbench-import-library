@@ -9,12 +9,12 @@ import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import eu.pb4.polymer.virtualentity.api.tracker.InteractionTrackedData;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -52,7 +52,7 @@ public class ModelEntity extends Interaction implements AnimatedEntity {
     }
 
     @Override
-    public boolean saveAsPassenger(CompoundTag compoundTag) {
+    public boolean saveAsPassenger(ValueOutput valueOutput) {
         // Don't save this entity.
         return false;
     }

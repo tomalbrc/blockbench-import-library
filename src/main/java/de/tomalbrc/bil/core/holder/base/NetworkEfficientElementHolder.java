@@ -4,7 +4,6 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
@@ -96,22 +95,5 @@ public class NetworkEfficientElementHolder extends ElementHolder {
 
     public void sendPacketDirect(ServerGamePacketListenerImpl player, Packet<? extends ClientGamePacketListener> packet) {
         player.send(packet);
-    }
-
-    public static List<Packet<? super ClientGamePacketListener>> bundlePackets(List<Packet<? super ClientGamePacketListener>> packets) {
-        final int size = packets.size();
-        if (packets.size() == 1)
-            return List.of(packets.getFirst());
-
-        if (size <= 4096) {
-            return List.of(new ClientboundBundlePacket((Iterable<Packet<? super ClientGamePacketListener>>) packets));
-        }
-
-        List<Packet<? super ClientGamePacketListener>> bundlePackets = new ObjectArrayList<>();
-        for (int index = 0; index < size; index += 4096) {
-            bundlePackets.add(new ClientboundBundlePacket((Iterable<Packet<? super ClientGamePacketListener>>) packets.subList(index, Math.min(size, index + 4096))));
-        }
-
-        return bundlePackets;
     }
 }

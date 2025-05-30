@@ -1,12 +1,12 @@
 package de.tomalbrc.bil.core.holder.base;
 
+import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.util.IChunkMap;
 import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.jetbrains.annotations.Nullable;
@@ -17,13 +17,17 @@ import org.jetbrains.annotations.Nullable;
  * This class mainly exists to split off ElementHolder logic from the element logic.
  */
 public abstract class AbstractElementHolder extends NetworkEfficientElementHolder {
-    protected final ServerLevel level;
     private ServerGamePacketListenerImpl[] watchingPlayers;
     private boolean elementsInitialized;
     private boolean isDataLoaded;
 
+    @Deprecated(forRemoval = true)
     protected AbstractElementHolder(ServerLevel level) {
-        this.level = level;
+        this();
+    }
+
+    protected AbstractElementHolder() {
+        super();
         this.watchingPlayers = Utils.EMPTY_CONNECTION_ARRAY;
     }
 
@@ -82,7 +86,7 @@ public abstract class AbstractElementHolder extends NetworkEfficientElementHolde
 
     public void sendPacketDirect(ServerGamePacketListenerImpl player, Packet<? extends ClientGamePacketListener> packet) {
         if (player != null) {
-            if (this.getServer().isSameThread()) {
+            if (BIL.SERVER.isSameThread()) {
                 super.sendPacketDirect(player, packet);
             } else {
                 Utils.sendPacketNoFlush(player, packet);
@@ -90,11 +94,7 @@ public abstract class AbstractElementHolder extends NetworkEfficientElementHolde
         }
     }
 
-    public ServerLevel getLevel() {
-        return this.level;
-    }
-
-    public MinecraftServer getServer() {
-        return this.level.getServer();
+    public @Nullable ServerLevel getLevel() {
+        return this.getAttachment() != null ? this.getAttachment().getWorld() : null;
     }
 }

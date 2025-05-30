@@ -1,8 +1,10 @@
 package de.tomalbrc.bil.core.model;
 
 import com.mojang.brigadier.CommandDispatcher;
+import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.core.holder.base.AbstractAnimationHolder;
 import de.tomalbrc.bil.util.command.ParsedCommand;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -38,7 +40,7 @@ public record Frame(
     }
 
     public void runEffects(AbstractAnimationHolder holder) {
-        CommandDispatcher<CommandSourceStack> dispatcher = holder.getServer().getCommands().getDispatcher();
+        CommandDispatcher<CommandSourceStack> dispatcher = BIL.SERVER.getCommands().getDispatcher();
         CommandSourceStack source = holder.createCommandSourceStack().withPermission(2).withSuppressedOutput();
 
         if (this.soundEffect != null) {
@@ -46,11 +48,14 @@ public record Frame(
             if (entity != null) {
                 entity.playSound(this.soundEffect);
             } else {
-                holder.getLevel().playSound(
-                        null, BlockPos.containing(source.getPosition()),
-                        this.soundEffect, SoundSource.MASTER,
-                        1.0F, 1.0F
-                );
+                HolderAttachment attachment = holder.getAttachment();
+                if (attachment != null) {
+                    attachment.getWorld().playSound(
+                            null, BlockPos.containing(source.getPosition()),
+                            this.soundEffect, SoundSource.MASTER,
+                            1.0F, 1.0F
+                    );
+                }
             }
         }
 

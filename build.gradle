@@ -45,7 +45,7 @@ dependencies {
     }
 
     // Permission API
-    modImplementation shade('me.lucko:fabric-permissions-api:0.3.3') {
+    modImplementation shade('me.lucko:fabric-permissions-api:0.3.5-SNAPSHOT') {
         exclude group: "net.fabricmc", module: "fabric-loader"
     }
 }

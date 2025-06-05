@@ -1,6 +1,5 @@
 package de.tomalbrc.bil.core.holder.positioned;
 
-import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.core.holder.base.AbstractAnimationHolder;
 import de.tomalbrc.bil.core.model.Model;
 import net.minecraft.commands.CommandSourceStack;
@@ -28,14 +27,14 @@ public class PositionedHolder extends AbstractAnimationHolder {
     public CommandSourceStack createCommandSourceStack() {
         String name = String.format("PositionedHolder[%.1f, %.1f, %.1f]", this.getPos().x, this.getPos().y, this.getPos().z);
         return new CommandSourceStack(
-                this.getServer(),
+                this.getLevel().getServer(),
                 this.getPos(),
                 Vec2.ZERO,
                 this.getLevel(),
                 0,
                 name,
                 Component.literal(name),
-                this.getServer(),
+                this.getLevel().getServer(),
                 null
         );
     }

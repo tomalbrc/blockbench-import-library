@@ -46,24 +46,27 @@ public class BbModelLoader implements ModelLoader {
             // re-map uv based on texture size
             BbFace face = entry.getValue();
             for (int i = 0; i < face.uv.size(); i++) {
+                Vector2i scaling = null;
                 int largestWidth = 0;
                 int largestHeight = 0;
                 for (BbTexture currentTexture : textures) {
-                    if (currentTexture.id == face.texture && currentTexture.uvWidth != 0 && currentTexture.uvHeight != 0)
-                        res = new Vector2i(currentTexture.uvWidth, currentTexture.uvHeight);
+                    if (currentTexture.id == face.texture && currentTexture.width != 0 && currentTexture.height != 0)
+                        scaling = new Vector2i(currentTexture.width, currentTexture.height);
 
-                    if (currentTexture.uvWidth > largestWidth)
-                        largestWidth = currentTexture.uvWidth;
+                    if (currentTexture.width > largestWidth)
+                        largestWidth = currentTexture.width;
 
-                    if (currentTexture.uvHeight > largestHeight)
-                        largestHeight = currentTexture.uvHeight;
+                    if (currentTexture.height > largestHeight)
+                        largestHeight = currentTexture.height;
                 }
 
-                if ((res.x == 0 || res.y == 0) && largestHeight != 0 && largestWidth != 0) {
-                    res = new Vector2i(largestWidth, largestHeight);
+                if (scaling == null && largestHeight != 0 && largestWidth != 0) {
+                    scaling = new Vector2i(largestWidth, largestHeight);
+                } else if (scaling == null) {
+                    scaling = res;
                 }
 
-                face.uv.set(i, (face.uv.get(i) * 16.f) / res.get(i % 2));
+                face.uv.set(i, (face.uv.get(i) * 16.f) / scaling.get(i % 2));
             }
         }
     }

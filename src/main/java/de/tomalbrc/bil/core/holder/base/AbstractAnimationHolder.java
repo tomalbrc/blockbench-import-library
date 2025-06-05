@@ -40,8 +40,13 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
     protected float scale = 1F;
     protected int color = -1;
 
+    @Deprecated(forRemoval = true)
     protected AbstractAnimationHolder(Model model, ServerLevel level) {
-        super(level);
+        this(model);
+    }
+
+    protected AbstractAnimationHolder(Model model) {
+        super();
         this.model = model;
         this.animationComponent = new AnimationComponent(model, this);
         this.variantComponent = new VariantComponent(model, this);

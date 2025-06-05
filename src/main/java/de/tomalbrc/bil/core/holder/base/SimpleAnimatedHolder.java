@@ -1,5 +1,6 @@
 package de.tomalbrc.bil.core.holder.base;
 
+import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.core.model.Model;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -7,8 +8,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec2;
 
 public class SimpleAnimatedHolder extends AbstractAnimationHolder {
-    protected SimpleAnimatedHolder(Model model, ServerLevel level) {
-        super(model, level);
+    protected SimpleAnimatedHolder(Model model) {
+        super(model);
     }
 
     @Override

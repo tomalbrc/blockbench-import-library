@@ -49,6 +49,9 @@ public class BbModelLoader implements ModelLoader {
                 int largestWidth = 0;
                 int largestHeight = 0;
                 for (BbTexture currentTexture : textures) {
+                    if (currentTexture.id == face.texture && currentTexture.uvWidth != 0 && currentTexture.uvHeight != 0)
+                        res = new Vector2i(currentTexture.uvWidth, currentTexture.uvHeight);
+
                     if (currentTexture.uvWidth > largestWidth)
                         largestWidth = currentTexture.uvWidth;
 
@@ -56,7 +59,7 @@ public class BbModelLoader implements ModelLoader {
                         largestHeight = currentTexture.uvHeight;
                 }
 
-                if (largestWidth != 0 && largestHeight != 0) {
+                if ((res.x == 0 || res.y == 0) && largestHeight != 0 && largestWidth != 0) {
                     res = new Vector2i(largestWidth, largestHeight);
                 }
 

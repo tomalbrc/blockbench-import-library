@@ -18,7 +18,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -33,7 +32,7 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
     protected int tickCount;
 
     protected EntityHolder(T parent, Model model) {
-        super(model, (ServerLevel) parent.level());
+        super(model);
         this.additionalDisplays = new ObjectOpenHashSet<>();
         this.parent = parent;
 
@@ -101,7 +100,7 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
 
     @Override
     public CommandSourceStack createCommandSourceStack() {
-        return this.parent.createCommandSourceStackForNameResolution(this.level);
+        return this.parent.createCommandSourceStackForNameResolution(this.getLevel());
     }
 
     @Override

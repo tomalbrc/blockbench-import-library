@@ -44,10 +44,7 @@ dependencies {
         exclude group: "org.ow2.asm", module: "asm-tree"
     }
 
-    // Permission API
-    modImplementation shade('me.lucko:fabric-permissions-api:0.3.5-SNAPSHOT') {
-        exclude group: "net.fabricmc", module: "fabric-loader"
-    }
+    modCompileOnly("net.luckperms:api:5.4")
 }
 
 shadowJar {

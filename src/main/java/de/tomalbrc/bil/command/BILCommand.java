@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import me.lucko.fabric.api.permissions.v0.Permissions;
+import de.tomalbrc.bil.util.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 

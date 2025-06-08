@@ -24,7 +24,7 @@ public class Permissions {
             try {
                 return check(source.getPlayerOrException(), node, fallbackLevel);
             } catch (CommandSyntaxException e) {
-                return false;
+                return source.hasPermission(fallbackLevel);
             }
         };
     }

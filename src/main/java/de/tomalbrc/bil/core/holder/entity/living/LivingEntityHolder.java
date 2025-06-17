@@ -22,9 +22,12 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -185,7 +188,16 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         this.updateEntityScale(this.scale);
         super.onDimensionsUpdated(dimensions);
 
-        this.collisionElement.setSize(Math.max(1, Utils.toSlimeSize(Math.min(dimensions.width(), dimensions.height()))));
+        var size = Utils.toSlimeSize(Math.min(dimensions.width(), dimensions.height()));
+        if (size <= 0) {
+            var attributeInstance = new AttributeInstance(Attributes.SCALE, (instance) -> {});
+            attributeInstance.setBaseValue(0.01);
+            var attributesPacket = new ClientboundUpdateAttributesPacket(this.collisionElement.getEntityId(), List.of(attributeInstance));
+            this.sendPacket(attributesPacket);
+            size = 1;
+        }
+
+        this.collisionElement.setSize(size);
         this.sendPacket(new ClientboundBundlePacket(Utils.updateClientInteraction(this.hitboxInteraction, dimensions)));
     }
 
@@ -193,6 +205,7 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
     public void onSyncedDataUpdated(EntityDataAccessor<?> key, Object object) {
         super.onSyncedDataUpdated(key, object);
         if (key.equals(Constants.DATA_EFFECT_PARTICLES)) {
+            // noinspection unchecked
             this.collisionElement.getDataTracker().set(Constants.DATA_EFFECT_PARTICLES, (List<ParticleOptions>) object);
         }
 

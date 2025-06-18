@@ -51,7 +51,9 @@ public class BbModelLoader implements ModelLoader {
                 int largestHeight = 0;
                 for (BbTexture currentTexture : textures) {
                     if (currentTexture.id == face.texture && currentTexture.width != 0 && currentTexture.height != 0)
-                        scaling = new Vector2i(currentTexture.width, currentTexture.height);
+                        scaling = new Vector2i(
+                                currentTexture.uvWidth != 0 ? currentTexture.uvWidth : currentTexture.width,
+                                currentTexture.uvHeight != 0 ? currentTexture.uvHeight : currentTexture.height);
 
                     if (currentTexture.width > largestWidth)
                         largestWidth = currentTexture.width;

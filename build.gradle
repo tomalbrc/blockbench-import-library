@@ -16,7 +16,6 @@ configurations {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url 'https://maven.tomalbrc.de' }
     maven { url 'https://maven.nucleoid.xyz' }
@@ -45,7 +44,7 @@ dependencies {
         exclude group: "org.ow2.asm", module: "asm-tree"
     }
 
-    modCompileOnly("net.luckperms:api:5.4")
+    include(modImplementation('me.lucko:fabric-permissions-api:0.4.0'))
 }
 
 shadowJar {

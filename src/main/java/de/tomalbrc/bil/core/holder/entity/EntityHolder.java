@@ -140,7 +140,7 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
 
     protected void updateInvisibility(boolean isInvisible) {
         for (int i = 0; i < this.bones.length; i++) {
-            if (this.bones[i] instanceof ItemBone itemBone) itemBone.updateColor(color);
+            if (this.bones[i] instanceof ItemBone itemBone) itemBone.setInvisible(isInvisible);
         }
     }
 

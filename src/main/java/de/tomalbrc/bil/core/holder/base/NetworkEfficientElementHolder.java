@@ -96,4 +96,10 @@ public class NetworkEfficientElementHolder extends ElementHolder {
     public void sendPacketDirect(ServerGamePacketListenerImpl player, Packet<? extends ClientGamePacketListener> packet) {
         player.send(packet);
     }
+
+    @Override
+    public void destroy() {
+        this.flushPackets();
+        super.destroy();
+    }
 }

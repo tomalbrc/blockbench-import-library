@@ -190,14 +190,12 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
     }
 
     protected void asyncTickFor(ServerGamePacketListenerImpl watchingPlayer) {
-        boolean didUpdateDefaultElement = false;
         for (int boneIdx = 0; boneIdx < this.bones.length; boneIdx++) {
-            didUpdateDefaultElement = this.updateElement(watchingPlayer.player, this.bones[boneIdx], didUpdateDefaultElement);
+            this.updateElement(watchingPlayer.player, this.bones[boneIdx]);
         }
 
-        boolean didUpdateDefaultLoc = false;
         for (int locatorIdx = 0; locatorIdx < this.locators.length; locatorIdx++) {
-            didUpdateDefaultLoc = this.updateLocator(watchingPlayer.player, this.locators[locatorIdx], didUpdateDefaultLoc);
+            this.updateLocator(watchingPlayer.player, this.locators[locatorIdx]);
         }
     }
 
@@ -205,18 +203,15 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         this.updateElement(null, display, display.getDefaultPose());
     }
 
-    protected boolean updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> display, boolean didUpdateDefault) {
+    protected void updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> display) {
         var queryResult = this.animationComponent.findPose(serverPlayer, display);
         if (queryResult != null) {
-            if (didUpdateDefault && queryResult.owner() != serverPlayer) // prevent re-doing the default for every player
-                return true;
-
-            didUpdateDefault |= queryResult.owner() != serverPlayer;
+            if (queryResult.owner() != serverPlayer && display.element().getDataTracker().isDirty()) {
+                return;
+            }
 
             this.updateElement(queryResult.owner(), display, queryResult.pose());
         }
-
-        return didUpdateDefault;
     }
 
     public void updateElement(@Nullable ServerPlayer serverPlayer, DisplayWrapper<?> display, @Nullable Pose pose) {
@@ -227,23 +222,15 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         }
     }
 
-    protected boolean updateLocator(ServerPlayer serverPlayer, Locator locator, boolean didUpdateDefault) {
+    protected void updateLocator(ServerPlayer serverPlayer, Locator locator) {
         if (locator.requiresUpdate()) {
             var queryResult = this.animationComponent.findPose(serverPlayer, locator);
             if (queryResult != null) {
-                if (didUpdateDefault && queryResult.owner() != serverPlayer) // prevent re-doing the default for every player
-                    return true;
-
-                didUpdateDefault |= queryResult.owner() != serverPlayer;
-
                 var pose = queryResult.pose() == null ? locator.getLastPose(serverPlayer) : queryResult.pose();
                 if (pose != null)
                     locator.updateListeners(queryResult.owner(), this, pose);
             }
-
         }
-
-        return didUpdateDefault;
     }
 
     protected void applyPose(ServerPlayer serverPlayer, Pose pose, DisplayWrapper<?> display) {

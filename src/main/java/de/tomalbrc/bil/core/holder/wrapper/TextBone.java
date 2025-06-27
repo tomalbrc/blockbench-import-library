@@ -1,30 +1,30 @@
 package de.tomalbrc.bil.core.holder.wrapper;
 
+import de.tomalbrc.bil.core.element.PerPlayerTextDisplayElement;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-public class TextBone extends Bone<TextDisplayElement> {
+public class TextBone extends Bone<PerPlayerTextDisplayElement> {
     private Component text;
     private final byte opacity;
     private Integer backgroundColor;
     private boolean invisible;
 
-    protected TextBone(TextDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
+    protected TextBone(PerPlayerTextDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
         super(element, node, defaultPose, isHead);
         this.text = element.getText();
         this.opacity = element.getTextOpacity();
         this.backgroundColor = element.getDataTracker().get(DisplayTrackedData.Text.BACKGROUND);
     }
 
-    public static TextBone of(TextDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
+    public static TextBone of(PerPlayerTextDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
         return new TextBone(element, node, defaultPose, isHead);
     }
 
-    public static TextBone of(TextDisplayElement element, @NotNull Node node, Pose defaultPose) {
+    public static TextBone of(PerPlayerTextDisplayElement element, @NotNull Node node, Pose defaultPose) {
         Node current = node;
         boolean head = false;
         while (current != null) {

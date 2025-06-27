@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.core.holder.entity.simple;
 
 import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.core.element.PerPlayerTransformableElement;
 import de.tomalbrc.bil.core.holder.entity.EntityHolder;
 import de.tomalbrc.bil.core.holder.wrapper.Bone;
 import de.tomalbrc.bil.core.holder.wrapper.DisplayWrapper;
@@ -13,6 +14,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -43,31 +45,29 @@ public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends
     }
 
     @Override
-    public void updateElement(DisplayWrapper<?> display, @Nullable Pose pose) {
+    public void updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> display, @Nullable Pose pose) {
         display.element().setYaw(this.parent.getYRot());
         display.element().setPitch(this.parent.getXRot());
-        if (pose == null) {
-            this.applyPose(display.getLastPose(), display);
-        } else {
-            this.applyPose(pose, display);
-        }
+        super.updateElement(serverPlayer, display, pose);
     }
 
     @Override
-    protected void applyPose(Pose pose, DisplayWrapper<?> display) {
+    protected void applyPose(ServerPlayer serverPlayer, Pose pose, DisplayWrapper<?> display) {
+        var element = (PerPlayerTransformableElement)display.element();
+
         Vector3f translation = pose.translation();
         if (this.scale != 1F) {
             translation.mul(this.scale);
-            display.element().setScale(pose.scale().mul(this.scale));
+            element.setScale(serverPlayer, pose.scale().mul(this.scale));
         } else {
-            display.element().setScale(pose.readOnlyScale());
+            element.setScale(serverPlayer, pose.readOnlyScale());
         }
 
-        display.element().setTranslation(translation.sub(0, this.dimensions.height() - 0.01f, 0));
-        display.element().setLeftRotation(pose.leftRotation());
-        display.element().setRightRotation(pose.rightRotation());
+        element.setTranslation(serverPlayer, translation.sub(0, this.dimensions.height() - 0.01f, 0));
+        element.setLeftRotation(serverPlayer, pose.leftRotation());
+        element.setRightRotation(serverPlayer, pose.rightRotation());
 
-        display.element().startInterpolationIfDirty();
+        element.startInterpolationIfDirty(serverPlayer);
     }
 
     @Override

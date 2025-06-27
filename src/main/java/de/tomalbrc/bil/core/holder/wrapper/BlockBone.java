@@ -1,27 +1,27 @@
 package de.tomalbrc.bil.core.holder.wrapper;
 
+import de.tomalbrc.bil.core.element.PerPlayerBlockDisplayElement;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-public class BlockBone extends Bone<BlockDisplayElement> {
+public class BlockBone extends Bone<PerPlayerBlockDisplayElement> {
     private BlockState blockState;
     private boolean invisible;
 
-    protected BlockBone(BlockDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
+    protected BlockBone(PerPlayerBlockDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
         super(element, node, defaultPose, isHead);
         this.blockState = element.getBlockState();
     }
 
-    public static BlockBone of(BlockDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
+    public static BlockBone of(PerPlayerBlockDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
         return new BlockBone(element, node, defaultPose, isHead);
     }
 
-    public static BlockBone of(BlockDisplayElement element, @NotNull Node node, Pose defaultPose) {
+    public static BlockBone of(PerPlayerBlockDisplayElement element, @NotNull Node node, Pose defaultPose) {
         Node current = node;
         boolean head = false;
         while (current != null) {

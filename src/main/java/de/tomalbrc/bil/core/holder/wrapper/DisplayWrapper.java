@@ -1,10 +1,10 @@
 package de.tomalbrc.bil.core.holder.wrapper;
 
+import de.tomalbrc.bil.core.element.PerPlayerTransformableElement;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
 
-public class DisplayWrapper<T extends DisplayElement> extends AbstractWrapper {
+public class DisplayWrapper<T extends PerPlayerTransformableElement> extends AbstractWrapper {
     private final T element;
     private final boolean isHead;
 

@@ -7,9 +7,10 @@ import de.tomalbrc.bil.util.command.ParsedCommand;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +40,7 @@ public record Frame(
         return this.variant != null || this.commands != null || this.soundEffect != null;
     }
 
-    public void runEffects(AbstractAnimationHolder holder) {
+    public void runEffects(ServerPlayer serverPlayer, AbstractAnimationHolder holder) {
         CommandDispatcher<CommandSourceStack> dispatcher = BIL.SERVER.getCommands().getDispatcher();
         CommandSourceStack source = holder.createCommandSourceStack().withPermission(2).withSuppressedOutput();
 
@@ -50,11 +51,12 @@ public record Frame(
             } else {
                 HolderAttachment attachment = holder.getAttachment();
                 if (attachment != null) {
-                    attachment.getWorld().playSound(
-                            null, BlockPos.containing(source.getPosition()),
-                            this.soundEffect, SoundSource.MASTER,
-                            1.0F, 1.0F
-                    );
+                    var soundPacket = new ClientboundSoundPacket(Holder.direct(this.soundEffect), holder.getSoundSource(), source.getPosition().x, source.getPosition().y, source.getPosition().z, 1.f, 1.f, attachment.getWorld().getRandom().nextLong());
+                    if (serverPlayer == null) {
+                        holder.sendPacket(soundPacket);
+                    } else {
+                        serverPlayer.connection.send(soundPacket);
+                    }
                 }
             }
         }

@@ -1,5 +1,7 @@
 package de.tomalbrc.bil.core.holder.base;
 
+import de.tomalbrc.bil.BIL;
+import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.network.protocol.Packet;
@@ -72,11 +74,12 @@ public class NetworkEfficientElementHolder extends ElementHolder {
         return packetList;
     }
 
-    protected void flushPackets() {
+    protected void flushPackets(ServerGamePacketListenerImpl[] watchingPlayers) {
         if (this.stagedPackets.isEmpty())
             return;
 
-        for (ServerGamePacketListenerImpl player : this.getWatchingPlayers()) {
+        for (int i = 0; i < watchingPlayers.length; i++) {
+            var player = watchingPlayers[i];
             if (player != null) {
                 var playerPackets = filterForPlayer(this.stagedPackets, player);
                 var list = playerPackets != this.stagedPackets ? playerPackets : this.stagedPackets;
@@ -94,12 +97,18 @@ public class NetworkEfficientElementHolder extends ElementHolder {
     }
 
     public void sendPacketDirect(ServerGamePacketListenerImpl player, Packet<? extends ClientGamePacketListener> packet) {
-        player.send(packet);
+        if (player != null) {
+            if (BIL.SERVER.isSameThread()) {
+                player.send(packet);
+            } else {
+                Utils.sendPacketNoFlush(player, packet);
+            }
+        }
     }
 
     @Override
     public void destroy() {
-        this.flushPackets();
+        this.flushPackets(this.getWatchingPlayers().toArray(new ServerGamePacketListenerImpl[0]));
         super.destroy();
     }
 }

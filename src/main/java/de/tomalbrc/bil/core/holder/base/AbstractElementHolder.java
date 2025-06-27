@@ -1,12 +1,9 @@
 package de.tomalbrc.bil.core.holder.base;
 
-import de.tomalbrc.bil.BIL;
 import de.tomalbrc.bil.util.IChunkMap;
 import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.jetbrains.annotations.Nullable;
@@ -17,12 +14,12 @@ import org.jetbrains.annotations.Nullable;
  * This class mainly exists to split off ElementHolder logic from the element logic.
  */
 public abstract class AbstractElementHolder extends NetworkEfficientElementHolder {
-    private ServerGamePacketListenerImpl[] watchingPlayers;
-    private boolean elementsInitialized;
-    private boolean isDataLoaded;
+    protected ServerGamePacketListenerImpl[] watchingPlayers;
+    protected boolean elementsInitialized;
+    protected boolean isDataLoaded;
 
     @Deprecated(forRemoval = true)
-    protected AbstractElementHolder(ServerLevel level) {
+    protected AbstractElementHolder(ServerLevel unused) {
         this();
     }
 
@@ -55,7 +52,16 @@ public abstract class AbstractElementHolder extends NetworkEfficientElementHolde
             this.onDataLoaded();
         }
 
-        return super.startWatching(player);
+        var result = super.startWatching(player);
+        this.watchingPlayers = this.getWatchingPlayers().toArray(Utils.EMPTY_CONNECTION_ARRAY);
+        return result;
+    }
+
+    @Override
+    public boolean stopWatching(ServerGamePacketListenerImpl player) {
+        boolean result = super.stopWatching(player);
+        this.watchingPlayers = this.getWatchingPlayers().toArray(Utils.EMPTY_CONNECTION_ARRAY);
+        return result;
     }
 
     @Override
@@ -73,25 +79,13 @@ public abstract class AbstractElementHolder extends NetworkEfficientElementHolde
     }
 
     public final void asyncTick() {
-        this.watchingPlayers = this.getWatchingPlayers().toArray(this.watchingPlayers);
-
         this.onAsyncTick();
 
         for (VirtualElement element : this.getElements()) {
             element.tick();
         }
 
-        flushPackets();
-    }
-
-    public void sendPacketDirect(ServerGamePacketListenerImpl player, Packet<? extends ClientGamePacketListener> packet) {
-        if (player != null) {
-            if (BIL.SERVER.isSameThread()) {
-                super.sendPacketDirect(player, packet);
-            } else {
-                Utils.sendPacketNoFlush(player, packet);
-            }
-        }
+        flushPackets(watchingPlayers);
     }
 
     public @Nullable ServerLevel getLevel() {

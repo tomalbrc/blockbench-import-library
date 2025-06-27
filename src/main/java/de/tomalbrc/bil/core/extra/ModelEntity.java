@@ -27,14 +27,10 @@ public class ModelEntity extends Interaction implements AnimatedEntity {
         super(EntityType.INTERACTION, level);
         this.holder = new SimpleEntityHolder<>(this, model) {
             @Override
-            public void updateElement(DisplayWrapper<?> display, @Nullable Pose pose) {
+            public void updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> display, @Nullable Pose pose) {
                 display.element().setYaw(this.parent.getYRot());
                 display.element().setPitch(this.parent.getXRot());
-                if (pose == null) {
-                    this.applyPose(display.getLastPose(), display);
-                } else {
-                    this.applyPose(pose, display);
-                }
+                super.updateElement(serverPlayer, display, pose);
             }
 
             @Override

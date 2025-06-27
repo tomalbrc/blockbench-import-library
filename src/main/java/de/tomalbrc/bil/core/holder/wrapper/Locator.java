@@ -6,6 +6,7 @@ import de.tomalbrc.bil.core.model.Pose;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
+import net.minecraft.server.level.ServerPlayer;
 
 public class Locator extends AbstractWrapper {
     private final ObjectSet<LocatorListener> listeners;
@@ -23,8 +24,8 @@ public class Locator extends AbstractWrapper {
         return !this.listeners.isEmpty();
     }
 
-    public void updateListeners(AbstractAnimationHolder holder, Pose pose) {
-        this.listeners.forEach(listener -> listener.update(holder, pose));
+    public void updateListeners(ServerPlayer serverPlayer, AbstractAnimationHolder holder, Pose pose) {
+        this.listeners.forEach(listener -> listener.update(serverPlayer, holder, pose));
     }
 
     public void addListener(LocatorListener newListener) {
@@ -44,6 +45,6 @@ public class Locator extends AbstractWrapper {
          * Called whenever a locator is updated.
          * This method can be called asynchronously.
          */
-        void update(AbstractAnimationHolder holder, Pose pose);
+        void update(ServerPlayer serverPlayer, AbstractAnimationHolder holder, Pose pose);
     }
 }

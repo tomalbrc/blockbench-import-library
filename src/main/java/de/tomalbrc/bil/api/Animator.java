@@ -1,7 +1,9 @@
 package de.tomalbrc.bil.api;
 
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 @SuppressWarnings("unused")
@@ -14,7 +16,10 @@ public interface Animator {
      * @param name: The name of the animation.
      */
     default void playAnimation(String name) {
-        this.playAnimation(name, DEFAULT_PRIORITY, false, null, (Runnable) null);
+        this.playAnimation(null, name);
+    }
+    default void playAnimation(ServerPlayer serverPlayer, String name) {
+        this.playAnimation(serverPlayer, name, DEFAULT_PRIORITY, false, null, null);
     }
 
     /**
@@ -24,27 +29,10 @@ public interface Animator {
      * @param priority: The priority of the animation.
      */
     default void playAnimation(String name, int priority) {
-        this.playAnimation(name, priority, false, null, (Runnable) null);
+        this.playAnimation(null, name, priority);
     }
-
-    /**
-     * Starts playing an animation on the intermediate.
-     *
-     * @param name:          The name of the animation.
-     * @param restartPaused: Whether to restart paused animations, rather than resuming them where they left off.
-     */
-    default void playAnimation(String name, boolean restartPaused) {
-        this.playAnimation(name, DEFAULT_PRIORITY, restartPaused, null, (Runnable) null);
-    }
-
-    /**
-     * Starts playing an animation on the intermediate.
-     *
-     * @param name:    The name of the animation.
-     * @param onFrame: Callback that runs on each frame of the animation. The frame index is passed as argument.
-     */
-    default void playAnimation(String name, @Nullable IntConsumer onFrame) {
-        this.playAnimation(name, DEFAULT_PRIORITY, false, onFrame, null);
+    default void playAnimation(ServerPlayer serverPlayer, String name, int priority) {
+        this.playAnimation(serverPlayer, name, priority, false, null, null);
     }
 
     /**
@@ -53,7 +41,10 @@ public interface Animator {
      * @param name:     The name of the animation.
      * @param onFinish: Callback that runs when the animation finishes.
      */
-    default void playAnimation(String name, @Nullable Runnable onFinish) {
+    default void playAnimation(String name, @Nullable Consumer<ServerPlayer> onFinish) {
+        this.playAnimation(null, name, onFinish);
+    }
+    default void playAnimation(ServerPlayer serverPlayer, String name, @Nullable Consumer<ServerPlayer> onFinish) {
         this.playAnimation(name, DEFAULT_PRIORITY, false, null, onFinish);
     }
 
@@ -64,18 +55,10 @@ public interface Animator {
      * @param onFrame:  Callback that runs on each frame of the animation. The frame index is passed as argument.
      * @param onFinish: Callback that runs when the animation finishes.
      */
-    default void playAnimation(String name, @Nullable IntConsumer onFrame, @Nullable Runnable onFinish) {
-        this.playAnimation(name, DEFAULT_PRIORITY, false, onFrame, onFinish);
+    default void playAnimation(String name, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish) {
+        this.playAnimation(null, name, onFrame, onFinish);
     }
-
-    /**
-     * Starts playing an animation on the intermediate.
-     *
-     * @param name:     The name of the animation.
-     * @param onFrame:  Callback that runs on each frame of the animation. The frame index is passed as argument.
-     * @param onFinish: Callback that runs when the animation finishes.
-     */
-    default void playAnimation(String name, @Nullable Runnable onFinish, @Nullable IntConsumer onFrame) {
+    default void playAnimation(ServerPlayer serverPlayer, String name, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish) {
         this.playAnimation(name, DEFAULT_PRIORITY, false, onFrame, onFinish);
     }
 
@@ -87,18 +70,10 @@ public interface Animator {
      * @param restartPaused: Whether to restart paused animations, rather than resuming them where they left off.
      */
     default void playAnimation(String name, int priority, boolean restartPaused) {
-        this.playAnimation(name, priority, restartPaused, null, (Runnable) null);
+        this.playAnimation(null, name, priority, restartPaused);
     }
-
-    /**
-     * Starts playing an animation on the intermediate.
-     *
-     * @param name:     The name of the animation.
-     * @param priority: The priority of the animation.
-     * @param onFrame:  Callback that runs on each frame of the animation. The frame index is passed as argument.
-     */
-    default void playAnimation(String name, int priority, @Nullable IntConsumer onFrame) {
-        this.playAnimation(name, priority, false, onFrame, null);
+    default void playAnimation(ServerPlayer serverPlayer, String name, int priority, boolean restartPaused) {
+        this.playAnimation(serverPlayer, name, priority, restartPaused, null, null);
     }
 
     /**
@@ -108,8 +83,11 @@ public interface Animator {
      * @param priority: The priority of the animation.
      * @param onFinish: Callback that runs when the animation finishes.
      */
-    default void playAnimation(String name, int priority, @Nullable Runnable onFinish) {
-        this.playAnimation(name, priority, false, null, onFinish);
+    default void playAnimation(String name, int priority, @Nullable Consumer<ServerPlayer> onFinish) {
+        this.playAnimation(null, name, priority, false, null, onFinish);
+    }
+    default void playAnimation(ServerPlayer serverPlayer, String name, int priority, @Nullable Consumer<ServerPlayer> onFinish) {
+        this.playAnimation(serverPlayer, name, priority, false, null, onFinish);
     }
 
     /**
@@ -120,19 +98,10 @@ public interface Animator {
      * @param onFrame:  Callback that runs on each frame of the animation. The frame index is passed as argument.
      * @param onFinish: Callback that runs when the animation finishes.
      */
-    default void playAnimation(String name, int priority, @Nullable IntConsumer onFrame, @Nullable Runnable onFinish) {
-        this.playAnimation(name, priority, false, onFrame, onFinish);
+    default void playAnimation(String name, int priority, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish) {
+        playAnimation(null, name, priority, onFrame, onFinish);
     }
-
-    /**
-     * Starts playing an animation on the intermediate.
-     *
-     * @param name:     The name of the animation.
-     * @param priority: The priority of the animation.
-     * @param onFrame:  Callback that runs on each frame of the animation. The frame index is passed as argument.
-     * @param onFinish: Callback that runs when the animation finishes.
-     */
-    default void playAnimation(String name, int priority, @Nullable Runnable onFinish, @Nullable IntConsumer onFrame) {
+    default void playAnimation(ServerPlayer serverPlayer, String name, int priority, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish) {
         this.playAnimation(name, priority, false, onFrame, onFinish);
     }
 
@@ -144,6 +113,9 @@ public interface Animator {
      * @param onFrame:       Callback that runs on each frame of the animation. The frame index is passed as argument.
      */
     default void playAnimation(String name, boolean restartPaused, @Nullable IntConsumer onFrame) {
+        playAnimation(null, name, restartPaused, onFrame);
+    }
+    default void playAnimation(ServerPlayer serverPlayer, String name, boolean restartPaused, @Nullable IntConsumer onFrame) {
         this.playAnimation(name, DEFAULT_PRIORITY, restartPaused, onFrame, null);
     }
 
@@ -154,7 +126,10 @@ public interface Animator {
      * @param restartPaused: Whether to restart paused animations, rather than resuming them where they left off.
      * @param onFinish:      Callback that runs when the animation finishes.
      */
-    default void playAnimation(String name, boolean restartPaused, @Nullable Runnable onFinish) {
+    default void playAnimation(String name, boolean restartPaused, @Nullable Consumer<ServerPlayer> onFinish) {
+        playAnimation(null, name, restartPaused, onFinish);
+    }
+    default void playAnimation(ServerPlayer serverPlayer, String name, boolean restartPaused, @Nullable Consumer<ServerPlayer> onFinish) {
         this.playAnimation(name, DEFAULT_PRIORITY, restartPaused, null, onFinish);
     }
 
@@ -166,19 +141,10 @@ public interface Animator {
      * @param onFrame:       Callback that runs on each frame of the animation. The frame index is passed as argument.
      * @param onFinish:      Callback that runs when the animation finishes.
      */
-    default void playAnimation(String name, boolean restartPaused, @Nullable IntConsumer onFrame, @Nullable Runnable onFinish) {
-        this.playAnimation(name, DEFAULT_PRIORITY, restartPaused, onFrame, onFinish);
+    default void playAnimation(String name, boolean restartPaused, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish) {
+        playAnimation(null, name, restartPaused, onFrame, onFinish);
     }
-
-    /**
-     * Starts playing an animation on the intermediate.
-     *
-     * @param name:          The name of the animation.
-     * @param restartPaused: Whether to restart paused animations, rather than resuming them where they left off.
-     * @param onFrame:       Callback that runs on each frame of the animation. The frame index is passed as argument.
-     * @param onFinish:      Callback that runs when the animation finishes.
-     */
-    default void playAnimation(String name, boolean restartPaused, @Nullable Runnable onFinish, @Nullable IntConsumer onFrame) {
+    default void playAnimation(ServerPlayer serverPlayer, String name, boolean restartPaused, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish) {
         this.playAnimation(name, DEFAULT_PRIORITY, restartPaused, onFrame, onFinish);
     }
 
@@ -191,20 +157,8 @@ public interface Animator {
      * @param onFrame:       Callback that runs on each frame of the animation. The frame index is passed as argument.
      * @param onFinish:      Callback that runs when the animation finishes.
      */
-    default void playAnimation(String name, int priority, boolean restartPaused, @Nullable Runnable onFinish, @Nullable IntConsumer onFrame) {
-        this.playAnimation(name, priority, restartPaused, onFrame, onFinish);
-    }
-
-    /**
-     * Starts playing an animation on the intermediate.
-     *
-     * @param name:          The name of the animation.
-     * @param priority:      The priority of the animation.
-     * @param restartPaused: Whether to restart paused animations, rather than resuming them where they left off.
-     * @param onFrame:       Callback that runs on each frame of the animation. The frame index is passed as argument.
-     * @param onFinish:      Callback that runs when the animation finishes.
-     */
-    void playAnimation(String name, int priority, boolean restartPaused, @Nullable IntConsumer onFrame, @Nullable Runnable onFinish);
+    default void playAnimation(String name, int priority, boolean restartPaused, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish) { playAnimation(null, name, priority, restartPaused, onFrame, onFinish); }
+    void playAnimation(ServerPlayer serverPlayer, String name, int priority, boolean restartPaused, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish);
 
     /**
      * Sets the current frame of an animation.
@@ -212,23 +166,28 @@ public interface Animator {
      * @param name:  The name of the animation.
      * @param frame: The frame to set the animation to. A negative value will delay the animation from being played.
      */
-    void setAnimationFrame(String name, int frame);
+    default void setAnimationFrame(String name, int frame) { setAnimationFrame(null, name, frame); }
+    void setAnimationFrame(ServerPlayer serverPlayer, String name, int frame);
 
     /**
      * Pauses an animation on the intermediate.
      *
      * @param name: The name of the animation.
      */
-    void pauseAnimation(String name);
+    default void pauseAnimation(String name) { pauseAnimation(null, name); }
+    void pauseAnimation(ServerPlayer serverPlayer, String name);
 
     /**
      * Stops an animation from playing on the intermediate.
      *
      * @param name: The name of the animation.
      */
-    void stopAnimation(String name);
+    default void stopAnimation(String name) { stopAnimation(null, name); }
+    void stopAnimation(ServerPlayer serverPlayer, String name);
 
-    boolean isPlaying(String name);
+    default boolean isPlaying(String name) { return isPlaying(null, name); }
+    boolean isPlaying(ServerPlayer serverPlayer, String name);
 
-    boolean hasRunningAnimations();
+    default boolean hasRunningAnimations() { return hasRunningAnimations(null); }
+    boolean hasRunningAnimations(ServerPlayer serverPlayer);
 }

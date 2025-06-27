@@ -8,25 +8,53 @@ import de.tomalbrc.bil.core.model.Frame;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Pose;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 public class AnimationComponent extends ComponentBase implements Animator {
-    private final Object2ObjectOpenHashMap<String, AnimationPlayer> animationMap = new Object2ObjectOpenHashMap<>();
-    private final CopyOnWriteArrayList<AnimationPlayer> animationPlayerList = new CopyOnWriteArrayList<>();
+    private final Map<String, AnimationPlayer> animationMap = new Object2ReferenceOpenHashMap<>();
+    private final Map<ServerPlayer, Map<String, AnimationPlayer>> perPlayerAnimationMap = new Object2ReferenceOpenHashMap<>();
+
+    private final List<AnimationPlayer> animationPlayerList = new CopyOnWriteArrayList<>();
 
     public AnimationComponent(Model model, AbstractAnimationHolder holder) {
         super(model, holder);
     }
 
+    private Map<String, AnimationPlayer> animationMap(ServerPlayer serverPlayer) {
+        return serverPlayer == null ? animationMap : perPlayerAnimationMap.computeIfAbsent(serverPlayer, (x) -> new Object2ObjectOpenHashMap<>());
+    }
+
+    private AnimationPlayer removeFromAnimationMap(ServerPlayer serverPlayer, String name) {
+        if (serverPlayer == null) {
+            return animationMap.remove(name);
+        }
+
+        var map = perPlayerAnimationMap.get(serverPlayer);
+        if (map != null) {
+            var val = map.remove(name);
+            if (map.isEmpty())
+                perPlayerAnimationMap.remove(serverPlayer);
+            return val;
+        }
+        return null;
+    }
+
     @Override
-    public void playAnimation(String name, int priority, boolean restartPaused, IntConsumer onFrame, Runnable onFinish) {
-        AnimationPlayer animationPlayer = this.animationMap.get(name);
+    public void playAnimation(ServerPlayer serverPlayer, String name, int priority, boolean restartPaused, IntConsumer onFrame, Consumer<ServerPlayer> onFinish) {
+        Map<String, AnimationPlayer> map = this.animationMap(serverPlayer);
+
+        AnimationPlayer animationPlayer = map.get(name);
         if (priority < 0) {
             priority = 0;
         }
@@ -34,7 +62,14 @@ public class AnimationComponent extends ComponentBase implements Animator {
         if (animationPlayer == null) {
             Animation animation = this.model.animations().get(name);
             if (animation != null) {
-                this.addAnimationPlayer(new AnimationPlayer(name, animation, this.holder, priority, onFrame, onFinish));
+                if (serverPlayer != null) holder.addBoneDataTracker(serverPlayer);
+
+                this.addAnimationPlayer(new AnimationPlayer(serverPlayer, name, animation, this.holder, priority, onFrame, (serverPlayer1) -> {
+                    if (serverPlayer1 != null && !this.hasRunningAnimationsSinglePlayer(serverPlayer1))
+                        holder.resetBoneDataTracker(serverPlayer1);
+                    if (onFinish != null)
+                        onFinish.accept(serverPlayer1);
+                }));
             }
         } else {
             // Update values of the existing animation.
@@ -56,31 +91,31 @@ public class AnimationComponent extends ComponentBase implements Animator {
     }
 
     @Override
-    public void setAnimationFrame(String name, int frame) {
-        AnimationPlayer animationPlayer = this.animationMap.get(name);
+    public void setAnimationFrame(ServerPlayer serverPlayer, String name, int frame) {
+        AnimationPlayer animationPlayer = this.animationMap(serverPlayer).get(name);
         if (animationPlayer != null) {
             animationPlayer.skipToFrame(frame);
         }
     }
 
     @Override
-    public void pauseAnimation(String name) {
-        AnimationPlayer animationPlayer = this.animationMap.get(name);
+    public void pauseAnimation(ServerPlayer serverPlayer, String name) {
+        AnimationPlayer animationPlayer = this.animationMap(serverPlayer).get(name);
         if (animationPlayer != null && animationPlayer.state == AnimationPlayer.State.PLAYING) {
             animationPlayer.state = AnimationPlayer.State.PAUSED;
         }
     }
 
     @Override
-    public void stopAnimation(String name) {
-        AnimationPlayer animationPlayer = this.animationMap.remove(name);
+    public void stopAnimation(ServerPlayer serverPlayer, String name) {
+        AnimationPlayer animationPlayer = removeFromAnimationMap(serverPlayer, name);
         if (animationPlayer != null) {
             this.animationPlayerList.remove(animationPlayer);
         }
     }
 
     private void addAnimationPlayer(AnimationPlayer animationPlayer) {
-        this.animationMap.put(animationPlayer.name, animationPlayer);
+        this.animationMap(animationPlayer.getOwner()).put(animationPlayer.name, animationPlayer);
 
         if (this.animationPlayerList.size() > 0 && animationPlayer.priority > 0) {
             int index = Collections.binarySearch(this.animationPlayerList, animationPlayer);
@@ -94,38 +129,40 @@ public class AnimationComponent extends ComponentBase implements Animator {
         for (int index = this.animationPlayerList.size() - 1; index >= 0; index--) {
             AnimationPlayer animationPlayer = this.animationPlayerList.get(index);
             if (animationPlayer.hasFinished()) {
-                this.animationMap.remove(animationPlayer.name);
+                ServerPlayer serverPlayer = animationPlayer.getOwner();
+                removeFromAnimationMap(serverPlayer, animationPlayer.name);
                 this.animationPlayerList.remove(index);
-                animationPlayer.onFinished();
+                animationPlayer.onFinished(serverPlayer);
             } else {
-                animationPlayer.tick();
+                animationPlayer.tick(animationPlayer.getOwner());
             }
         }
     }
 
     @Nullable
-    public Pose findPose(AbstractWrapper wrapper) {
+    public PoseQueryResult findPose(ServerPlayer serverPlayer, AbstractWrapper wrapper) {
         UUID uuid = wrapper.node().uuid();
-        Pose pose = null;
+        PoseQueryResult queryResult = null;
 
-        for (AnimationPlayer animationPlayer : this.animationPlayerList) {
-            if (this.canAnimationAffect(animationPlayer, uuid)) {
+        for (int i = 0; i < this.animationPlayerList.size(); i++) {
+            AnimationPlayer animationPlayer = this.animationPlayerList.get(i);
+            if ((animationPlayer.owner == null || animationPlayer.owner == serverPlayer) && this.canAnimationAffect(animationPlayer, uuid)) {
                 if (animationPlayer.inResetState()) {
-                    pose = wrapper.getDefaultPose();
+                    queryResult = new PoseQueryResult(wrapper.getDefaultPose(), animationPlayer.owner);
                 } else {
-                    pose = this.findAnimationPose(wrapper, animationPlayer, uuid);
-                    if (pose != null) {
-                        return pose;
+                    var animationPose = this.findAnimationPose(wrapper, animationPlayer, uuid);
+                    if (animationPose != null) {
+                        queryResult = new PoseQueryResult(animationPose, animationPlayer.owner);
                     }
                 }
             }
         }
 
-        if (pose != null) {
-            wrapper.setLastPose(pose, null);
+        if (queryResult != null) {
+            wrapper.setLastPose(queryResult.owner, queryResult.pose, null);
         }
 
-        return pose;
+        return queryResult;
     }
 
     private boolean canAnimationAffect(AnimationPlayer anim, UUID uuid) {
@@ -143,12 +180,12 @@ public class AnimationComponent extends ComponentBase implements Animator {
 
         Pose pose = frame.poses().get(uuid);
         if (pose != null) {
-            wrapper.setLastPose(pose, animation);
+            wrapper.setLastPose(anim.getOwner(), pose, animation);
             return pose;
         }
 
-        if (animation == wrapper.getLastAnimation()) {
-            return wrapper.getLastPose();
+        if (animation == wrapper.getLastAnimation(anim.getOwner())) {
+            return wrapper.getLastPose(anim.getOwner());
         }
 
         // Since the animation just switched, the last known pose is no longer valid.
@@ -160,7 +197,7 @@ public class AnimationComponent extends ComponentBase implements Animator {
         for (int i = startIndex; i >= 0; i--) {
             pose = frames[i].poses().get(uuid);
             if (pose != null) {
-                wrapper.setLastPose(pose, animation);
+                wrapper.setLastPose(anim.getOwner(), pose, animation);
                 return pose;
             }
         }
@@ -168,16 +205,23 @@ public class AnimationComponent extends ComponentBase implements Animator {
     }
 
     @Override
-    public boolean isPlaying(String name) {
-        return this.animationMap.containsKey(name);
+    public boolean isPlaying(ServerPlayer serverPlayer, String name) {
+        return this.animationMap(serverPlayer).containsKey(name);
     }
 
     @Override
-    public boolean hasRunningAnimations() {
-        return !this.animationMap.isEmpty();
+    public boolean hasRunningAnimations(ServerPlayer serverPlayer) {
+        return this.animationMap(serverPlayer) != null && !this.animationMap(serverPlayer).isEmpty();
     }
 
-    private static class AnimationPlayer implements Comparable<AnimationPlayer> {
+    public boolean hasRunningAnimationsSinglePlayer(ServerPlayer serverPlayer) {
+        var map = this.perPlayerAnimationMap.get(serverPlayer);
+        return map != null && !map.isEmpty();
+    }
+
+    public record PoseQueryResult(@Nullable Pose pose, @Nullable ServerPlayer owner) {}
+
+    static class AnimationPlayer implements Comparable<AnimationPlayer> {
         @NotNull
         private final Animation animation;
         private final AbstractAnimationHolder holder;
@@ -192,9 +236,12 @@ public class AnimationComponent extends ComponentBase implements Animator {
         @Nullable
         private IntConsumer onFrameCallback;
         @Nullable
-        private Runnable onFinishCallback;
+        private Consumer<ServerPlayer> onFinishCallback;
 
-        private AnimationPlayer(String name, @NotNull Animation animation, AbstractAnimationHolder holder, int priority, @Nullable IntConsumer onFrame, @Nullable Runnable onFinish) {
+        @Nullable
+        private final ServerPlayer owner;
+
+        private AnimationPlayer(@Nullable ServerPlayer owner, String name, @NotNull Animation animation, AbstractAnimationHolder holder, int priority, @Nullable IntConsumer onFrame, @Nullable Consumer<ServerPlayer> onFinish) {
             this.name = name;
             this.holder = holder;
             this.animation = animation;
@@ -203,27 +250,32 @@ public class AnimationComponent extends ComponentBase implements Animator {
             this.onFrameCallback = onFrame;
             this.onFinishCallback = onFinish;
             this.resetFrameCounter(false);
+            this.owner = owner;
         }
 
-        private void onFinished() {
+        public @Nullable ServerPlayer getOwner() {
+            return this.owner;
+        }
+
+        private void onFinished(ServerPlayer serverPlayer) {
             if (this.onFinishCallback != null) {
-                this.onFinishCallback.run();
+                this.onFinishCallback.accept(serverPlayer);
             }
         }
 
-        private void tick() {
+        private void tick(ServerPlayer serverPlayer) {
             if (this.frameCounter < 0) {
                 this.onFramesFinished();
                 return;
             }
 
             if (this.shouldAnimate()) {
-                this.updateFrame();
+                this.updateFrame(serverPlayer);
                 this.frameCounter--;
             }
         }
 
-        private void updateFrame() {
+        private void updateFrame(ServerPlayer serverPlayer) {
             Frame[] frames = this.animation.frames();
             if (this.frameCounter >= 0 && this.frameCounter < frames.length) {
                 int index = (frames.length - 1) - this.frameCounter;
@@ -234,7 +286,7 @@ public class AnimationComponent extends ComponentBase implements Animator {
                 }
 
                 if (this.currentFrame.requiresUpdates()) {
-                    this.currentFrame.runEffects(this.holder);
+                    this.currentFrame.runEffects(serverPlayer, this.holder);
                 }
             }
         }

@@ -31,7 +31,7 @@ public class VariantComponent extends ComponentBase implements VariantController
             this.currentVariant = null;
             for (int i = 0; i < this.holder.getBones().length; i++) {
                 if (this.holder.getBones()[i] instanceof ItemBone itemBone) {
-                    itemBone.updateModelData(itemBone.node().modelData());
+                    itemBone.updateModel(itemBone.node().modelData());
                 }
             }
         }
@@ -87,7 +87,7 @@ public class VariantComponent extends ComponentBase implements VariantController
                 UUID uuid = bone.node().uuid();
                 ResourceLocation modelData = variant.models().get(uuid);
                 if (modelData != null && variant.isAffected(uuid)) {
-                    bone.updateModelData(modelData);
+                    bone.updateModel(modelData);
                 }
             }
         }

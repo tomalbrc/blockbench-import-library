@@ -4,14 +4,13 @@ import de.tomalbrc.bil.api.AnimatedHolder;
 import de.tomalbrc.bil.api.Animator;
 import de.tomalbrc.bil.core.component.AnimationComponent;
 import de.tomalbrc.bil.core.component.VariantComponent;
+import de.tomalbrc.bil.core.element.PerPlayerBlockDisplayElement;
+import de.tomalbrc.bil.core.element.PerPlayerItemDisplayElement;
+import de.tomalbrc.bil.core.element.PerPlayerTextDisplayElement;
 import de.tomalbrc.bil.core.holder.wrapper.*;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
@@ -20,18 +19,25 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractAnimationHolder extends AbstractElementHolder implements AnimatedHolder {
-
     protected final Model model;
+
     protected final AnimationComponent animationComponent;
+
     protected final VariantComponent variantComponent;
     protected final Object2ObjectOpenHashMap<String, Locator> locatorMap;
 
@@ -71,22 +77,56 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         }
     }
 
+    public void addBoneDataTracker(ServerPlayer serverPlayer) {
+        for (int i = 0; i < this.getBones().length; i++) {
+            var bone = this.getBones()[i];
+            bone.setLastPose(serverPlayer, bone.getLastPose(null), bone.getLastAnimation(null));
+            bone.element().addDataTracker(serverPlayer);
+        }
+    }
+
+    public void resetBoneDataTracker(ServerPlayer serverPlayer) {
+        for (int i = 0; i < this.getBones().length; i++) {
+            var bone = this.getBones()[i];
+            bone.resetLastPose(serverPlayer);
+            bone.element().resetDataTracker(serverPlayer);
+        }
+    }
+
     @Nullable
-    protected ItemDisplayElement createBoneDisplay(ResourceLocation modelData) {
+    protected PerPlayerItemDisplayElement createBoneDisplay(ResourceLocation modelData) {
         if (modelData == null)
             return null;
-
-        ItemDisplayElement element = new ItemDisplayElement();
-        element.setItemDisplayContext(ItemDisplayContext.HEAD);
-        element.setInvisible(true);
-        element.setInterpolationDuration(3);
-        element.getDataTracker().set(DisplayTrackedData.TELEPORTATION_DURATION, 3);
 
         ItemStack itemStack = new ItemStack(Items.LEATHER_HORSE_ARMOR);
         itemStack.set(DataComponents.ITEM_MODEL, modelData);
         itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(-1));
 
-        element.setItem(itemStack);
+        PerPlayerItemDisplayElement element = createItemDisplayElement(itemStack);
+        element.setItemDisplayContext(ItemDisplayContext.HEAD);
+        return element;
+    }
+
+    @NotNull protected PerPlayerItemDisplayElement createItemDisplayElement(ItemStack item) {
+        var element = new PerPlayerItemDisplayElement(item);
+        element.setInterpolationDuration(3);
+        element.setTeleportDuration(3);
+        element.setInvisible(true);
+        return element;
+    }
+
+    @NotNull protected PerPlayerBlockDisplayElement createBlockDisplayElement(BlockState blockState) {
+        var element = new PerPlayerBlockDisplayElement(blockState);
+        element.setInterpolationDuration(3);
+        element.setTeleportDuration(3);
+        element.setInvisible(true);
+        return element;
+    }
+
+    @NotNull protected PerPlayerTextDisplayElement createTextDisplayElement(Component text) {
+        var element = new PerPlayerTextDisplayElement(text);
+        element.setInterpolationDuration(3);
+        element.setTeleportDuration(3);
         return element;
     }
 
@@ -95,7 +135,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
             Pose defaultPose = this.model.defaultPose().get(node.uuid());
             switch (node.type()) {
                 case BONE -> {
-                    ItemDisplayElement bone = this.createBoneDisplay(node.modelData());
+                    var bone = this.createBoneDisplay(node.modelData());
                     if (bone != null) {
                         bones.add(ModelBone.of(bone, node, defaultPose));
                         this.addElement(bone);
@@ -103,27 +143,21 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
                 }
                 case ITEM -> {
                     if (node.displayDataElement() != null) {
-                        ItemDisplayElement bone = new ItemDisplayElement(BuiltInRegistries.ITEM.getValue(node.displayDataElement().getItem()));
-                        bone.setInterpolationDuration(3);
-                        bone.setTeleportDuration(3);
+                        var bone = createItemDisplayElement(BuiltInRegistries.ITEM.getValue(node.displayDataElement().getItem()).getDefaultInstance());
                         bones.add(ItemBone.of(bone, node, defaultPose));
                         this.addElement(bone);
                     }
                 }
                 case BLOCK -> {
                     if (node.displayDataElement() != null) {
-                        BlockDisplayElement bone = new BlockDisplayElement(BuiltInRegistries.BLOCK.getValue(node.displayDataElement().getBlock()).defaultBlockState());
-                        bone.setInterpolationDuration(3);
-                        bone.setTeleportDuration(3);
+                        var bone = createBlockDisplayElement(BuiltInRegistries.BLOCK.getValue(node.displayDataElement().getBlock()).defaultBlockState());
                         bones.add(BlockBone.of(bone, node, defaultPose));
                         this.addElement(bone);
                     }
                 }
                 case TEXT -> {
                     if (node.displayDataElement() != null) {
-                        TextDisplayElement bone = new TextDisplayElement(Component.literal(node.displayDataElement().getText()));
-                        bone.setInterpolationDuration(3);
-                        bone.setTeleportDuration(3);
+                        var bone = createTextDisplayElement(Component.literal(node.displayDataElement().getText()));
                         bones.add(TextBone.of(bone, node, defaultPose));
                         this.addElement(bone);
                     }
@@ -152,51 +186,79 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
 
     @Override
     protected void onAsyncTick() {
-        for (Bone<?> bone : this.bones) {
-            this.updateElement(bone);
-        }
-
-        for (Locator locator : this.locators) {
-            this.updateLocator(locator);
-        }
+        Arrays.stream(this.watchingPlayers).parallel().forEach(this::asyncTickFor);
     }
 
-    protected void updateElement(DisplayWrapper<?> display) {
-        this.updateElement(display, this.animationComponent.findPose(display));
+    protected void asyncTickFor(ServerGamePacketListenerImpl watchingPlayer) {
+        boolean didUpdateDefaultElement = false;
+        for (int boneIdx = 0; boneIdx < this.bones.length; boneIdx++) {
+            didUpdateDefaultElement = this.updateElement(watchingPlayer.player, this.bones[boneIdx], didUpdateDefaultElement);
+        }
+
+        boolean didUpdateDefaultLoc = false;
+        for (int locatorIdx = 0; locatorIdx < this.locators.length; locatorIdx++) {
+            didUpdateDefaultLoc = this.updateLocator(watchingPlayer.player, this.locators[locatorIdx], didUpdateDefaultLoc);
+        }
     }
 
     public void initializeDisplay(DisplayWrapper<?> display) {
-        this.updateElement(display, display.getDefaultPose());
+        this.updateElement(null, display, display.getDefaultPose());
     }
 
-    public void updateElement(DisplayWrapper<?> display, @Nullable Pose pose) {
+    protected boolean updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> display, boolean didUpdateDefault) {
+        var queryResult = this.animationComponent.findPose(serverPlayer, display);
+        if (queryResult != null) {
+            if (didUpdateDefault && queryResult.owner() != serverPlayer) // prevent re-doing the default for every player
+                return true;
+
+            didUpdateDefault |= queryResult.owner() != serverPlayer;
+
+            this.updateElement(queryResult.owner(), display, queryResult.pose());
+        }
+
+        return didUpdateDefault;
+    }
+
+    public void updateElement(@Nullable ServerPlayer serverPlayer, DisplayWrapper<?> display, @Nullable Pose pose) {
         if (pose != null) {
-            this.applyPose(pose, display);
-        }
-    }
-
-    protected void updateLocator(Locator locator) {
-        if (locator.requiresUpdate()) {
-            Pose pose = this.animationComponent.findPose(locator);
-            if (pose != null) {
-                locator.updateListeners(this, pose);
-            }
-        }
-    }
-
-    protected void applyPose(Pose pose, DisplayWrapper<?> display) {
-        if (this.scale != 1F) {
-            display.element().setScale(pose.scale().mul(this.scale));
-            display.element().setTranslation(pose.translation().mul(this.scale));
+            this.applyPose(serverPlayer, pose, display);
         } else {
-            display.element().setScale(pose.readOnlyScale());
-            display.element().setTranslation(pose.readOnlyTranslation());
+            this.applyPose(serverPlayer, display.getLastPose(serverPlayer), display);
+        }
+    }
+
+    protected boolean updateLocator(ServerPlayer serverPlayer, Locator locator, boolean didUpdateDefault) {
+        if (locator.requiresUpdate()) {
+            var queryResult = this.animationComponent.findPose(serverPlayer, locator);
+            if (queryResult != null) {
+                if (didUpdateDefault && queryResult.owner() != serverPlayer) // prevent re-doing the default for every player
+                    return true;
+
+                didUpdateDefault |= queryResult.owner() != serverPlayer;
+
+                var pose = queryResult.pose() == null ? locator.getLastPose(serverPlayer) : queryResult.pose();
+                if (pose != null)
+                    locator.updateListeners(queryResult.owner(), this, pose);
+            }
+
         }
 
-        display.element().setLeftRotation(pose.readOnlyLeftRotation());
-        display.element().setRightRotation(pose.readOnlyRightRotation());
+        return didUpdateDefault;
+    }
 
-        display.element().startInterpolationIfDirty();
+    protected void applyPose(ServerPlayer serverPlayer, Pose pose, DisplayWrapper<?> display) {
+        if (this.scale != 1F) {
+            display.element().setScale(serverPlayer, pose.scale().mul(this.scale));
+            display.element().setTranslation(serverPlayer, pose.translation().mul(this.scale));
+        } else {
+            display.element().setScale(serverPlayer, pose.readOnlyScale());
+            display.element().setTranslation(serverPlayer, pose.readOnlyTranslation());
+        }
+
+        display.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
+        display.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
+
+        display.element().startInterpolationIfDirty(serverPlayer);
     }
 
     @Override
@@ -248,4 +310,8 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
     }
 
     abstract public CommandSourceStack createCommandSourceStack();
+
+    public SoundSource getSoundSource() {
+        return SoundSource.BLOCKS;
+    }
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public record Node(
         @NotNull NodeType type,
-        @NotNull Node parent,
+        @Nullable Node parent,
         @NotNull Transform transform,
         @NotNull String name,
         @NotNull UUID uuid,

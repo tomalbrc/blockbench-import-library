@@ -3,9 +3,7 @@ package de.tomalbrc.bil.core.holder.entity.living;
 import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.core.element.CollisionElement;
 import de.tomalbrc.bil.core.holder.entity.EntityHolder;
-import de.tomalbrc.bil.core.holder.wrapper.Bone;
 import de.tomalbrc.bil.core.holder.wrapper.DisplayWrapper;
-import de.tomalbrc.bil.core.holder.wrapper.Locator;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Pose;
 import de.tomalbrc.bil.util.Constants;
@@ -18,11 +16,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
@@ -64,29 +63,13 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
     }
 
     @Override
-    public void updateElement(DisplayWrapper<?> display, @Nullable Pose pose) {
+    public void updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> display, @Nullable Pose pose) {
         display.element().setYaw(this.parent.yBodyRot);
-        if (pose == null) {
-            this.applyPose(display.getLastPose(), display);
-        } else {
-            this.applyPose(pose, display);
-        }
+        super.updateElement(serverPlayer, display, pose);
     }
 
     @Override
-    protected void updateLocator(Locator locator) {
-        if (locator.requiresUpdate()) {
-            Pose pose = this.animationComponent.findPose(locator);
-            if (pose == null) {
-                locator.updateListeners(this, locator.getLastPose());
-            } else {
-                locator.updateListeners(this, pose);
-            }
-        }
-    }
-
-    @Override
-    protected void applyPose(Pose pose, DisplayWrapper<?> display) {
+    protected void applyPose(ServerPlayer serverPlayer, Pose pose, DisplayWrapper<?> display) {
         Vector3f translation = pose.translation();
         boolean isHead = display.isHead();
         boolean isDead = this.parent.deathTime > 0;
@@ -103,22 +86,22 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
                 bodyRotation.rotateX(Mth.DEG_TO_RAD * Mth.lerp(0.5f, this.parent.xRotO, this.parent.getXRot()));
             }
 
-            display.element().setLeftRotation(bodyRotation.mul(pose.readOnlyLeftRotation()));
+            display.element().setLeftRotation(serverPlayer, bodyRotation.mul(pose.readOnlyLeftRotation()));
         } else {
-            display.element().setLeftRotation(pose.readOnlyLeftRotation());
+            display.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
         }
 
         if (this.entityScale != 1F) {
             translation.mul(this.entityScale);
-            display.element().setScale(pose.scale().mul(this.entityScale));
+            display.element().setScale(serverPlayer, pose.scale().mul(this.entityScale));
         } else {
-            display.element().setScale(pose.readOnlyScale());
+            display.element().setScale(serverPlayer, pose.readOnlyScale());
         }
 
-        display.element().setTranslation(translation.sub(0, this.dimensions.height() - 0.01f, 0));
-        display.element().setRightRotation(pose.readOnlyRightRotation());
+        display.element().setTranslation(serverPlayer, translation.sub(0, this.dimensions.height() - 0.01f, 0));
+        display.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
 
-        display.element().startInterpolationIfDirty();
+        display.element().startInterpolationIfDirty(serverPlayer);
     }
 
     @Override
@@ -178,8 +161,8 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         float width = scale * (this.dimensions.width() * 2);
         float height = -this.dimensions.height() - 1;
 
-        for (Bone bone : this.bones) {
-            bone.element().setDisplaySize(width, height);
+        for (int i = 0; i < this.bones.length; i++) {
+            this.bones[i].element().setDisplaySize(width, height);
         }
     }
 
@@ -244,5 +227,10 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
 
     protected void updateEntityScale(float scalar) {
         this.entityScale = this.parent.getScale() * scalar;
+    }
+
+    @Override
+    public SoundSource getSoundSource() {
+        return SoundSource.NEUTRAL;
     }
 }

@@ -6,6 +6,7 @@ import de.tomalbrc.bil.core.holder.wrapper.Locator;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -23,7 +24,7 @@ public class ElementUpdateListener implements Locator.LocatorListener {
     }
 
     @Override
-    public void update(AbstractAnimationHolder holder, Pose pose) {
+    public void update(ServerPlayer serverPlayer, AbstractAnimationHolder holder, Pose pose) {
         if (this.element.isSendingPositionUpdates()) {
             if (holder instanceof EntityHolder<?> entityHolder) {
                 this.updateEntityBasedHolder(entityHolder, pose);

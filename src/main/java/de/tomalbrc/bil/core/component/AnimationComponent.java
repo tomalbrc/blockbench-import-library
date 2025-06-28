@@ -142,19 +142,20 @@ public class AnimationComponent extends ComponentBase implements Animator {
 
     @Nullable
     public PoseQueryResult findPose(ServerPlayer serverPlayer, AbstractWrapper wrapper) {
-        UUID uuid = wrapper.node().uuid();
+        UUID nodeId = wrapper.node().uuid();
         PoseQueryResult queryResult = null;
 
         for (int i = 0; i < this.animationPlayerList.size(); i++) {
             AnimationPlayer animationPlayer = this.animationPlayerList.get(i);
-            if ((animationPlayer.owner == null || animationPlayer.owner == serverPlayer) && this.canAnimationAffect(animationPlayer, uuid)) {
+            var owned = animationPlayer.owner != null;
+            if ((!owned || animationPlayer.owner == serverPlayer) && animationPlayer.affects(nodeId)) {
                 if (animationPlayer.inResetState()) {
                     queryResult = new PoseQueryResult(wrapper.getDefaultPose(), animationPlayer.owner);
                 } else {
-                    var animationPose = this.findAnimationPose(wrapper, animationPlayer, uuid);
+                    var animationPose = this.findAnimationPose(wrapper, animationPlayer, nodeId);
                     if (animationPose != null) {
                         queryResult = new PoseQueryResult(animationPose, animationPlayer.owner);
-                        if (animationPlayer.owner != null) { // stop earlier for player specific animation
+                        if (owned) { // stop earlier for player specific animation
                             break;
                         }
                     }
@@ -167,11 +168,6 @@ public class AnimationComponent extends ComponentBase implements Animator {
         }
 
         return queryResult;
-    }
-
-    private boolean canAnimationAffect(AnimationPlayer anim, UUID uuid) {
-        final boolean canAnimate = anim.inResetState() || anim.shouldAnimate();
-        return canAnimate && anim.animation.isAffected(uuid);
     }
 
     @Nullable
@@ -343,6 +339,11 @@ public class AnimationComponent extends ComponentBase implements Animator {
         @Override
         public int compareTo(@NotNull AnimationPlayer other) {
             return Integer.compare(other.priority, this.priority);
+        }
+
+        public boolean affects(UUID nodeId) {
+            final boolean canAnimate = this.inResetState() || this.shouldAnimate();
+            return canAnimate && this.animation.isAffected(nodeId);
         }
 
         private enum State {

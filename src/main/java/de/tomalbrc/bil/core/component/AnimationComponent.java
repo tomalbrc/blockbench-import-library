@@ -153,6 +153,9 @@ public class AnimationComponent extends ComponentBase implements Animator {
                     var animationPose = this.findAnimationPose(wrapper, animationPlayer, uuid);
                     if (animationPose != null) {
                         queryResult = new PoseQueryResult(animationPose, animationPlayer.owner);
+                        if (animationPlayer.owner == serverPlayer) { // stop earlier for player specific animation
+                            break;
+                        }
                     }
                 }
             }

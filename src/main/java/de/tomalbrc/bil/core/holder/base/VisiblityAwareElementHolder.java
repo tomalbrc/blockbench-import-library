@@ -13,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-public class NetworkEfficientElementHolder extends ElementHolder {
+public class VisiblityAwareElementHolder extends ElementHolder {
     protected static final double FOV = 80 * Mth.DEG_TO_RAD; // assume fov of 160°
     protected static final double MAX_DISTANCE_SQR = Mth.square(9*16); // 8 chunks, always stop animating
     protected static final double MIN_DISTANCE_SQR = Mth.square(7*16); // 6 chunks, ignore fov
@@ -43,14 +43,16 @@ public class NetworkEfficientElementHolder extends ElementHolder {
     }
 
     protected boolean isInFov(ServerGamePacketListenerImpl player) {
-        double dist = player.player.distanceToSqr(this.getPos());
-        if (dist > this.getMaxAnimationDistance())
+        Vec3 holderPos = this.getPos();
+        double dist = player.player.distanceToSqr(holderPos.x, player.player.getY(), holderPos.z);
+        boolean inVRange = Math.abs(player.player.getY()-holderPos.z)/2 > this.getMaxAnimationDistance();
+        if (dist > this.getMaxAnimationDistance() && !inVRange)
             return false;
-        else if (dist <= this.getMinAnimationDistance())
+        else if (dist <= this.getMinAnimationDistance() || inVRange)
             return true;
 
         Vec3 directionFacing = player.player.getViewVector(1).normalize();
-        Vec3 directionToTarget = this.getPos().subtract(player.player.position()).normalize();
+        Vec3 directionToTarget = holderPos.subtract(player.player.position()).normalize();
 
         Vec3 horizontalFacing = new Vec3(directionFacing.x, 0, directionFacing.z).normalize();
         Vec3 horizontalToTarget = new Vec3(directionToTarget.x, 0, directionToTarget.z).normalize();
@@ -66,8 +68,12 @@ public class NetworkEfficientElementHolder extends ElementHolder {
 
     protected List<Packet<? super ClientGamePacketListener>> filterForPlayer(List<Packet<? super ClientGamePacketListener>> packetList, ServerGamePacketListenerImpl packetListener) {
         if (!isInFov(packetListener)) {
-            List<Packet<? super ClientGamePacketListener>> filteredList = new ObjectArrayList<>(packetList);
-            filteredList.removeIf(packet -> packet instanceof ClientboundSetEntityDataPacket);
+            List<Packet<? super ClientGamePacketListener>> filteredList = new ObjectArrayList<>(packetList.size());
+            for (int i = 0; i < filteredList.size(); i++) {
+                var packet = filteredList.get(i);
+                if (!(packet instanceof ClientboundSetEntityDataPacket))
+                    filteredList.add(packet);
+            }
             return filteredList;
         }
 

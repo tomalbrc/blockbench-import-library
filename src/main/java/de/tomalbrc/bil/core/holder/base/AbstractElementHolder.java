@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * This class mainly exists to split off ElementHolder logic from the element logic.
  */
-public abstract class AbstractElementHolder extends NetworkEfficientElementHolder {
+public abstract class AbstractElementHolder extends VisiblityAwareElementHolder {
     protected ServerGamePacketListenerImpl[] watchingPlayers;
     protected boolean elementsInitialized;
     protected boolean isDataLoaded;

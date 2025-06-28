@@ -3,7 +3,7 @@ package de.tomalbrc.bil.core.holder.wrapper;
 import de.tomalbrc.bil.core.model.Animation;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Map;
@@ -14,8 +14,8 @@ public abstract class AbstractWrapper {
     protected Animation lastAnimation;
     protected Pose lastPose;
 
-    protected Map<ServerPlayer, Animation> lastAnimationPerPlayer = new Object2ReferenceOpenHashMap<>();
-    protected Map<ServerPlayer, Pose> lastPosePerPlayer = new Object2ReferenceOpenHashMap<>();
+    protected Map<ServerPlayer, Animation> lastAnimationPerPlayer = new Reference2ReferenceOpenHashMap<>();
+    protected Map<ServerPlayer, Pose> lastPosePerPlayer = new Reference2ReferenceOpenHashMap<>();
 
     public AbstractWrapper(Node node, Pose defaultPose) {
         this.node = node;

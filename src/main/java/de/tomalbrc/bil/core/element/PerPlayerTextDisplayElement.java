@@ -3,7 +3,7 @@ package de.tomalbrc.bil.core.element;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
-import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class PerPlayerTextDisplayElement extends TextDisplayElement implements PerPlayerTransformableElement {
-    Map<ServerPlayer, Data> playerDataTrackers = new Object2ReferenceOpenHashMap<>();
+    Map<ServerPlayer, Data> playerDataTrackers = new Reference2ObjectOpenHashMap<>();
 
     public PerPlayerTextDisplayElement(Component text) {
         super(text);

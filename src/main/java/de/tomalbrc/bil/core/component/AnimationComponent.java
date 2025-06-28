@@ -9,6 +9,7 @@ import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Pose;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,7 @@ import java.util.function.IntConsumer;
 
 public class AnimationComponent extends ComponentBase implements Animator {
     private final Map<String, AnimationPlayer> animationMap = new Object2ReferenceOpenHashMap<>();
-    private final Map<ServerPlayer, Map<String, AnimationPlayer>> perPlayerAnimationMap = new Object2ReferenceOpenHashMap<>();
+    private final Map<ServerPlayer, Map<String, AnimationPlayer>> perPlayerAnimationMap = new Reference2ObjectOpenHashMap<>();
 
     private final List<AnimationPlayer> animationPlayerList = new CopyOnWriteArrayList<>();
 
@@ -153,7 +154,7 @@ public class AnimationComponent extends ComponentBase implements Animator {
                     var animationPose = this.findAnimationPose(wrapper, animationPlayer, uuid);
                     if (animationPose != null) {
                         queryResult = new PoseQueryResult(animationPose, animationPlayer.owner);
-                        if (animationPlayer.owner == serverPlayer) { // stop earlier for player specific animation
+                        if (animationPlayer.owner != null) { // stop earlier for player specific animation
                             break;
                         }
                     }

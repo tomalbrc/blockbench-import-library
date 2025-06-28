@@ -3,7 +3,7 @@ package de.tomalbrc.bil.core.element;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
-import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class PerPlayerBlockDisplayElement extends BlockDisplayElement implements PerPlayerTransformableElement {
-    Map<ServerPlayer, Data> playerDataTracker = new Object2ReferenceOpenHashMap<>();
+    Map<ServerPlayer, Data> playerDataTracker = new Reference2ObjectOpenHashMap<>();
 
     public PerPlayerBlockDisplayElement(BlockState blockState) {
         super(blockState);

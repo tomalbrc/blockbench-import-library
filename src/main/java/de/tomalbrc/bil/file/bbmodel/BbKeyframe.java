@@ -71,9 +71,25 @@ public class BbKeyframe implements Comparable<BbKeyframe> {
     }
 
     static public class DataPointValue {
+        public static DataPointValue BLANK = new BbKeyframe.DataPointValue("");
+
         private float value;
         private String stringValue;
         private MolangExpression molangExpression;
+
+        public DataPointValue() {}
+
+        public DataPointValue(MolangExpression expression) {
+            this.molangExpression = expression;
+        }
+
+        public DataPointValue(float val) {
+            this.value = val;
+        }
+
+        public DataPointValue(String stringValue) {
+            this.stringValue = stringValue;
+        }
 
         public void setValue(float value) {
             this.value = value;

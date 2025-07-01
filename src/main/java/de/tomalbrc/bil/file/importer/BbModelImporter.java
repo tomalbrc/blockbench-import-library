@@ -248,12 +248,13 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 if (difference == t && kf.channel == BbKeyframe.Channel.TIMELINE) {
                     String key = "script";
                     var map = kf.dataPoints.getFirst();
-                    var val = map.get(key);
+                    var val = map.getOrDefault(key, BbKeyframe.DataPointValue.BLANK);
                     if (val == null) continue;
-                    String script = map.get(key).getStringValue();
+
+                    String script = val.getStringValue();
                     if (!script.isEmpty()) {
-                        var cmds = CommandParser.parse(map.get(key).getStringValue());
-                        return new Frame.Particle(map.get("effect").getStringValue(), map.get("locator").getStringValue(), cmds, map.get("effect").getStringValue());
+                        var cmds = CommandParser.parse(val.getStringValue());
+                        return new Frame.Particle(map.getOrDefault("effect", BbKeyframe.DataPointValue.BLANK).getStringValue(), map.getOrDefault("locator", BbKeyframe.DataPointValue.BLANK).getStringValue(), cmds, map.getOrDefault("effect", BbKeyframe.DataPointValue.BLANK).getStringValue());
                     }
                 }
             }

@@ -3,17 +3,17 @@ package de.tomalbrc.bil.core.element;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class PerPlayerItemDisplayElement extends ItemDisplayElement implements PerPlayerTransformableElement {
-    Map<ServerPlayer, Data> playerDataTracker = new Reference2ObjectOpenHashMap<>();
+    final Map<ServerPlayer, Data> playerDataTracker = new ConcurrentHashMap<>();
 
     public PerPlayerItemDisplayElement(ItemStack itemStack) {
         super(itemStack);

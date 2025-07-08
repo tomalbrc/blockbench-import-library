@@ -3,17 +3,17 @@ package de.tomalbrc.bil.core.element;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class PerPlayerTextDisplayElement extends TextDisplayElement implements PerPlayerTransformableElement {
-    Map<ServerPlayer, Data> playerDataTrackers = new Reference2ObjectOpenHashMap<>();
+    final Map<ServerPlayer, Data> playerDataTracker = new ConcurrentHashMap<>();
 
     public PerPlayerTextDisplayElement(Component text) {
         super(text);
@@ -21,18 +21,18 @@ public class PerPlayerTextDisplayElement extends TextDisplayElement implements P
 
     @Override
     public Map<ServerPlayer, Data> playerDataTrackers() {
-        return playerDataTrackers;
+        return playerDataTracker;
     }
 
     @Override
     public void startWatching(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> packetConsumer) {
-        this.playerDataTrackers.put(player, new Data());
+        this.playerDataTracker.put(player, new Data());
         super.startWatching(player, packetConsumer);
     }
 
     @Override
     public void stopWatching(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> packetConsumer) {
-        this.playerDataTrackers.remove(player);
+        this.playerDataTracker.remove(player);
         super.stopWatching(player, packetConsumer);
     }
 

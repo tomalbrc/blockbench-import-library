@@ -249,8 +249,6 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                     String key = "script";
                     var map = kf.dataPoints.getFirst();
                     var val = map.getOrDefault(key, BbKeyframe.DataPointValue.BLANK);
-                    if (val == null) continue;
-
                     String script = val.getStringValue();
                     if (!script.isEmpty()) {
                         var cmds = CommandParser.parse(val.getStringValue());

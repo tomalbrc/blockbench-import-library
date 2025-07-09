@@ -60,7 +60,7 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
                         } else {
                             for (BbTexture e : model.textures) {
                                 BbTexture newMapped = variant.textureMap().containsKey(e.uuid) ? BbModelUtils.getTexture(model, variant.textureMap().get(e.uuid)) : e;
-                                textureMap.put(e.id, newMapped);
+                                textureMap.putIfAbsent(e.id, newMapped);
                             }
                         }
 

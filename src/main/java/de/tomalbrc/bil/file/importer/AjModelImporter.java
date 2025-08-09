@@ -132,7 +132,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
                 if (difference == t && kf.channel == BbKeyframe.Channel.SOUND && kf.dataPoints.getFirst().containsKey("sound")) {
-                    return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.getFirst().get("sound").getStringValue())).orElseThrow().value();
+                    return SoundEvent.createVariableRangeEvent(ResourceLocation.parse(kf.dataPoints.getFirst().get("sound").getStringValue()));
                 } else {
                     // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key
                     return super.frameSound(anim, t);

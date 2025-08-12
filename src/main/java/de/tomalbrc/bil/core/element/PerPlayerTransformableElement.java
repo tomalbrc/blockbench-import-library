@@ -140,7 +140,7 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
     }
 
     default void sendTrackerIfDirty(ServerGamePacketListenerImpl serverPlayer, List<SynchedEntityData.DataValue<?>> list) {
-        if (list != null) {
+        if (list != null && serverPlayer != null) {
             serverPlayer.send(new ClientboundSetEntityDataPacket(getEntityId(), list));
         }
     }

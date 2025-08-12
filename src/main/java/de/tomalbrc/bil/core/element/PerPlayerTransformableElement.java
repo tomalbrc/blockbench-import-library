@@ -3,6 +3,7 @@ package de.tomalbrc.bil.core.element;
 import com.mojang.math.MatrixUtil;
 import com.mojang.math.Transformation;
 import de.tomalbrc.bil.mixin.accessor.SimpleDataTrackerAccessor;
+import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
@@ -150,7 +151,8 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
             return;
 
         var defaultDirty = this.getDataTracker().getDirtyEntries();
-        for (ServerGamePacketListenerImpl watchingPlayer : holder.getWatchingPlayers()) {
+        var arr = holder.getWatchingPlayers().toArray(Utils.EMPTY_CONNECTION_ARRAY);
+        for (ServerGamePacketListenerImpl watchingPlayer : arr) {
             var data = this.playerDataTrackers().get(watchingPlayer.player);
             if (data != null && data.dataTracker != null) {
                 sendTrackerIfDirty(watchingPlayer, data.dataTracker.getDirtyEntries());

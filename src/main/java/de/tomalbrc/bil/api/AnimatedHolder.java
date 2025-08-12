@@ -1,7 +1,9 @@
 package de.tomalbrc.bil.api;
 
 import de.tomalbrc.bil.core.holder.wrapper.Locator;
+import de.tomalbrc.bil.core.model.Frame;
 import de.tomalbrc.bil.core.model.Model;
+import net.minecraft.server.level.ServerPlayer;
 
 @SuppressWarnings("unused")
 public interface AnimatedHolder {
@@ -45,5 +47,16 @@ public interface AnimatedHolder {
      */
     default void clearColor() {
         this.setColor(-1);
+    }
+
+    /**
+     * Whether effect can (sounds, commands, particles) can be run
+     *
+     * @param serverPlayer
+     * @param currentFrame
+     * @return
+     */
+    default boolean canRunEffects(ServerPlayer serverPlayer, Frame currentFrame) {
+        return true;
     }
 }

@@ -16,6 +16,7 @@ import de.tomalbrc.bil.api.VariantController;
 import de.tomalbrc.bil.core.extra.ModelEntity;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Variant;
+import de.tomalbrc.bil.file.loader.AjBlueprintLoader;
 import de.tomalbrc.bil.file.loader.AjModelLoader;
 import de.tomalbrc.bil.file.loader.BbModelLoader;
 import de.tomalbrc.bil.util.Utils;
@@ -32,6 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Collection;
 import java.util.HexFormat;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ModelCommand {
@@ -74,13 +76,19 @@ public class ModelCommand {
 
     private static int spawnModel(CommandSourceStack source, String path) throws CommandSyntaxException {
         ResourceLocation resource = ResourceLocation.parse(path);
-        if (path.endsWith("ajmodel")) {
-            var newPath = path.replace(".ajmodel", "");
-            var newResource = ResourceLocation.parse(newPath);
-            return spawnModel(source, () -> new AjModelLoader().loadResource(newResource), newPath);
+        if (path.endsWith(".ajmodel")) {
+            return substituteModelLoader(source, path, "ajmodel", newResource -> new AjModelLoader().loadResource(newResource));
+        } else if (path.endsWith(".ajblueprint")) {
+            return substituteModelLoader(source, path, "ajblueprint", newResource -> new AjBlueprintLoader().loadResource(newResource));
         }
 
         return spawnModel(source, () -> new BbModelLoader().loadResource(resource), path);
+    }
+
+    private static int substituteModelLoader(CommandSourceStack source, String path, String suffix, Function<ResourceLocation, Model> function) throws CommandSyntaxException {
+        var newPath = path.replace("." + suffix, "");
+        var newResource = ResourceLocation.parse(newPath);
+        return spawnModel(source, () -> function.apply(newResource), newPath);
     }
 
     private static int spawnModel(CommandSourceStack source, Supplier<Model> supplier, String path) throws CommandSyntaxException {

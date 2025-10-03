@@ -18,6 +18,7 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 import java.io.*;
+import java.util.List;
 
 public class BbModelLoader implements ModelLoader {
     protected static Gson GSON = JSON.GENERIC_BUILDER
@@ -39,12 +40,21 @@ public class BbModelLoader implements ModelLoader {
         }
     }
 
-    private void rescaleUV(Vector2i res, BbElement element) {
+    private void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
         for (var entry : element.faces.entrySet()) {
-            // re-map uv based on resolution
+            // re-map uv based on texture size
             BbFace face = entry.getValue();
             for (int i = 0; i < face.uv.size(); i++) {
-                face.uv.set(i, (face.uv.get(i) * 16.f) / res.get(i % 2));
+                Vector2i textureResolution = null;
+                var texture = textures.get(face.texture);
+                if (texture.uvHeight != 0 && texture.uvWidth != 0)
+                    textureResolution = new Vector2i(texture.uvWidth, texture.uvHeight);
+
+                if (textureResolution == null) {
+                    textureResolution = globalResolution != null ? globalResolution : new Vector2i(16, 16);
+                }
+
+                face.uv.set(i, (face.uv.get(i)*16f) / textureResolution.get(i % 2));
             }
         }
     }

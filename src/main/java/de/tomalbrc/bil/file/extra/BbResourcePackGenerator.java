@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.file.extra;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import de.tomalbrc.bil.file.bbmodel.BbElement;
 import de.tomalbrc.bil.file.bbmodel.BbFace;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
@@ -12,6 +13,7 @@ import de.tomalbrc.bil.util.ResourcePackUtil;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.io.FilenameUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 
@@ -38,7 +40,24 @@ public class BbResourcePackGenerator {
             while (str.endsWith(".png")) { // remove all .png extensions if multiple
                 str = str.substring(0, str.length() - 4);
             }
+
+            if (isMultipleOf(texture.width, texture.height)) {
+                JsonObject root = new JsonObject();
+                JsonObject animation = new JsonObject();
+                animation.addProperty("frametime", texture.frameTime);
+                root.add("animation", animation);
+
+                String json = new Gson().toJson(root);
+                var mcmeta = json.getBytes(StandardCharsets.UTF_8);
+
+                ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png.mcmeta"), mcmeta);
+            }
+
             ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png"), texData);
         }
+    }
+
+    public static boolean isMultipleOf(int width, int height) {
+        return width > 0 && height % width == 0;
     }
 }

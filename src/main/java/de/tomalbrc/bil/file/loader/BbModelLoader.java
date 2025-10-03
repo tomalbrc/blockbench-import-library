@@ -41,34 +41,21 @@ public class BbModelLoader implements ModelLoader {
         }
     }
 
-    private void rescaleUV(Vector2i res, List<BbTexture> textures, BbElement element) {
+    private void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
         for (var entry : element.faces.entrySet()) {
             // re-map uv based on texture size
             BbFace face = entry.getValue();
             for (int i = 0; i < face.uv.size(); i++) {
-                Vector2i scaling = null;
-                int largestWidth = 0;
-                int largestHeight = 0;
-                for (BbTexture currentTexture : textures) {
-                    if (currentTexture.id == face.texture && currentTexture.width != 0 && currentTexture.height != 0)
-                        scaling = new Vector2i(
-                                currentTexture.uvWidth != 0 ? currentTexture.uvWidth : currentTexture.width,
-                                currentTexture.uvHeight != 0 ? currentTexture.uvHeight : currentTexture.height);
+                Vector2i textureResolution = null;
+                var texture = textures.get(face.texture);
+                if (texture.uvHeight != 0 && texture.uvWidth != 0)
+                    textureResolution = new Vector2i(texture.uvWidth, texture.uvHeight);
 
-                    if (currentTexture.width > largestWidth)
-                        largestWidth = currentTexture.width;
-
-                    if (currentTexture.height > largestHeight)
-                        largestHeight = currentTexture.height;
+                if (textureResolution == null) {
+                    textureResolution = globalResolution != null ? globalResolution : new Vector2i(16, 16);
                 }
 
-                if (scaling == null && largestHeight != 0 && largestWidth != 0) {
-                    scaling = new Vector2i(largestWidth, largestHeight);
-                } else if (scaling == null) {
-                    scaling = res;
-                }
-
-                face.uv.set(i, (face.uv.get(i) * 16.f) / scaling.get(i % 2));
+                face.uv.set(i, (face.uv.get(i)*16f) / textureResolution.get(i % 2));
             }
         }
     }

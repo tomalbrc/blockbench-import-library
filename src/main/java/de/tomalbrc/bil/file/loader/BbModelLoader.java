@@ -68,7 +68,7 @@ public class BbModelLoader implements ModelLoader {
         for (BbElement element : model.elements) {
             if (element.type != BbElement.ElementType.CUBE) continue;
 
-            this.rescaleUV(model.resolution, element);
+            this.rescaleUV(model.resolution, model.textures, element);
             this.inflateElement(element);
 
             BbOutliner parent = BbModelUtils.getParent(model, element);

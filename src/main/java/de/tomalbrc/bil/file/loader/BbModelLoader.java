@@ -41,7 +41,7 @@ public class BbModelLoader implements ModelLoader {
         }
     }
 
-    private void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
+    protected void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
         for (var entry : element.faces.entrySet()) {
             // re-map uv based on texture size
             BbFace face = entry.getValue();

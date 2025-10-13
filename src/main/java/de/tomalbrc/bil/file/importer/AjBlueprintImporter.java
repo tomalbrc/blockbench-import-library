@@ -16,6 +16,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector2i;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,17 @@ import java.util.UUID;
 public class AjBlueprintImporter extends AjModelImporter implements ModelImporter<BbModel> {
     public AjBlueprintImporter(BbModel model) {
         super(model);
+    }
+
+    @Override
+    protected void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
+        for (var entry : element.faces.entrySet()) {
+            // re-map uv based on texture size
+            BbFace face = entry.getValue();
+            for (int i = 0; i < face.uv.size(); i++) {
+                face.uv.set(i, (face.uv.get(i)*16f) / globalResolution.get(i % 2));
+            }
+        }
     }
 
     @NotNull

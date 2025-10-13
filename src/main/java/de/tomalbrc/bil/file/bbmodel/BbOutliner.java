@@ -7,18 +7,16 @@ import java.util.List;
 import java.util.UUID;
 
 public class BbOutliner {
-    public String name = "";
-    public Vector3f origin = new Vector3f();
-    public Vector3f rotation = new Vector3f();
     public UUID uuid;
-    public boolean export;
-    @SerializedName("mirror_uv")
-    public boolean mirrorUv;
 
-    public int autouv;
-
-    // AnimatedJava compat hack, not part of file format
-    public float scale = 1.f;
+    // old format, these are now fields in BbGroup for Blockbench 5+
+    @Deprecated public String name = "";
+    @Deprecated public Vector3f origin = new Vector3f();
+    @Deprecated public Vector3f rotation = new Vector3f();
+    @Deprecated public boolean export;
+    @Deprecated @SerializedName("mirror_uv") public boolean mirrorUv;
+    @Deprecated public int autouv;
+    @Deprecated public float scale = 1.f; // AnimatedJava compat hack, not part of bbmodel file format
 
     public List<ChildEntry> children;
 

@@ -14,7 +14,6 @@ import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -24,11 +23,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +35,82 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
     public BbModelImporter(BbModel model) {
         this.model = model;
+        postProcess(model);
+    }
+
+    protected void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
+        for (var entry : element.faces.entrySet()) {
+            // re-map uv based on texture size
+            BbFace face = entry.getValue();
+            for (int i = 0; i < face.uv.size(); i++) {
+                Vector2i textureResolution = null;
+                var texture = textures.get(face.texture);
+                if (texture.uvHeight != 0 && texture.uvWidth != 0)
+                    textureResolution = new Vector2i(texture.uvWidth, texture.uvHeight);
+
+                if (textureResolution == null) {
+                    textureResolution = globalResolution != null ? globalResolution : new Vector2i(16, 16);
+                }
+
+                face.uv.set(i, (face.uv.get(i) * 16f) / textureResolution.get(i % 2));
+            }
+        }
+    }
+
+    protected void inflateElement(BbElement element) {
+        element.from.sub(element.inflate, element.inflate, element.inflate);
+        element.to.add(element.inflate, element.inflate, element.inflate);
+    }
+
+    protected void postProcess(BbModel model) {
+        for (BbElement element : model.elements) {
+            if (element.type != BbElement.ElementType.CUBE_MODEL) continue;
+
+            // remove elements without texture
+            element.faces.entrySet().removeIf(entry -> entry.getValue().texture == null);
+
+            this.rescaleUV(model.resolution, model.textures, element);
+            this.inflateElement(element);
+
+            BbOutliner parent = BbModelUtils.getParent(model, element);
+            if (parent != null) {
+                element.from.sub(parent.origin);
+                element.to.sub(parent.origin);
+            }
+        }
+
+        for (BbOutliner parent : BbModelUtils.modelOutliner(model)) {
+            Vector3f min = new Vector3f(), max = new Vector3f();
+            // find max for scale (aj compatibility)
+            for (var childEntry : parent.children) {
+                if (!childEntry.isNode()) {
+                    BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
+                    if (element != null && element.type == BbElement.ElementType.CUBE_MODEL) {
+                        min.min(element.from);
+                        max.max(element.to);
+                    }
+                }
+            }
+
+            for (var childEntry : parent.children) {
+                if (!childEntry.isNode()) {
+                    BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
+                    if (element == null || element.type != BbElement.ElementType.CUBE_MODEL) continue;
+
+                    var diff = min.sub(max, new Vector3f()).absolute();
+                    float m = diff.get(diff.maxComponent());
+                    float scale = Math.min(1.f, 24.f / m);
+
+                    // for animation + default pose later, to allow for larger models
+                    parent.scale = 1.f / scale;
+
+                    element.from.mul(scale).add(8, 8, 8);
+                    element.to.mul(scale).add(8, 8, 8);
+
+                    element.origin.sub(parent.origin).mul(scale).add(8, 8, 8);
+                }
+            }
+        }
     }
 
     protected Object2ObjectOpenHashMap<UUID, Node> makeNodeMap() {
@@ -90,9 +163,21 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelData, outliner.name.startsWith("head"));
                 nodeMap.put(outliner.uuid, node);
 
-                List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
-                for (BbElement locator : locatorElements) {
-                    Vector3f localPos2 = locator.position.sub(outliner.origin, new Vector3f());
+                processLocators(nodeMap, outliner, node);
+                processTextDisplays(nodeMap, outliner, node);
+                processBlockDisplays(nodeMap, outliner, node);
+                processItemDisplays(nodeMap, outliner, node);
+
+                // children
+                createBones(node, outliner, outliner.children, nodeMap);
+            }
+        }
+    }
+
+    protected void processLocators(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
+        for (BbElement element : locatorElements) {
+            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
 
                     var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(locator.rotation), 1);
                     locatorTransform.mul(node.transform());
@@ -101,10 +186,42 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                     nodeMap.put(locator.uuid, locatorNode);
                 }
 
+    protected void processTextDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.TEXT_DISPLAY);
+        for (BbElement element : locatorElements) {
+            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
 
-                // children
-                createBones(node, outliner, outliner.children, nodeMap);
-            }
+            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            locatorTransform.mul(node.transform());
+
+            Node locatorNode = new Node(Node.NodeType.TEXT, node, locatorTransform, element.name, element.uuid, null, false, element);
+            nodeMap.put(element.uuid, locatorNode);
+        }
+    }
+
+    protected void processBlockDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.BLOCK_DISPLAY);
+        for (BbElement element : locatorElements) {
+            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
+
+            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            locatorTransform.mul(node.transform());
+
+            Node locatorNode = new Node(Node.NodeType.BLOCK, node, locatorTransform, element.name, element.uuid, null, false, element);
+            nodeMap.put(element.uuid, locatorNode);
+        }
+    }
+
+    protected void processItemDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.ITEM_DISPLAY);
+        for (BbElement element : locatorElements) {
+            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
+
+            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            locatorTransform.mul(node.transform());
+
+            Node locatorNode = new Node(Node.NodeType.ITEM, node, locatorTransform, element.name, element.uuid, null, false, element);
+            nodeMap.put(element.uuid, locatorNode);
         }
     }
 
@@ -292,7 +409,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
     }
 
     @NotNull
-    private Vec2 size() {
+    public Vec2 size() {
         // TODO: read from element or outliner
         return new Vec2(0.5f, 1.f);
     }

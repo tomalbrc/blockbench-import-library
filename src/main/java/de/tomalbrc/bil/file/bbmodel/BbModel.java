@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
+@SuppressWarnings("unused")
 public class BbModel {
     public BbMeta meta;
 
@@ -20,10 +21,14 @@ public class BbModel {
 
     public Vector2i resolution;
     public ObjectArrayList<BbElement> elements;
+    public ObjectArrayList<BbGroup> groups;
     public ObjectArrayList<BbOutliner.ChildEntry> outliner;
     public ObjectArrayList<BbTexture> textures;
     public ObjectArrayList<BbAnimation> animations;
 
     @SerializedName("animation_variable_placeholders")
-    public BbVariablePlaceholders animationVariablePlaceholders;
+    public BbVariablePlaceholders animationVariablePlaceholders; // aj support
+
+    // ajblueprint support
+    public AjBlueprintVariants variants;
 }

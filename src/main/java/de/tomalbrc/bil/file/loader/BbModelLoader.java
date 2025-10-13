@@ -3,22 +3,22 @@ package de.tomalbrc.bil.file.loader;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
-import de.tomalbrc.bil.file.bbmodel.*;
-import de.tomalbrc.bil.file.extra.BbModelUtils;
+import de.tomalbrc.bil.file.bbmodel.BbKeyframe;
+import de.tomalbrc.bil.file.bbmodel.BbModel;
+import de.tomalbrc.bil.file.bbmodel.BbOutliner;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
+import de.tomalbrc.bil.file.importer.BbModel5Importer;
 import de.tomalbrc.bil.file.importer.BbModelImporter;
 import de.tomalbrc.bil.json.BbVariablePlaceholdersDeserializer;
 import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
+import de.tomalbrc.bil.util.VersionCheck;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2i;
-import org.joml.Vector3f;
 
 import java.io.*;
-import java.util.List;
 
 public class BbModelLoader implements ModelLoader {
     protected static Gson GSON = JSON.GENERIC_BUILDER
@@ -40,78 +40,6 @@ public class BbModelLoader implements ModelLoader {
         }
     }
 
-    private void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
-        for (var entry : element.faces.entrySet()) {
-            // re-map uv based on texture size
-            BbFace face = entry.getValue();
-            for (int i = 0; i < face.uv.size(); i++) {
-                Vector2i textureResolution = null;
-                var texture = textures.get(face.texture);
-                if (texture.uvHeight != 0 && texture.uvWidth != 0)
-                    textureResolution = new Vector2i(texture.uvWidth, texture.uvHeight);
-
-                if (textureResolution == null) {
-                    textureResolution = globalResolution != null ? globalResolution : new Vector2i(16, 16);
-                }
-
-                face.uv.set(i, (face.uv.get(i)*16f) / textureResolution.get(i % 2));
-            }
-        }
-    }
-
-    private void inflateElement(BbElement element) {
-        element.from.sub(element.inflate, element.inflate, element.inflate);
-        element.to.add(element.inflate, element.inflate, element.inflate);
-    }
-
-    protected void postProcess(BbModel model) {
-        for (BbElement element : model.elements) {
-            if (element.type != BbElement.ElementType.CUBE) continue;
-
-            this.rescaleUV(model.resolution, model.textures, element);
-            this.inflateElement(element);
-
-            BbOutliner parent = BbModelUtils.getParent(model, element);
-            if (parent != null) {
-                element.from.sub(parent.origin);
-                element.to.sub(parent.origin);
-            }
-        }
-
-        for (BbOutliner parent : BbModelUtils.modelOutliner(model)) {
-            Vector3f min = new Vector3f(), max = new Vector3f();
-            // find max for scale (aj compatibility)
-            for (var childEntry : parent.children) {
-                if (!childEntry.isNode()) {
-                    BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
-                    if (element != null && element.type == BbElement.ElementType.CUBE) {
-                        min.min(element.from);
-                        max.max(element.to);
-                    }
-                }
-            }
-
-            for (var childEntry : parent.children) {
-                if (!childEntry.isNode()) {
-                    BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
-                    if (element == null || element.type != BbElement.ElementType.CUBE) continue;
-
-                    var diff = min.sub(max, new Vector3f()).absolute();
-                    float m = diff.get(diff.maxComponent());
-                    float scale = Math.min(1.f, 24.f / m);
-
-                    // for animation + default pose later, to allow for larger models
-                    parent.scale = 1.f / scale;
-
-                    element.from.mul(scale).add(8, 8, 8);
-                    element.to.mul(scale).add(8, 8, 8);
-
-                    element.origin.sub(parent.origin).mul(scale).add(8, 8, 8);
-                }
-            }
-        }
-    }
-
     @Override
     public Model load(InputStream input, @NotNull String name) throws JsonParseException {
         try (Reader reader = new InputStreamReader(input)) {
@@ -121,7 +49,8 @@ public class BbModelLoader implements ModelLoader {
             if (model.modelIdentifier == null) model.modelIdentifier = model.name;
             model.modelIdentifier = ModelLoader.normalizedModelId(model.modelIdentifier);
 
-            this.postProcess(model);
+            if (VersionCheck.isAtLeastVersion(model.meta.formatVersion, "5.0.0"))
+                return new BbModel5Importer(model).importModel();
 
             return new BbModelImporter(model).importModel();
         } catch (Throwable throwable) {

@@ -4,11 +4,11 @@ import com.google.gson.annotations.SerializedName;
 
 public class BbMeta {
     @SerializedName("format_version")
-    String formatVersion;
+    public String formatVersion;
 
     @SerializedName("model_format")
-    String modelFormat;
+    public String modelFormat;
 
     @SerializedName("box_uv")
-    boolean boxUV;
+    public boolean boxUV;
 }

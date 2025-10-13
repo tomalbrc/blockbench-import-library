@@ -10,17 +10,7 @@ public class VersionCheck {
         String[] v1Main = v1.split("-", 2);
         String[] v2Main = v2.split("-", 2);
 
-        int mainCompare = compareMain(v1Main[0], v2Main[0]);
-        if (mainCompare != 0) return mainCompare;
-
-        if (v1Main.length > 1 && v2Main.length > 1) {
-            return v1Main[1].compareToIgnoreCase(v2Main[1]);
-        }
-
-        if (v1Main.length > 1) return -1;
-        if (v2Main.length > 1) return 1;
-
-        return 0;
+        return compareMain(v1Main[0], v2Main[0]);
     }
 
     private static int compareMain(String v1, String v2) {

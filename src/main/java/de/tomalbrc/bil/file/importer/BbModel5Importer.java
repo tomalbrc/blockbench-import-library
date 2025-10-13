@@ -86,7 +86,7 @@ public class BbModel5Importer extends BbModelImporter {
                 BbOutliner outliner = entry.outliner;
                 ResourceLocation modelPath = null;
 
-                BbGroup group = BbModelUtils.getGroup(model, entry);
+                BbGroup group = BbModelUtils.getGroup(model, entry.outliner);
                 if (group == null)
                     continue;
 

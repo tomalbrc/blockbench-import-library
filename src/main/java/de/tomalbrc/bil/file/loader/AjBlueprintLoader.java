@@ -19,8 +19,6 @@ public class AjBlueprintLoader extends BbModelLoader {
             if (model.modelIdentifier == null) model.modelIdentifier = model.name;
             model.modelIdentifier = ModelLoader.normalizedModelId(model.modelIdentifier);
 
-            this.postProcess(model);
-
             return new AjBlueprintImporter(model).importModel();
         } catch (Throwable throwable) {
             throw new JsonParseException("Failed to parse: " + name, throwable);

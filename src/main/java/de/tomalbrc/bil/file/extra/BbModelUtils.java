@@ -1,9 +1,6 @@
 package de.tomalbrc.bil.file.extra;
 
-import de.tomalbrc.bil.file.bbmodel.BbElement;
-import de.tomalbrc.bil.file.bbmodel.BbModel;
-import de.tomalbrc.bil.file.bbmodel.BbOutliner;
-import de.tomalbrc.bil.file.bbmodel.BbTexture;
+import de.tomalbrc.bil.file.bbmodel.*;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.List;
@@ -76,6 +73,20 @@ public class BbModelUtils {
             }
         }
         return null;
+    }
+
+    public static BbGroup getGroup(BbModel model, BbOutliner outliner) {
+        if (outliner != null) for (BbGroup entry : model.groups) {
+            if (entry.uuid.equals(outliner.uuid)) return entry;
+        }
+        return outliner == null ? null : new BbGroup(outliner.uuid);
+    }
+
+    public static BbGroup getGroup(BbModel model, BbOutliner.ChildEntry outliner) {
+        if (outliner != null) for (BbGroup entry : model.groups) {
+            if (entry.uuid.equals(outliner.uuid)) return entry;
+        }
+        return outliner == null ? null : new BbGroup(outliner.uuid);
     }
 
     public static BbOutliner findParent(BbModel model, BbOutliner x, BbElement element) {

@@ -1,18 +1,22 @@
 package de.tomalbrc.bil.file.importer;
 
 import de.tomalbrc.bil.core.model.Node;
-import de.tomalbrc.bil.file.bbmodel.BbElement;
-import de.tomalbrc.bil.file.bbmodel.BbGroup;
-import de.tomalbrc.bil.file.bbmodel.BbModel;
-import de.tomalbrc.bil.file.bbmodel.BbOutliner;
+import de.tomalbrc.bil.core.model.Pose;
+import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import gg.moonflower.molangcompiler.api.MolangEnvironment;
+import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.Collection;
 import java.util.List;
@@ -131,5 +135,37 @@ public class BbModel5Importer extends BbModelImporter {
             Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, element.name, element.uuid, null, false);
             nodeMap.put(element.uuid, locatorNode);
         }
+    }
+
+    @NotNull
+    protected Reference2ObjectOpenHashMap<UUID, Pose> poses(BbAnimation animation, Object2ObjectOpenHashMap<UUID, Node> nodeMap, MolangEnvironment environment, float time) throws MolangRuntimeException {
+        Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
+        for (var entry : nodeMap.entrySet()) {
+            Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
+            //boolean requiresFrame = time == 0;
+            List<Node> nodePath = nodePath(entry.getValue());
+
+            for (var node : nodePath) {
+                BbAnimator animator = animation.animators != null ? animation.animators.get(node.uuid()) : null;
+                //requiresFrame |= animator != null;
+
+                Vector3fc origin = node.transform().origin();
+
+                var triple = animator == null ?
+                        Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
+                        Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
+
+                Quaternionf localRot = createQuaternion(triple.getMiddle()).mul(node.transform().rotation());
+                Vector3f localPos = triple.getLeft().div(16).add(origin);
+
+                matrix4f.translate(localPos);
+                matrix4f.rotate(localRot);
+                matrix4f.scale(triple.getRight());
+            }
+
+            // TODO: check if frame is required?
+            poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+        }
+        return poses;
     }
 }

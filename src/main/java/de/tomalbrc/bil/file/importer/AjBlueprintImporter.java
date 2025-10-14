@@ -1,20 +1,24 @@
 package de.tomalbrc.bil.file.importer;
 
+import com.google.gson.annotations.SerializedName;
 import de.tomalbrc.bil.core.model.Frame;
 import de.tomalbrc.bil.core.model.Variant;
 import de.tomalbrc.bil.file.ajmodel.AjVariant;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
-import de.tomalbrc.bil.file.extra.ResourcePackModel;
+import de.tomalbrc.bil.file.extra.ResourcePackItemModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import de.tomalbrc.bil.util.command.ParsedCommand;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 
@@ -57,14 +61,14 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
                 // generate more models
                 var affectedBones = this.affectedBones(variant);
 
-                Reference2ObjectOpenHashMap<UUID, ResourceLocation> models = new Reference2ObjectOpenHashMap<>();
+                Reference2ObjectOpenHashMap<UUID, PolymerModelData> models = new Reference2ObjectOpenHashMap<>();
 
                 for (BbOutliner outliner : BbModelUtils.modelOutliner(model)) {
                     boolean affected = affectedBones.contains(outliner.uuid) && variant.affectedBonesIsAWhitelist() ||
                             !variant.affectedBonesIsAWhitelist() && !affectedBones.contains(outliner.uuid);
 
                     if (!outliner.isHitbox() && affected) {
-                        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE_MODEL);
+                        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE);
 
                         Int2ObjectOpenHashMap<BbTexture> textureMap = new Int2ObjectOpenHashMap<>();
                         if (variant.textureMap() == null || variant.textureMap().isEmpty()) {
@@ -76,13 +80,13 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
                             }
                         }
 
-                        ResourcePackModel.Builder builder = new ResourcePackModel.Builder(model.modelIdentifier)
+                        ResourcePackItemModel.Builder builder = new ResourcePackItemModel.Builder(model.modelIdentifier)
                                 .withTextures(textureMap)
                                 .withElements(elements)
-                                .addDisplayTransform("head", ResourcePackModel.DEFAULT_TRANSFORM);
+                                .addDisplayTransform("head", ResourcePackItemModel.DEFAULT_TRANSFORM);
 
-                        ResourceLocation location = BbResourcePackGenerator.addItemModel(model, String.format("%s_%s", outliner.uuid.toString(), variant.name().toLowerCase()), builder.build());
-                        models.put(outliner.uuid, location);
+                        ResourceLocation location = BbResourcePackGenerator.addModelPart(model, String.format("%s_%s", outliner.uuid.toString(), variant.name().toLowerCase()), builder.build());
+                        models.put(outliner.uuid, PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, location));
                     }
                 }
 
@@ -98,9 +102,9 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID)) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            if (animator.type == BbAnimator.Type.EFFECT) {
+            if (animator.type == BbAnimator.Type.effect) {
                 for (BbKeyframe kf : animator.keyframes) {
-                    if (Math.abs(kf.time - t) < 0.15f && kf.channel == BbKeyframe.Channel.VARIANTS) { // snap value to 50ms increments
+                    if (Math.abs(kf.time - t) < 0.15f && kf.channel == BbKeyframe.Channel.variants) { // snap value to 50ms increments
                         UUID key = CachedUuidDeserializer.get(kf.dataPoints.getFirst().get("variant").getStringValue());
                         var cond = kf.dataPoints.getFirst().containsKey("execute_condition") ? CommandParser.parse(kf.dataPoints.getFirst().get("execute_condition").getStringValue()) : null;
                         return new Frame.Variant(key, cond);
@@ -114,11 +118,11 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
     @Override
     protected Frame.Commands frameCommands(BbAnimation anim, float t) {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
-        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
+        if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
-                if (difference == t && kf.channel == BbKeyframe.Channel.COMMANDS) {
+                if (difference == t && kf.channel == BbKeyframe.Channel.commands) {
                     var script = kf.dataPoints.getFirst().get("commands").getStringValue();
                     if (!script.isEmpty()) {
                         ParsedCommand[] cmds = CommandParser.parse(kf.dataPoints.getFirst().get("commands").getStringValue());
@@ -129,5 +133,11 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
             }
         }
         return null;
+    }
+
+    public record AjBlueprintVariants(
+            @SerializedName("default") AjVariant defaultVariant,
+            List<AjVariant> list
+    ) {
     }
 }

@@ -14,6 +14,7 @@ import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -64,7 +65,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
     protected void postProcess(BbModel model) {
         for (BbElement element : model.elements) {
-            if (element.type != BbElement.ElementType.CUBE_MODEL) continue;
+            if (element.type != BbElement.ElementType.CUBE) continue;
 
             // remove elements without texture
             element.faces.entrySet().removeIf(entry -> entry.getValue().texture == null);
@@ -85,7 +86,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             for (var childEntry : parent.children) {
                 if (!childEntry.isNode()) {
                     BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
-                    if (element != null && element.type == BbElement.ElementType.CUBE_MODEL) {
+                    if (element != null && element.type == BbElement.ElementType.CUBE) {
                         min.min(element.from);
                         max.max(element.to);
                     }
@@ -95,7 +96,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             for (var childEntry : parent.children) {
                 if (!childEntry.isNode()) {
                     BbElement element = BbModelUtils.getElement(model, childEntry.uuid);
-                    if (element == null || element.type != BbElement.ElementType.CUBE_MODEL) continue;
+                    if (element == null || element.type != BbElement.ElementType.CUBE) continue;
 
                     var diff = min.sub(max, new Vector3f()).absolute();
                     float m = diff.get(diff.maxComponent());
@@ -164,9 +165,6 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 nodeMap.put(outliner.uuid, node);
 
                 processLocators(nodeMap, outliner, node);
-                processTextDisplays(nodeMap, outliner, node);
-                processBlockDisplays(nodeMap, outliner, node);
-                processItemDisplays(nodeMap, outliner, node);
 
                 // children
                 createBones(node, outliner, outliner.children, nodeMap);
@@ -179,48 +177,10 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         for (BbElement element : locatorElements) {
             Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
 
-                    var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(locator.rotation), 1);
-                    locatorTransform.mul(node.transform());
-
-                    Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, locator.name, locator.uuid, null, false);
-                    nodeMap.put(locator.uuid, locatorNode);
-                }
-
-    protected void processTextDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
-        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.TEXT_DISPLAY);
-        for (BbElement element : locatorElements) {
-            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
-
             var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
             locatorTransform.mul(node.transform());
 
-            Node locatorNode = new Node(Node.NodeType.TEXT, node, locatorTransform, element.name, element.uuid, null, false, element);
-            nodeMap.put(element.uuid, locatorNode);
-        }
-    }
-
-    protected void processBlockDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
-        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.BLOCK_DISPLAY);
-        for (BbElement element : locatorElements) {
-            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
-
-            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
-            locatorTransform.mul(node.transform());
-
-            Node locatorNode = new Node(Node.NodeType.BLOCK, node, locatorTransform, element.name, element.uuid, null, false, element);
-            nodeMap.put(element.uuid, locatorNode);
-        }
-    }
-
-    protected void processItemDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
-        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.ITEM_DISPLAY);
-        for (BbElement element : locatorElements) {
-            Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
-
-            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
-            locatorTransform.mul(node.transform());
-
-            Node locatorNode = new Node(Node.NodeType.ITEM, node, locatorTransform, element.name, element.uuid, null, false, element);
+            Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, element.name, element.uuid, null, false);
             nodeMap.put(element.uuid, locatorNode);
         }
     }

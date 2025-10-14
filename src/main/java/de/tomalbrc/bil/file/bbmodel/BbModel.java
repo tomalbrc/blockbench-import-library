@@ -3,6 +3,7 @@ package de.tomalbrc.bil.file.bbmodel;
 import com.google.gson.annotations.SerializedName;
 import de.tomalbrc.bil.file.ajmodel.AjMeta;
 import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
+import de.tomalbrc.bil.file.importer.AjBlueprintImporter;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
@@ -30,5 +31,5 @@ public class BbModel {
     public BbVariablePlaceholders animationVariablePlaceholders; // aj support
 
     // ajblueprint support
-    public AjBlueprintVariants variants;
+    public AjBlueprintImporter.AjBlueprintVariants variants;
 }

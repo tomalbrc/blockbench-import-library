@@ -103,7 +103,7 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID)) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             if (animator.type == BbAnimator.Type.effect) {
-                for (BbKeyframe kf : animator.keyframes) {
+                if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
                     if (Math.abs(kf.time - t) < 0.15f && kf.channel == BbKeyframe.Channel.variants) { // snap value to 50ms increments
                         UUID key = CachedUuidDeserializer.get(kf.dataPoints.getFirst().get("variant").getStringValue());
                         var cond = kf.dataPoints.getFirst().containsKey("execute_condition") ? CommandParser.parse(kf.dataPoints.getFirst().get("execute_condition").getStringValue()) : null;
@@ -120,7 +120,7 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            for (BbKeyframe kf : animator.keyframes) {
+            if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.commands) {
                     var script = kf.dataPoints.getFirst().get("commands").getStringValue();

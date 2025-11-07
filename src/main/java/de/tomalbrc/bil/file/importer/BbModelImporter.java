@@ -260,7 +260,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            for (BbKeyframe kf : animator.keyframes) {
+            if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.timeline) {
                     String key = "script";
@@ -280,7 +280,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            for (BbKeyframe kf : animator.keyframes) {
+            if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.timeline) {
                     String key = "script";
@@ -301,7 +301,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.effect) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            for (BbKeyframe kf : animator.keyframes) {
+            if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.sound) {
                     return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(kf.dataPoints.get(0).get("effect").getStringValue()));

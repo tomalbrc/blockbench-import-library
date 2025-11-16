@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.CompletableFuture;
 
+import static de.tomalbrc.bil.BIL.EXECUTOR;
+
 @Mixin(value = ChunkMap.class, priority = 900)
 public class ChunkMapMixin implements IChunkMap {
     @Unique
@@ -34,7 +36,7 @@ public class ChunkMapMixin implements IChunkMap {
             for (AbstractElementHolder holder : holders) {
                 holder.asyncTick();
             }
-        });
+        }, EXECUTOR);
     }
 
     @Override

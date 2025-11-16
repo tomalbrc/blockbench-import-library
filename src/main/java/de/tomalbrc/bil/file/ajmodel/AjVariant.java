@@ -8,17 +8,11 @@ import java.util.UUID;
 
 public record AjVariant(UUID uuid,
                         String name,
-                        Object2ObjectOpenHashMap<UUID, UUID> textureMap, // goofy aj model
-                        Object2ObjectOpenHashMap<UUID, UUID> texture_map, // goofy aj blueprint
+                        @SerializedName(value = "textureMap", alternate = "texture_map") Object2ObjectOpenHashMap<UUID, UUID> textureMap, // goofy aj model
                         ObjectArrayList<AffectedBoneEntry> affectedBones,
                         boolean affectedBonesIsAWhitelist,
                         @SerializedName("default") boolean isDefault) {
 
     public record AffectedBoneEntry(String name, UUID value) {
-    }
-
-    @Override
-    public Object2ObjectOpenHashMap<UUID, UUID> textureMap() {
-        return textureMap == null ? texture_map : textureMap;
     }
 }

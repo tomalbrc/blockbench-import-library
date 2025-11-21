@@ -38,6 +38,7 @@ public class BbModel5Importer extends BbModelImporter {
 
             this.rescaleUV(model.resolution, model.textures, element);
             this.inflateElement(element);
+            BoxRotationBaker.bakeRotation(element);
 
             BbOutliner parent = BbModelUtils.getParent(model, element);
             if (parent != null) {

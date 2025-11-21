@@ -22,7 +22,6 @@ public class BbElement {
 
     public Vector3f rotation;
     public int autouv;
-    public int color;
     public float inflate;
     public Vector3f origin;
     public Vector3f position; // used by locators

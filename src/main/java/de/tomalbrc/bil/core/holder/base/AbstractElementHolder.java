@@ -2,6 +2,7 @@ package de.tomalbrc.bil.core.holder.base;
 
 import de.tomalbrc.bil.util.IChunkMap;
 import de.tomalbrc.bil.util.Utils;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import net.minecraft.server.level.ServerLevel;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * This class mainly exists to split off ElementHolder logic from the element logic.
  */
-public abstract class AbstractElementHolder extends VisiblityAwareElementHolder {
+public abstract class AbstractElementHolder extends ElementHolder {
     protected ServerGamePacketListenerImpl[] watchingPlayers;
     protected boolean elementsInitialized;
     protected boolean isDataLoaded;
@@ -84,8 +85,6 @@ public abstract class AbstractElementHolder extends VisiblityAwareElementHolder 
         for (VirtualElement element : this.getElements()) {
             element.tick();
         }
-
-        flushPackets(watchingPlayers);
     }
 
     public @Nullable ServerLevel getLevel() {

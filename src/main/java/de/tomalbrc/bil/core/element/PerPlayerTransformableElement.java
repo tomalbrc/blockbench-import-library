@@ -153,11 +153,13 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
         var defaultDirty = this.getDataTracker().getDirtyEntries();
         var arr = holder.getWatchingPlayers().toArray(Utils.EMPTY_CONNECTION_ARRAY);
         for (ServerGamePacketListenerImpl watchingPlayer : arr) {
-            var data = this.playerDataTrackers().get(watchingPlayer.player);
-            if (data != null && data.dataTracker != null) {
-                sendTrackerIfDirty(watchingPlayer, data.dataTracker.getDirtyEntries());
-            } else {
-                sendTrackerIfDirty(watchingPlayer, defaultDirty);
+            if (watchingPlayer != null) {
+                var data = this.playerDataTrackers().get(watchingPlayer.player);
+                if (data != null && data.dataTracker != null) {
+                    sendTrackerIfDirty(watchingPlayer, data.dataTracker.getDirtyEntries());
+                } else {
+                    sendTrackerIfDirty(watchingPlayer, defaultDirty);
+                }
             }
         }
     }

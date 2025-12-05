@@ -6,7 +6,7 @@ import de.tomalbrc.bil.file.extra.BbVariablePlaceholders;
 import de.tomalbrc.bil.file.importer.AjBlueprintImporter;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2i;
+import org.joml.Vector2f;
 
 @SuppressWarnings("unused")
 public class BbModel {
@@ -20,7 +20,7 @@ public class BbModel {
     @SerializedName("model_identifier")
     public String modelIdentifier;
 
-    public Vector2i resolution;
+    public Vector2f resolution;
     public ObjectArrayList<BbElement> elements;
     public ObjectArrayList<BbGroup> groups;
     public ObjectArrayList<BbOutliner.ChildEntry> outliner;

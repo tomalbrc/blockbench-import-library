@@ -39,18 +39,18 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         postProcess(model);
     }
 
-    protected void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
+    protected void rescaleUV(Vector2f globalResolution, List<BbTexture> textures, BbElement element) {
         for (var entry : element.faces.entrySet()) {
             // re-map uv based on texture size
             BbFace face = entry.getValue();
             for (int i = 0; i < face.uv.size(); i++) {
-                Vector2i textureResolution = null;
+                Vector2f textureResolution = null;
                 var texture = textures.get(face.texture);
                 if (texture.uvHeight != 0 && texture.uvWidth != 0)
-                    textureResolution = new Vector2i(texture.uvWidth, texture.uvHeight);
+                    textureResolution = new Vector2f(texture.uvWidth, texture.uvHeight);
 
                 if (textureResolution == null) {
-                    textureResolution = globalResolution != null ? globalResolution : new Vector2i(16, 16);
+                    textureResolution = globalResolution != null ? globalResolution : new Vector2f(16, 16);
                 }
 
                 face.uv.set(i, (face.uv.get(i) * 16f) / textureResolution.get(i % 2));

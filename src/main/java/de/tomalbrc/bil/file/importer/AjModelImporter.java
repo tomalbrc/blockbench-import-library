@@ -21,7 +21,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2i;
+import org.joml.Vector2f;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
     }
 
     @Override
-    protected void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
+    protected void rescaleUV(Vector2f globalResolution, List<BbTexture> textures, BbElement element) {
         for (var entry : element.faces.entrySet()) {
             // re-map uv based on texture size
             BbFace face = entry.getValue();

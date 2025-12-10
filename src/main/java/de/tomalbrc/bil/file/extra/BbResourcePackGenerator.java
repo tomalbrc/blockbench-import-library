@@ -14,7 +14,7 @@ import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.DyeTintSource;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.io.FilenameUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -32,14 +32,14 @@ public class BbResourcePackGenerator {
     static String MODEL_DIR = ":assets/bil/models/item/";
     static String TEXTURE_DIR = ":assets/bil/textures/item/";
 
-    public static ResourceLocation addModelPart(BbModel model, String partName, ResourcePackModel resourcePackModel) {
-        ResourceLocation modelResourceLocation = ResourceLocation.parse(MODEL_DIR + model.modelIdentifier + "/" + partName.toLowerCase() + ".json");
-        ResourcePackUtil.add(modelResourceLocation, resourcePackModel.getBytes());
+    public static Identifier addModelPart(BbModel model, String partName, ResourcePackModel resourcePackModel) {
+        Identifier modelIdentifier = Identifier.parse(MODEL_DIR + model.modelIdentifier + "/" + partName.toLowerCase() + ".json");
+        ResourcePackUtil.add(modelIdentifier, resourcePackModel.getBytes());
 
-        return ResourceLocation.fromNamespaceAndPath("bil", "item/" + model.modelIdentifier + "/" + partName.toLowerCase());
+        return Identifier.fromNamespaceAndPath("bil", "item/" + model.modelIdentifier + "/" + partName.toLowerCase());
     }
 
-    public static ResourceLocation addItemModel(BbModel model, String partName, ResourcePackModel resourcePackModel) {
+    public static Identifier addItemModel(BbModel model, String partName, ResourcePackModel resourcePackModel) {
         partName = model.modelIdentifier + "_" + partName;
         var modelPath = addModelPart(model, partName, resourcePackModel);
 
@@ -49,8 +49,8 @@ public class BbResourcePackGenerator {
                 ItemAsset.Properties.DEFAULT
         ).toJson().getBytes(StandardCharsets.UTF_8);
 
-        var id = ResourceLocation.fromNamespaceAndPath("bil", model.modelIdentifier + "_" + partName);
-        ResourcePackUtil.add(ResourceLocation.parse(":" + AssetPaths.itemAsset(id)), bytes);
+        var id = Identifier.fromNamespaceAndPath("bil", model.modelIdentifier + "_" + partName);
+        ResourcePackUtil.add(Identifier.parse(":" + AssetPaths.itemAsset(id)), bytes);
 
         return id;
     }
@@ -72,10 +72,10 @@ public class BbResourcePackGenerator {
                 String json = new Gson().toJson(root);
                 var mcmeta = json.getBytes(StandardCharsets.UTF_8);
 
-                ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png.mcmeta"), mcmeta);
+                ResourcePackUtil.add(Identifier.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png.mcmeta"), mcmeta);
             }
 
-            ResourcePackUtil.add(ResourceLocation.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png"), texData);
+            ResourcePackUtil.add(Identifier.parse(TEXTURE_DIR + model.modelIdentifier + "/" + str + ".png"), texData);
         }
     }
 

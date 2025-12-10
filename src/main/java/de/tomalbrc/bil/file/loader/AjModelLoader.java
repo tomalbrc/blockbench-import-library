@@ -4,14 +4,14 @@ import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
 import de.tomalbrc.bil.file.importer.AjModelImporter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
 public class AjModelLoader extends BbModelLoader {
-    static public Model load(ResourceLocation resourceLocation) {
+    static public Model load(Identifier resourceLocation) {
         return new AjModelLoader().loadResource(resourceLocation);
     }
 
@@ -39,7 +39,7 @@ public class AjModelLoader extends BbModelLoader {
     }
 
     @Override
-    public Model loadResource(ResourceLocation resourceLocation) throws IllegalArgumentException, JsonParseException {
+    public Model loadResource(Identifier resourceLocation) throws IllegalArgumentException, JsonParseException {
         String path = String.format("/model/%s/%s.ajmodel", resourceLocation.getNamespace(), resourceLocation.getPath());
         InputStream input = BbModelLoader.class.getResourceAsStream(path);
         if (input == null) {

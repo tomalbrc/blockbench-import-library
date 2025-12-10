@@ -10,6 +10,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +43,7 @@ public record Frame(
 
     public void runEffects(ServerPlayer serverPlayer, AbstractAnimationHolder holder) {
         CommandDispatcher<CommandSourceStack> dispatcher = BIL.SERVER.getCommands().getDispatcher();
-        CommandSourceStack source = holder.createCommandSourceStack().withPermission(2).withSuppressedOutput();
+        CommandSourceStack source = holder.createCommandSourceStack().withPermission(PermissionSet.ALL_PERMISSIONS).withSuppressedOutput();
 
         if (this.soundEffect != null) {
             Entity entity = source.getEntity();

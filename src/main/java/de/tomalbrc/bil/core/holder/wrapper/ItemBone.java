@@ -5,7 +5,7 @@ import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ public class ItemBone extends Bone<PerPlayerItemDisplayElement> {
         }
     }
 
-    public void updateModel(ResourceLocation model) {
+    public void updateModel(Identifier model) {
         this.item.set(DataComponents.ITEM_MODEL, model);
 
         if (!this.invisible) {

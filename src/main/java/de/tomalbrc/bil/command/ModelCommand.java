@@ -20,11 +20,12 @@ import de.tomalbrc.bil.file.loader.AjBlueprintLoader;
 import de.tomalbrc.bil.file.loader.AjModelLoader;
 import de.tomalbrc.bil.file.loader.BbModelLoader;
 import de.tomalbrc.bil.util.Utils;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec2;
@@ -41,7 +42,7 @@ public class ModelCommand {
     private static final String ANIMATION = "animation";
 
     public static ArgumentBuilder<CommandSourceStack, ?> register() {
-        var builder = Commands.literal("model").requires(source -> source.hasPermission(2));
+        var builder = Commands.literal("model").requires(Permissions.require("bil.command.model", 2));
 
         // Create model command
         builder.then(modelCreator());
@@ -75,7 +76,7 @@ public class ModelCommand {
     }
 
     private static int spawnModel(CommandSourceStack source, String path) throws CommandSyntaxException {
-        ResourceLocation resource = ResourceLocation.parse(path);
+        Identifier resource = Identifier.parse(path);
         if (path.endsWith(".ajmodel")) {
             return substituteModelLoader(source, path, "ajmodel", newResource -> new AjModelLoader().loadResource(newResource));
         } else if (path.endsWith(".ajblueprint")) {
@@ -85,9 +86,9 @@ public class ModelCommand {
         return spawnModel(source, () -> new BbModelLoader().loadResource(resource), path);
     }
 
-    private static int substituteModelLoader(CommandSourceStack source, String path, String suffix, Function<ResourceLocation, Model> function) throws CommandSyntaxException {
+    private static int substituteModelLoader(CommandSourceStack source, String path, String suffix, Function<Identifier, Model> function) throws CommandSyntaxException {
         var newPath = path.replace("." + suffix, "");
-        var newResource = ResourceLocation.parse(newPath);
+        var newResource = Identifier.parse(newPath);
         return spawnModel(source, () -> function.apply(newResource), newPath);
     }
 

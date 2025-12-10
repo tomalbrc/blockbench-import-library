@@ -15,7 +15,7 @@ import de.tomalbrc.bil.json.ChildEntryDeserializer;
 import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.util.VersionCheck;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +29,7 @@ public class BbModelLoader implements ModelLoader {
             .setStrictness(Strictness.LENIENT)
             .create();
 
-    static public Model load(ResourceLocation resourceLocation) {
+    static public Model load(Identifier resourceLocation) {
         return new BbModelLoader().loadResource(resourceLocation);
     }
 
@@ -60,7 +60,7 @@ public class BbModelLoader implements ModelLoader {
     }
 
     @Override
-    public Model loadResource(ResourceLocation resourceLocation) throws IllegalArgumentException, JsonParseException {
+    public Model loadResource(Identifier resourceLocation) throws IllegalArgumentException, JsonParseException {
         String path = String.format("/model/%s/%s.bbmodel", resourceLocation.getNamespace(), resourceLocation.getPath());
         InputStream input = BbModelLoader.class.getResourceAsStream(path);
         if (input == null) {

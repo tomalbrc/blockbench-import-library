@@ -17,7 +17,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -94,7 +94,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
     }
 
     @Nullable
-    protected PerPlayerItemDisplayElement createBoneDisplay(ResourceLocation modelData) {
+    protected PerPlayerItemDisplayElement createBoneDisplay(Identifier modelData) {
         if (modelData == null)
             return null;
 

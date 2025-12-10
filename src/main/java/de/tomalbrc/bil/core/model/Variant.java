@@ -2,14 +2,14 @@ package de.tomalbrc.bil.core.model;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.UUID;
 
 public record Variant(
         String name,
         UUID uuid,
-        Reference2ObjectOpenHashMap<UUID, ResourceLocation> models,
+        Reference2ObjectOpenHashMap<UUID, Identifier> models,
         ReferenceOpenHashSet<UUID> affectedBones,
         boolean affectedBonesIsAWhitelist
 ) {

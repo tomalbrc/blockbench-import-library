@@ -4,11 +4,11 @@ import com.google.gson.GsonBuilder;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.Item;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
@@ -40,7 +40,7 @@ public class JSON {
             .registerTypeAdapter(Matrix4f.class, new SimpleCodecDeserializer<>(ExtraCodecs.MATRIX4F))
             .registerTypeAdapter(Vector3f.class, new SimpleCodecDeserializer<>(ExtraCodecs.VECTOR3F))
             .registerTypeAdapter(Vector2i.class, new SimpleCodecDeserializer<>(VECTOR2I))
-            .registerTypeAdapter(ResourceLocation.class, new SimpleCodecDeserializer<>(ResourceLocation.CODEC))
+            .registerTypeAdapter(Identifier.class, new SimpleCodecDeserializer<>(Identifier.CODEC))
             .registerTypeAdapter(Item.class, new RegistryDeserializer<>(BuiltInRegistries.ITEM))
             .registerTypeAdapter(SoundEvent.class, new RegistryDeserializer<>(BuiltInRegistries.SOUND_EVENT));
 }

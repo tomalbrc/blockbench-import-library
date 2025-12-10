@@ -2,7 +2,7 @@ package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Vector3f;
@@ -31,8 +31,8 @@ public class BbElement {
 
     // ajblueprint...
     // Yes, camelCase in the json, this is intended
-    ResourceLocation item;
-    ResourceLocation block;
+    Identifier item;
+    Identifier block;
     String text;
     int lineWidth;
     ItemDisplayContext itemDisplayContext = ItemDisplayContext.NONE;
@@ -41,11 +41,11 @@ public class BbElement {
     double backgroundAlpha;
     String backgroundColor;
 
-    public ResourceLocation getItem() {
+    public Identifier getItem() {
         return item;
     }
 
-    public ResourceLocation getBlock() {
+    public Identifier getBlock() {
         return block;
     }
 

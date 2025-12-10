@@ -8,7 +8,7 @@ import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
@@ -88,7 +88,7 @@ public class BbModel5Importer extends BbModelImporter {
         for (BbOutliner.ChildEntry entry : children) {
             if (entry.isNode()) {
                 BbOutliner outliner = entry.outliner;
-                ResourceLocation modelPath = null;
+                Identifier modelPath = null;
 
                 BbGroup group = BbModelUtils.getGroup(model, entry.outliner);
                 if (group == null)

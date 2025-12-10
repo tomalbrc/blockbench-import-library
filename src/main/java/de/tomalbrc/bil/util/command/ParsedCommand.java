@@ -7,14 +7,12 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class ParsedCommand {
-    private static final CommandSourceStack PARSING_SOURCE = new CommandSourceStack(
-            CommandSource.NULL, Vec3.ZERO, Vec2.ZERO, null, 2, "", CommonComponents.EMPTY, null, null
-    );
     private final String command;
     @Nullable
     private ParseResults<CommandSourceStack> parsed;
@@ -26,7 +24,10 @@ public class ParsedCommand {
 
     public int execute(CommandDispatcher<CommandSourceStack> dispatcher, CommandSourceStack source) {
         if (this.parsed == null) {
-            this.parsed = dispatcher.parse(this.command, PARSING_SOURCE);
+            var parsingSource = new CommandSourceStack(
+                    CommandSource.NULL, Vec3.ZERO, Vec2.ZERO, source.getLevel(), PermissionSet.ALL_PERMISSIONS, "", CommonComponents.EMPTY, source.getServer(), null
+            );
+            this.parsed = dispatcher.parse(this.command, parsingSource);
 
             if (Commands.getParseException(this.parsed) != null) {
                 BIL.LOGGER.error("Unable to parse command: {}", this.command);

@@ -6,7 +6,7 @@ import de.tomalbrc.bil.file.bbmodel.BbTexture;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.io.FilenameUtils;
 import org.joml.Vector3f;
 
@@ -18,11 +18,11 @@ import java.util.Objects;
 public class ResourcePackModel {
     public static ResourcePackModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackModel.DisplayTransform(new Vector3f(0, 180, 0), null, null); // default BIL model transform
     protected final String parent;
-    protected final Map<String, ResourceLocation> textures;
+    protected final Map<String, Identifier> textures;
     protected final List<BbElement> elements;
     protected final Map<String, DisplayTransform> display;
 
-    public ResourcePackModel(String parent, Map<String, ResourceLocation> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
+    public ResourcePackModel(String parent, Map<String, Identifier> textures, List<BbElement> elements, Map<String, DisplayTransform> transformMap) {
         this.parent = parent;
         this.textures = textures;
         if (this.textures != null && !this.textures.isEmpty() && !this.textures.containsKey("particle")) {
@@ -43,7 +43,7 @@ public class ResourcePackModel {
         protected final String modelId;
         protected String parent = null;
 
-        protected Map<String, ResourceLocation> textureMap = null;
+        protected Map<String, Identifier> textureMap = null;
         protected List<BbElement> elements = null;
 
         protected Map<String, DisplayTransform> transformMap = new Object2ObjectArrayMap<>();
@@ -65,7 +65,7 @@ public class ResourcePackModel {
                     while (str.endsWith(".png")) { // remove all .png extensions if multiple
                         str = str.substring(0, str.length() - 4);
                     }
-                    this.textureMap.put(String.valueOf(entry.getIntKey()), ResourceLocation.fromNamespaceAndPath("bil", "item/" + this.modelId + "/" + str));
+                    this.textureMap.put(String.valueOf(entry.getIntKey()), Identifier.fromNamespaceAndPath("bil", "item/" + this.modelId + "/" + str));
                 }
             }
             return this;
@@ -83,7 +83,7 @@ public class ResourcePackModel {
 
 
         public ResourcePackModel build() {
-            Map<String, ResourceLocation> optimizedTextureMap = new Object2ObjectLinkedOpenHashMap<>();
+            Map<String, Identifier> optimizedTextureMap = new Object2ObjectLinkedOpenHashMap<>();
             if (this.elements != null)
                 for (BbElement element : this.elements) {
                     for (Map.Entry<String, BbFace> bbFaceEntry : element.faces.entrySet()) {

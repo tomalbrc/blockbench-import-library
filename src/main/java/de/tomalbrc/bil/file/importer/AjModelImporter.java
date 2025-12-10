@@ -14,7 +14,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                 // generate more models
                 var affectedBones = this.affectedBones(variant);
 
-                Reference2ObjectOpenHashMap<UUID, ResourceLocation> models = new Reference2ObjectOpenHashMap<>();
+                Reference2ObjectOpenHashMap<UUID, Identifier> models = new Reference2ObjectOpenHashMap<>();
 
                 for (BbOutliner outliner : BbModelUtils.modelOutliner(model)) {
                     boolean affected = affectedBones.contains(outliner.uuid) && variant.affectedBonesIsAWhitelist() ||
@@ -74,7 +74,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                                 .withElements(elements)
                                 .addDisplayTransform("head", ResourcePackModel.DEFAULT_TRANSFORM);
 
-                        ResourceLocation location = BbResourcePackGenerator.addItemModel(model, String.format("%s_%s", outliner.uuid.toString(), variant.name().toLowerCase()), builder.build());
+                        Identifier location = BbResourcePackGenerator.addItemModel(model, String.format("%s_%s", outliner.uuid.toString(), variant.name().toLowerCase()), builder.build());
                         models.put(outliner.uuid, location);
                     }
                 }
@@ -132,7 +132,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
                 if (difference == t && kf.channel == BbKeyframe.Channel.SOUND && kf.dataPoints.getFirst().containsKey("sound")) {
-                    return SoundEvent.createVariableRangeEvent(ResourceLocation.parse(kf.dataPoints.getFirst().get("sound").getStringValue()));
+                    return SoundEvent.createVariableRangeEvent(Identifier.parse(kf.dataPoints.getFirst().get("sound").getStringValue()));
                 } else {
                     // AnimatedJava >= 0.4.8 uses "effect" as sound-effect key
                     return super.frameSound(anim, t);

@@ -4,7 +4,7 @@ import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
 import de.tomalbrc.bil.file.importer.AjBlueprintImporter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -25,7 +25,7 @@ public class AjBlueprintLoader extends BbModelLoader {
         }
     }
     @Override
-    public Model loadResource(ResourceLocation resourceLocation) throws IllegalArgumentException, JsonParseException {
+    public Model loadResource(Identifier resourceLocation) throws IllegalArgumentException, JsonParseException {
         String path = String.format("/model/%s/%s.ajblueprint", resourceLocation.getNamespace(), resourceLocation.getPath());
         InputStream input = BbModelLoader.class.getResourceAsStream(path);
         if (input == null) {
@@ -35,7 +35,7 @@ public class AjBlueprintLoader extends BbModelLoader {
         return this.load(input, resourceLocation.getPath());
     }
 
-    static public Model load(ResourceLocation resourceLocation) {
+    static public Model load(Identifier resourceLocation) {
         return new AjBlueprintLoader().loadResource(resourceLocation);
     }
 

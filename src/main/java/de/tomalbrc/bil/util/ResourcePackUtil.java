@@ -1,15 +1,15 @@
 package de.tomalbrc.bil.util;
 
 import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ResourcePackUtil {
-    private static ConcurrentHashMap<ResourceLocation, byte[]> data = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Identifier, byte[]> data = new ConcurrentHashMap<>();
 
-    public static byte[] add(ResourceLocation location, byte[] bytes) {
+    public static byte[] add(Identifier location, byte[] bytes) {
         return data.put(location, bytes);
     }
 

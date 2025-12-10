@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.core.model;
 
 import de.tomalbrc.bil.file.bbmodel.BbElement;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
@@ -14,7 +14,7 @@ public record Node(
         @NotNull Transform transform,
         @NotNull String name,
         @NotNull UUID uuid,
-        @Nullable ResourceLocation modelData,
+        @Nullable Identifier modelData,
         boolean headTag,
         @Nullable BbElement displayDataElement
 ) {

@@ -1,6 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
-    id 'com.gradleup.shadow' version '8.3.6'
+    id 'fabric-loom' version '1.14-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -11,13 +10,8 @@ base {
     archivesName = project.archives_base_name
 }
 
-configurations {
-    shade
-}
-
 repositories {
     mavenCentral()
-    mavenLocal()
     maven { url 'https://maven.tomalbrc.de' }
     maven { url 'https://maven.nucleoid.xyz' }
     maven { url 'https://maven.blamejared.com' }
@@ -41,25 +35,9 @@ dependencies {
     modRuntimeOnly("eu.pb4:polymer-autohost:${project.polymer_version}")
 
     // Molang
-    implementation shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}") {
-        exclude group: "org.ow2.asm", module: "asm-tree"
-    }
-
-    modImplementation shade('me.lucko:fabric-permissions-api:0.4.0')
+    implementation include("gg.moonflower:molang-compiler:${project.molang_compiler_version}")
+    modImplementation include('me.lucko:fabric-permissions-api:0.5.0')
 }
-
-shadowJar {
-    configurations = [project.configurations.shade]
-    exclude('META-INF/**')
-    exclude('net/**')
-    archiveClassifier.set("shadow")
-}
-
-remapJar {
-    dependsOn(shadowJar)
-    input.set(shadowJar.archivePath)
-}
-
 
 processResources {
     inputs.property "version", project.version
@@ -97,21 +75,16 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}"}
+        rename { "${it}_${project.archives_base_name}" }
     }
 }
 
 // configure the maven publication
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-            artifact(sourcesJar) {
-                classifier "sources"
-                builtBy remapSourcesJar
-            }
+        create("mavenJava", MavenPublication) {
+            artifactId = project.archives_base_name
+            from components.java
         }
     }
 

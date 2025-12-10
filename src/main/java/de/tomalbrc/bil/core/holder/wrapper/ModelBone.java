@@ -4,7 +4,7 @@ import de.tomalbrc.bil.core.element.PerPlayerItemDisplayElement;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ public class ModelBone extends ItemBone {
         return new ModelBone(element, node, defaultPose, head);
     }
 
-    public void updateModel(ResourceLocation model) {
+    public void updateModel(Identifier model) {
         this.item.set(DataComponents.ITEM_MODEL, model);
 
         if (!this.invisible) {

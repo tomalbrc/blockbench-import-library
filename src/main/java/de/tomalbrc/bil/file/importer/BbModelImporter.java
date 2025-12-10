@@ -12,7 +12,7 @@ import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
@@ -126,7 +126,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return nodeMap;
     }
 
-    protected ResourceLocation generateModel(BbOutliner outliner) {
+    protected Identifier generateModel(BbOutliner outliner) {
         List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE_MODEL);
 
         ResourcePackModel.Builder builder = new ResourcePackModel.Builder(model.modelIdentifier)
@@ -141,7 +141,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         for (BbOutliner.ChildEntry entry : children) {
             if (entry.isNode()) {
                 BbOutliner outliner = entry.outliner;
-                ResourceLocation modelPath = null;
+                Identifier modelPath = null;
 
                 if (outliner.hasModel() && outliner.export && !outliner.isHitbox()) {
                     modelPath = this.generateModel(outliner);
@@ -341,7 +341,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.SOUND) {
-                    return SoundEvent.createVariableRangeEvent(ResourceLocation.parse(kf.dataPoints.getFirst().get("effect").getStringValue()));
+                    return SoundEvent.createVariableRangeEvent(Identifier.parse(kf.dataPoints.getFirst().get("effect").getStringValue()));
                 }
             }
         }

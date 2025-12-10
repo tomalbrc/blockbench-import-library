@@ -6,7 +6,7 @@ import de.tomalbrc.bil.core.holder.wrapper.ItemBone;
 import de.tomalbrc.bil.core.holder.wrapper.ModelBone;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Variant;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -85,7 +85,7 @@ public class VariantComponent extends ComponentBase implements VariantController
         for (int i = 0; i < this.holder.getBones().length; i++) {
             if (this.holder.getBones()[i] instanceof ModelBone bone) {
                 UUID uuid = bone.node().uuid();
-                ResourceLocation modelData = variant.models().get(uuid);
+                Identifier modelData = variant.models().get(uuid);
                 if (modelData != null && variant.isAffected(uuid)) {
                     bone.updateModel(modelData);
                 }

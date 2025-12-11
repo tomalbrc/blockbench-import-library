@@ -7,7 +7,7 @@ import java.util.List;
 public class BbAnimator {
     public String name;
     public Type type;
-    public List<BbKeyframe> keyframes;
+    public List<BbKeyframe> keyframes = List.of();
 
     public enum Type {
         @SerializedName("bone")

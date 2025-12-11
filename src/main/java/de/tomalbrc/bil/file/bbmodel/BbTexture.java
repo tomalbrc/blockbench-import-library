@@ -11,12 +11,12 @@ public class BbTexture {
     public String folder;
     public String namespace;
     public int id;
-    public float width;
-    public float height;
+    public int width;
+    public int height;
     @SerializedName("uv_width")
-    public float uvWidth;
+    public int uvWidth;
     @SerializedName("uv_height")
-    public float uvHeight;
+    public int uvHeight;
     public boolean particle;
     @SerializedName("layers_enabled")
     public boolean layersEnabled;
@@ -25,7 +25,7 @@ public class BbTexture {
     @SerializedName("render_sides")
     public String renderSides;
     @SerializedName("frame_time")
-    public float frameTime;
+    public int frameTime;
     @SerializedName("frame_order_type")
     public String frameOrderType;
     @SerializedName("frame_order")

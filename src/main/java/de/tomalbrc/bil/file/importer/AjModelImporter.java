@@ -92,7 +92,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID)) {
             BbAnimator animator = anim.animators.get(effectsUUID);
             if (animator.type == BbAnimator.Type.EFFECT) {
-                for (BbKeyframe kf : animator.keyframes) {
+                if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
                     if (Math.abs(kf.time - t) < 0.15f && kf.channel == BbKeyframe.Channel.VARIANTS) { // snap value to 50ms increments
                         UUID key = CachedUuidDeserializer.get(kf.dataPoints.getFirst().get("variant").getStringValue());
                         var cond = kf.dataPoints.getFirst().containsKey("executeCondition") ? CommandParser.parse(kf.dataPoints.getFirst().get("executeCondition").getStringValue()) : null;
@@ -109,7 +109,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            for (BbKeyframe kf : animator.keyframes) {
+            if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
                 if (difference == t && kf.channel == BbKeyframe.Channel.COMMANDS) {
                     var script = kf.dataPoints.getFirst().get("commands").getStringValue();
@@ -129,7 +129,7 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            for (BbKeyframe kf : animator.keyframes) {
+            if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
                 float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // todo: snap based on "snapping" in anim
                 if (difference == t && kf.channel == BbKeyframe.Channel.SOUND && kf.dataPoints.getFirst().containsKey("sound")) {
                     return SoundEvent.createVariableRangeEvent(ResourceLocation.parse(kf.dataPoints.getFirst().get("sound").getStringValue()));

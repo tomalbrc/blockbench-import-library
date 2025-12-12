@@ -36,7 +36,7 @@ dependencies {
 
     // Molang
     implementation include("gg.moonflower:molang-compiler:${project.molang_compiler_version}")
-    modImplementation include('me.lucko:fabric-permissions-api:0.5.0')
+    modImplementation include('me.lucko:fabric-permissions-api:0.6.1')
 }
 
 processResources {

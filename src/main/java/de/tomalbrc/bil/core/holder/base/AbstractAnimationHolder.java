@@ -150,7 +150,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
     }
 
     protected void setupElements(List<Bone<?>> bones) {
-        for (Node node : this.model.nodeMap().values()) {
+        if (this.model != null) for (Node node : this.model.nodeMap().values()) {
             Pose defaultPose = this.model.defaultPose().get(node.uuid());
             switch (node.type()) {
                 case BONE -> {
@@ -205,7 +205,7 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
 
     @Override
     protected void onAsyncTick() {
-        Arrays.stream(this.watchingPlayers).parallel().forEach(this::asyncTickFor);
+        Arrays.stream(this.watchingPlayers).forEach(this::asyncTickFor);
     }
 
     protected void asyncTickFor(ServerGamePacketListenerImpl watchingPlayer) {

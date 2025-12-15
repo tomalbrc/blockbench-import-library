@@ -2,6 +2,7 @@ package de.tomalbrc.bil.file.importer;
 
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
+import de.tomalbrc.bil.core.model.Transform;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.util.Utils;
@@ -18,7 +19,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -102,15 +102,17 @@ public class BbModel5Importer extends BbModelImporter {
 
                 Vector3f localPos = parentGroup != null ? group.origin.sub(parentGroup.origin, new Vector3f()) : new Vector3f(group.origin);
 
-                var tr = new Node.Transform(localPos.div(16), group.rotation, group.scale);
+                var tr = new Transform(localPos.div(16), group.rotation, group.scale);
                 if (parentOutliner != null)
                     tr.mul(parent.transform());
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = new Node(Node.NodeType.BONE, parent, tr, group.name, outliner.uuid, modelPath, group.name.startsWith("head"), null, new ArrayList<>());
+                Node node = Node.of(Node.NodeType.BONE, group, modelPath, parent, tr, null);
                 nodeMap.put(outliner.uuid, node);
-                if (parent != null) parent.addChild(node);
+
+                if (parent != null)
+                    parent.addChild(node);
 
                 processLocators(nodeMap, outliner, node);
                 processTextDisplays(nodeMap, outliner, node);
@@ -124,7 +126,7 @@ public class BbModel5Importer extends BbModelImporter {
     }
 
     @Override
-    protected void processLocators(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+    protected void processLocators(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
         for (BbElement element : locatorElements) {
             BbGroup group = BbModelUtils.getGroup(model, outliner);
@@ -133,17 +135,17 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
-            locatorTransform.mul(node.transform());
+            var tr = new Transform(localPos2.div(16), element.rotation, 1);
+            tr.mul(parent.transform());
 
-            Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, element.name, element.uuid, null, false, null, new ArrayList<>());
+            Node locatorNode = Node.of(Node.NodeType.LOCATOR, group, null, parent, tr, null);
             nodeMap.put(element.uuid, locatorNode);
 
-            node.addChild(locatorNode);
+            parent.addChild(locatorNode);
         }
     }
 
-    protected void processTextDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+    protected void processTextDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.TEXT_DISPLAY);
         for (BbElement element : locatorElements) {
             BbGroup group = BbModelUtils.getGroup(model, outliner);
@@ -152,15 +154,17 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
-            locatorTransform.mul(node.transform());
+            var tr = new Transform(localPos2.div(16), element.rotation, 1);
+            tr.mul(parent.transform());
 
-            Node locatorNode = new Node(Node.NodeType.TEXT, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
-            nodeMap.put(element.uuid, locatorNode);
+            Node node = Node.of(Node.NodeType.TEXT, group, null, parent, tr, element);
+            nodeMap.put(element.uuid, node);
+
+            parent.addChild(node);
         }
     }
 
-    protected void processBlockDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+    protected void processBlockDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.BLOCK_DISPLAY);
         for (BbElement element : locatorElements) {
             BbGroup group = BbModelUtils.getGroup(model, outliner);
@@ -169,15 +173,15 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
-            locatorTransform.mul(node.transform());
+            var tr = new Transform(localPos2.div(16), element.rotation, 1);
+            tr.mul(parent.transform());
 
-            Node locatorNode = new Node(Node.NodeType.BLOCK, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
-            nodeMap.put(element.uuid, locatorNode);
+            Node node = Node.of(Node.NodeType.BLOCK, group, null, parent, tr, element);
+            nodeMap.put(element.uuid, node);
         }
     }
 
-    protected void processItemDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+    protected void processItemDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.ITEM_DISPLAY);
         for (BbElement element : locatorElements) {
             BbGroup group = BbModelUtils.getGroup(model, outliner);
@@ -186,11 +190,12 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
-            locatorTransform.mul(node.transform());
+            var tr = new Transform(localPos2.div(16), element.rotation, 1);
+            tr.mul(parent.transform());
 
-            Node locatorNode = new Node(Node.NodeType.ITEM, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
-            nodeMap.put(element.uuid, locatorNode);
+
+            Node node = Node.of(Node.NodeType.ITEM, group, null, parent, tr, element);
+            nodeMap.put(element.uuid, node);
         }
     }
 
@@ -222,8 +227,8 @@ public class BbModel5Importer extends BbModelImporter {
                 matrix4f.rotate(localRot);
             }
 
-            // TODO: check if frame is required?
-            poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+            //if (requiresFrame)
+                poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
         }
         return poses;
     }

@@ -5,8 +5,8 @@ import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 
 public abstract class Bone<T extends PerPlayerTransformableElement> extends DisplayWrapper<T> {
-    protected Bone(T element, Node node, Pose defaultPose, BoneTag tag) {
-        super(element, node, defaultPose, tag);
+    protected Bone(T element, Node node, Pose defaultPose) {
+        super(element, node, defaultPose);
     }
 
     public abstract void setInvisible(boolean isInvisible);

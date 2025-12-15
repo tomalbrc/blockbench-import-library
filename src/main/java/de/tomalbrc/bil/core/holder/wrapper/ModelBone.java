@@ -11,27 +11,13 @@ import org.jetbrains.annotations.NotNull;
 public class ModelBone extends ItemBone {
     private final ItemStack item;
 
-    protected ModelBone(PerPlayerItemDisplayElement element, Node node, Pose defaultPose, BoneTag tag) {
-        super(element, node, defaultPose, tag);
+    protected ModelBone(PerPlayerItemDisplayElement element, Node node, Pose defaultPose) {
+        super(element, node, defaultPose);
         this.item = element.getItem();
     }
 
-    public static ModelBone of(PerPlayerItemDisplayElement element, Node node, Pose defaultPose, BoneTag tag) {
-        return new ModelBone(element, node, defaultPose, tag);
-    }
-
     public static ModelBone of(PerPlayerItemDisplayElement element, @NotNull Node node, Pose defaultPose) {
-        Node current = node;
-        boolean head = false;
-        while (current != null) {
-            if (current.headTag()) {
-                head = true;
-                break;
-            }
-            current = current.parent();
-        }
-
-        return new ModelBone(element, node, defaultPose, head ? BoneTag.HEAD : BoneTag.NONE);
+        return new ModelBone(element, node, defaultPose);
     }
 
     public void updateModel(Identifier model) {

@@ -1,24 +1,25 @@
 package de.tomalbrc.bil.core.model;
 
 import de.tomalbrc.bil.file.bbmodel.BbElement;
-import de.tomalbrc.bil.util.Utils;
+import de.tomalbrc.bil.file.bbmodel.BbGroup;
+import de.tomalbrc.bil.file.bbmodel.BbOutliner;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public record Node(
+        @NotNull UUID uuid,
         @NotNull NodeType type,
+        @NotNull NodeTag tag,
         @Nullable Node parent,
         @NotNull Transform transform,
         @NotNull String name,
-        @NotNull UUID uuid,
         @Nullable Identifier modelData,
-        boolean headTag,
         @Nullable BbElement displayDataElement,
         @NotNull List<Node> children
 ) {
@@ -30,6 +31,13 @@ public record Node(
         return Collections.unmodifiableList(children);
     }
 
+    public static Node of(NodeType type, BbGroup group, Identifier model, Node parent, Transform transform, BbElement displayDataElement) {
+        return new Node(group.uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
+    }
+    public static Node of(NodeType type, BbOutliner group, Identifier model, Node parent, Transform transform, BbElement displayDataElement) {
+        return new Node(group.uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
+    }
+
     public enum NodeType {
         BONE,
         LOCATOR,
@@ -38,44 +46,30 @@ public record Node(
         TEXT
     }
 
-    public static final class Transform {
-        private final Vector3fc origin;
-        private final Vector3fc rotation;
-        private final float scale;
+    public enum NodeTag {
+        NONE,
+        HEAD,
+        HEAD_CHILD,
+        HITBOX,
+        SEAT,
+        DRIVER_SEAT;
 
-        private Matrix4f globalTransform;
+        public static NodeTag of(String name) {
+            if (name.startsWith("head")) {
+                return HEAD;
+            } else if (name.startsWith("hitbox")) {
+                return HITBOX;
+            } else if (name.startsWith("seat")) {
+                return SEAT;
+            } else if (name.startsWith("driver")) {
+                return DRIVER_SEAT;
+            }
 
-        public Transform(Vector3f origin, Vector3f rotation, float scale) {
-            this.origin = origin;
-            this.rotation = rotation;
-            this.scale = scale;
-            this.globalTransform = new Matrix4f().translate(origin).rotate(Utils.createQuaternion(rotation));
+            return NONE;
         }
 
-        public Transform mul(Transform other) {
-            this.globalTransform = other.globalTransform.mul(this.globalTransform, new Matrix4f());
-            return this;
-        }
-
-        public Transform mul(Matrix4f other) {
-            this.globalTransform = other.mul(this.globalTransform);
-            return this;
-        }
-
-        public Vector3fc origin() {
-            return origin;
-        }
-
-        public Vector3fc rotation() {
-            return rotation;
-        }
-
-        public float scale() {
-            return scale;
-        }
-
-        public Matrix4fc globalTransform() {
-            return globalTransform;
+        public boolean isHead() {
+            return this == HEAD || this == HEAD_CHILD;
         }
     }
 }

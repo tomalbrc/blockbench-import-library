@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 import java.lang.Math;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -151,14 +150,17 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
                 Vector3f localPos = parentOutliner != null ? outliner.origin.sub(parentOutliner.origin, new Vector3f()) : new Vector3f(outliner.origin);
 
-                var tr = new Node.Transform(localPos.div(16), outliner.rotation, outliner.scale);
+                var tr = new Transform(localPos.div(16), outliner.rotation, outliner.scale);
                 if (parentOutliner != null)
                     tr.mul(parent.transform());
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = new Node(Node.NodeType.BONE, parent, tr, outliner.name, outliner.uuid, modelPath, outliner.name.startsWith("head"), null, new ArrayList<>());
+                Node node = Node.of(Node.NodeType.BONE, outliner, modelPath, parent, tr, null);
                 nodeMap.put(outliner.uuid, node);
+
+                if (parent != null)
+                    parent.addChild(node);
 
                 processLocators(nodeMap, outliner, node);
                 processTextDisplays(nodeMap, outliner, node);
@@ -171,55 +173,63 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         }
     }
 
-    protected void processLocators(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+    protected void processLocators(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
         for (BbElement element : locatorElements) {
             Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
-            locatorTransform.mul(node.transform());
+            var tr = new Transform(localPos2.div(16), element.rotation, 1);
+            tr.mul(parent.transform());
 
-            Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, element.name, element.uuid, null, false, null, new ArrayList<>());
-            nodeMap.put(element.uuid, locatorNode);
+            Node node = Node.of(Node.NodeType.LOCATOR, outliner, null, parent, tr, null);
+            nodeMap.put(element.uuid, node);
+
+            parent.addChild(node);
         }
     }
 
-    protected void processTextDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+    protected void processTextDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.TEXT_DISPLAY);
         for (BbElement element : locatorElements) {
             Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
-            locatorTransform.mul(node.transform());
+            var tr = new Transform(localPos2.div(16), element.rotation, 1);
+            tr.mul(parent.transform());
 
-            Node locatorNode = new Node(Node.NodeType.TEXT, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
-            nodeMap.put(element.uuid, locatorNode);
+            Node node = Node.of(Node.NodeType.TEXT, outliner, null, parent, tr, element);
+            nodeMap.put(element.uuid, node);
+
+            parent.addChild(node);
         }
     }
 
-    protected void processBlockDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+    protected void processBlockDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.BLOCK_DISPLAY);
         for (BbElement element : locatorElements) {
             Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
-            locatorTransform.mul(node.transform());
+            var tr = new Transform(localPos2.div(16), element.rotation, 1);
+            tr.mul(parent.transform());
 
-            Node locatorNode = new Node(Node.NodeType.BLOCK, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
-            nodeMap.put(element.uuid, locatorNode);
+            Node node = Node.of(Node.NodeType.BLOCK, outliner, null, parent, tr, element);
+            nodeMap.put(element.uuid, node);
+
+            parent.addChild(node);
         }
     }
 
-    protected void processItemDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node node) {
+    protected void processItemDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.ITEM_DISPLAY);
         for (BbElement element : locatorElements) {
             Vector3f localPos2 = element.position.sub(outliner.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
-            locatorTransform.mul(node.transform());
+            var tr = new Transform(localPos2.div(16), element.rotation, 1);
+            tr.mul(parent.transform());
 
-            Node locatorNode = new Node(Node.NodeType.ITEM, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
-            nodeMap.put(element.uuid, locatorNode);
+            Node node = Node.of(Node.NodeType.ITEM, outliner, null, parent, tr, element);
+            nodeMap.put(element.uuid, node);
+
+            parent.addChild(node);
         }
     }
 

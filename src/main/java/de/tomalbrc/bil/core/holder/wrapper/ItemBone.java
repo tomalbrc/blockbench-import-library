@@ -14,27 +14,13 @@ public class ItemBone extends Bone<PerPlayerItemDisplayElement> {
     protected final ItemStack item;
     protected boolean invisible;
 
-    protected ItemBone(PerPlayerItemDisplayElement element, Node node, Pose defaultPose, BoneTag tag) {
-        super(element, node, defaultPose, tag);
+    protected ItemBone(PerPlayerItemDisplayElement element, Node node, Pose defaultPose) {
+        super(element, node, defaultPose);
         this.item = element.getItem();
     }
 
-    public static ItemBone of(PerPlayerItemDisplayElement element, Node node, Pose defaultPose, BoneTag tag) {
-        return new ItemBone(element, node, defaultPose, tag);
-    }
-
     public static ItemBone of(PerPlayerItemDisplayElement element, @NotNull Node node, Pose defaultPose) {
-        Node current = node;
-        boolean head = false;
-        while (current != null) {
-            if (current.headTag()) {
-                head = true;
-                break;
-            }
-            current = current.parent();
-        }
-
-        return new ItemBone(element, node, defaultPose, head ? BoneTag.HEAD : BoneTag.NONE);
+        return new ItemBone(element, node, defaultPose);
     }
 
     public void setInvisible(boolean invisible) {

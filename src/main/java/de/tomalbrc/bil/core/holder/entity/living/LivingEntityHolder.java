@@ -5,6 +5,7 @@ import de.tomalbrc.bil.core.element.CollisionElement;
 import de.tomalbrc.bil.core.holder.entity.EntityHolder;
 import de.tomalbrc.bil.core.holder.wrapper.DisplayWrapper;
 import de.tomalbrc.bil.core.model.Model;
+import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import de.tomalbrc.bil.util.Constants;
 import de.tomalbrc.bil.util.Utils;
@@ -72,7 +73,7 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
     @Override
     protected void applyPose(ServerPlayer serverPlayer, Pose pose, DisplayWrapper<?> displayWrapper) {
         Vector3f translation = pose.translation();
-        boolean isHead = displayWrapper.tag() == DisplayWrapper.BoneTag.HEAD;
+        boolean isHead = displayWrapper.node().tag() == Node.NodeTag.HEAD;
         boolean isDead = this.parent.deathTime > 0;
 
         if (isHead || isDead) {

@@ -27,6 +27,7 @@ import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -63,15 +64,15 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
     }
 
     @Override
-    public void updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> display, @Nullable Pose pose) {
-        display.element().setYaw(this.parent.yBodyRot);
-        super.updateElement(serverPlayer, display, pose);
+    public void updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> displayWrapper, @Nullable Pose pose) {
+        displayWrapper.element().setYaw(this.parent.yBodyRot);
+        super.updateElement(serverPlayer, displayWrapper, pose);
     }
 
     @Override
-    protected void applyPose(ServerPlayer serverPlayer, Pose pose, DisplayWrapper<?> display) {
+    protected void applyPose(ServerPlayer serverPlayer, Pose pose, DisplayWrapper<?> displayWrapper) {
         Vector3f translation = pose.translation();
-        boolean isHead = display.isHead();
+        boolean isHead = displayWrapper.tag() == DisplayWrapper.BoneTag.HEAD;
         boolean isDead = this.parent.deathTime > 0;
 
         if (isHead || isDead) {
@@ -86,30 +87,31 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
                 bodyRotation.rotateX(Mth.DEG_TO_RAD * Mth.lerp(0.5f, this.parent.xRotO, this.parent.getXRot()));
             }
 
-            display.element().setLeftRotation(serverPlayer, bodyRotation.mul(pose.readOnlyLeftRotation()));
+            displayWrapper.element().setLeftRotation(serverPlayer, bodyRotation.mul(pose.readOnlyLeftRotation()));
         } else {
-            display.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
+            displayWrapper.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
         }
 
         if (this.entityScale != 1F) {
             translation.mul(this.entityScale);
-            display.element().setScale(serverPlayer, pose.scale().mul(this.entityScale));
+            displayWrapper.element().setScale(serverPlayer, pose.scale().mul(this.entityScale));
         } else {
-            display.element().setScale(serverPlayer, pose.readOnlyScale());
+            displayWrapper.element().setScale(serverPlayer, pose.readOnlyScale());
         }
 
-        display.element().setTranslation(serverPlayer, translation.sub(0, this.dimensions.height() - 0.01f, 0));
-        display.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
+        displayWrapper.element().setTranslation(serverPlayer, translation.sub(0, this.dimensions.height() - 0.01f, 0));
+        displayWrapper.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
 
-        display.element().startInterpolationIfDirty(serverPlayer);
+        displayWrapper.element().startInterpolationIfDirty(serverPlayer);
     }
 
     @Override
-    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<ClientGamePacketListener>> consumer) {
+    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<@NotNull ClientGamePacketListener>> consumer) {
         super.startWatchingExtraPackets(player, consumer);
 
         for (var packet : Utils.updateClientInteraction(this.hitboxInteraction, this.dimensions)) {
-            consumer.accept((Packet<ClientGamePacketListener>) packet);
+            // noinspection unchecked
+            consumer.accept((Packet<@NotNull ClientGamePacketListener>) packet);
         }
 
         if (this.parent.canBreatheUnderwater()) {

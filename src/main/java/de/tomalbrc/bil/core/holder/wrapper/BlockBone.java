@@ -12,13 +12,13 @@ public class BlockBone extends Bone<PerPlayerBlockDisplayElement> {
     private BlockState blockState;
     private boolean invisible;
 
-    protected BlockBone(PerPlayerBlockDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
-        super(element, node, defaultPose, isHead);
+    protected BlockBone(PerPlayerBlockDisplayElement element, Node node, Pose defaultPose, BoneTag tag) {
+        super(element, node, defaultPose, tag);
         this.blockState = element.getBlockState();
     }
 
-    public static BlockBone of(PerPlayerBlockDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
-        return new BlockBone(element, node, defaultPose, isHead);
+    public static BlockBone of(PerPlayerBlockDisplayElement element, Node node, Pose defaultPose, BoneTag tag) {
+        return new BlockBone(element, node, defaultPose, tag);
     }
 
     public static BlockBone of(PerPlayerBlockDisplayElement element, @NotNull Node node, Pose defaultPose) {
@@ -32,7 +32,7 @@ public class BlockBone extends Bone<PerPlayerBlockDisplayElement> {
             current = current.parent();
         }
 
-        return new BlockBone(element, node, defaultPose, head);
+        return new BlockBone(element, node, defaultPose, head ? BoneTag.HEAD : BoneTag.NONE);
     }
 
     public void setInvisible(boolean invisible) {

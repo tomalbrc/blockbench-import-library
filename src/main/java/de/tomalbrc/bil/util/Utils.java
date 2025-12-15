@@ -8,11 +8,11 @@ import eu.pb4.polymer.networking.api.util.ServerDynamicPacket;
 import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.tracker.EntityTrackedData;
 import eu.pb4.polymer.virtualentity.api.tracker.InteractionTrackedData;
+import io.netty.channel.ChannelFutureListener;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
 import net.minecraft.network.Connection;
-import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -23,6 +23,9 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -45,7 +48,7 @@ public class Utils {
         return (value & 1 << flag) != 0;
     }
 
-    public static List<Packet<? super ClientGamePacketListener>> updateClientInteraction(InteractionElement interaction, EntityDimensions dimensions) {
+    public static List<Packet<? super @NotNull ClientGamePacketListener>> updateClientInteraction(InteractionElement interaction, EntityDimensions dimensions) {
         return updateClientInteraction(interaction, dimensions, dimensions.height());
     }
 
@@ -70,7 +73,8 @@ public class Utils {
     }
 
     /**
-     * Vanilla + Polymer copy of {@link ServerCommonPacketListenerImpl#send(Packet, PacketSendListener)} but without flushing the connection.
+     * TODO: This implementation might be out of date, it was originally designed for 1.20
+     * Vanilla + Polymer copy of {@link ServerCommonPacketListenerImpl#send(Packet, ChannelFutureListener)} but without flushing the connection.
      * <p>
      * we will often have to send a ton of separate packet from a different thread.
      * Even though we always make sure to start and finish this process before player connection flushing gets resumed at the end of the game tick,
@@ -92,5 +96,17 @@ public class Utils {
         }
 
         PacketPatcher.sendExtra(networkHandler, packet);
+    }
+
+    /**
+     * Creates a Quaternionf from euler angles
+     * @param eulerAngles
+     * @return
+     */
+    public static Quaternionf createQuaternion(Vector3f eulerAngles) {
+        return new Quaternionf()
+                .rotateZ(Mth.DEG_TO_RAD * eulerAngles.z)
+                .rotateY(Mth.DEG_TO_RAD * eulerAngles.y)
+                .rotateX(Mth.DEG_TO_RAD * eulerAngles.x);
     }
 }

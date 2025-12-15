@@ -6,23 +6,31 @@ import de.tomalbrc.bil.core.model.Pose;
 
 public class DisplayWrapper<T extends PerPlayerTransformableElement> extends AbstractWrapper {
     private final T element;
-    private final boolean isHead;
+    private final BoneTag tag;
 
-    public DisplayWrapper(T element, AbstractWrapper wrapper, boolean isHead) {
-        this(element, wrapper.node(), wrapper.getDefaultPose(), isHead);
+    public DisplayWrapper(T element, AbstractWrapper wrapper, BoneTag tag) {
+        this(element, wrapper.node(), wrapper.getDefaultPose(), tag);
     }
 
-    public DisplayWrapper(T element, Node node, Pose defaultPose, boolean isHead) {
+    public DisplayWrapper(T element, Node node, Pose defaultPose, BoneTag tag) {
         super(node, defaultPose);
         this.element = element;
-        this.isHead = isHead;
+        this.tag = tag;
     }
 
     public T element() {
         return this.element;
     }
 
-    public boolean isHead() {
-        return this.isHead;
+    public BoneTag tag() {
+        return this.tag;
+    }
+
+    public enum BoneTag {
+        NONE,
+        HEAD,
+        HITBOX,
+        SEAT,
+        DRIVER_SEAT
     }
 }

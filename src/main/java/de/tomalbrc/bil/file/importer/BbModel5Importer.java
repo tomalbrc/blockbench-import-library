@@ -4,6 +4,7 @@ import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
+import de.tomalbrc.bil.util.Utils;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -17,6 +18,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -99,16 +101,16 @@ public class BbModel5Importer extends BbModelImporter {
                 }
 
                 Vector3f localPos = parentGroup != null ? group.origin.sub(parentGroup.origin, new Vector3f()) : new Vector3f(group.origin);
-                Quaternionf localRot = createQuaternion(group.rotation);
 
-                var tr = new Node.Transform(localPos.div(16), localRot, group.scale);
+                var tr = new Node.Transform(localPos.div(16), group.rotation, group.scale);
                 if (parentOutliner != null)
                     tr.mul(parent.transform());
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = new Node(Node.NodeType.BONE, parent, tr, group.name, outliner.uuid, modelPath, group.name.startsWith("head"), null);
+                Node node = new Node(Node.NodeType.BONE, parent, tr, group.name, outliner.uuid, modelPath, group.name.startsWith("head"), null, new ArrayList<>());
                 nodeMap.put(outliner.uuid, node);
+                if (parent != null) parent.addChild(node);
 
                 processLocators(nodeMap, outliner, node);
                 processTextDisplays(nodeMap, outliner, node);
@@ -131,11 +133,13 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
             locatorTransform.mul(node.transform());
 
-            Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, element.name, element.uuid, null, false, null);
+            Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, element.name, element.uuid, null, false, null, new ArrayList<>());
             nodeMap.put(element.uuid, locatorNode);
+
+            node.addChild(locatorNode);
         }
     }
 
@@ -148,10 +152,10 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
             locatorTransform.mul(node.transform());
 
-            Node locatorNode = new Node(Node.NodeType.TEXT, node, locatorTransform, element.name, element.uuid, null, false, element);
+            Node locatorNode = new Node(Node.NodeType.TEXT, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
             nodeMap.put(element.uuid, locatorNode);
         }
     }
@@ -165,10 +169,10 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
             locatorTransform.mul(node.transform());
 
-            Node locatorNode = new Node(Node.NodeType.BLOCK, node, locatorTransform, element.name, element.uuid, null, false, element);
+            Node locatorNode = new Node(Node.NodeType.BLOCK, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
             nodeMap.put(element.uuid, locatorNode);
         }
     }
@@ -182,10 +186,10 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
             locatorTransform.mul(node.transform());
 
-            Node locatorNode = new Node(Node.NodeType.ITEM, node, locatorTransform, element.name, element.uuid, null, false, element);
+            Node locatorNode = new Node(Node.NodeType.ITEM, node, locatorTransform, element.name, element.uuid, null, false, element, new ArrayList<>());
             nodeMap.put(element.uuid, locatorNode);
         }
     }
@@ -202,18 +206,20 @@ public class BbModel5Importer extends BbModelImporter {
                 BbAnimator animator = animation.animators != null ? animation.animators.get(node.uuid()) : null;
                 //requiresFrame |= animator != null;
 
-                Vector3fc origin = node.transform().origin();
-
                 var triple = animator == null ?
                         Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
                         Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
-                Quaternionf localRot = createQuaternion(triple.getMiddle()).mul(node.transform().rotation());
+                Vector3fc animRotation = triple.getMiddle();
+                Vector3fc baseRotation = node.transform().rotation();
+                Vector3fc origin = node.transform().origin();
+
+                Quaternionf localRot = Utils.createQuaternion(baseRotation.add(animRotation, new Vector3f()));
                 Vector3f localPos = triple.getLeft().div(16).add(origin);
 
                 matrix4f.translate(localPos);
-                matrix4f.rotate(localRot);
                 matrix4f.scale(triple.getRight());
+                matrix4f.rotate(localRot);
             }
 
             // TODO: check if frame is required?

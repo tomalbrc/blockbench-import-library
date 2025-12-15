@@ -4,7 +4,6 @@ import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.api.AnimatedEntityHolder;
 import de.tomalbrc.bil.core.holder.base.AbstractAnimationHolder;
 import de.tomalbrc.bil.core.holder.wrapper.Bone;
-import de.tomalbrc.bil.core.holder.wrapper.ItemBone;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
@@ -140,7 +139,7 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
 
     protected void updateInvisibility(boolean isInvisible) {
         for (int i = 0; i < this.bones.length; i++) {
-            if (this.bones[i] instanceof ItemBone itemBone) itemBone.setInvisible(isInvisible);
+            this.bones[i].setInvisible(isInvisible);
         }
     }
 

@@ -51,7 +51,7 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
         this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.RIGHT_ROTATION, transformation.getRightRotation());
     }
 
-    default void setTransformation(ServerPlayer serverPlayer, Matrix4f matrix) {
+    default void setTransformation(ServerPlayer serverPlayer, Matrix4fc matrix) {
         float f = 1.0F / matrix.m33();
         Triple<Quaternionf, Vector3f, Quaternionf> triple = MatrixUtil.svdDecompose((new Matrix3f(matrix)).scale(f));
         this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.TRANSLATION, matrix.getTranslation(new Vector3f()));

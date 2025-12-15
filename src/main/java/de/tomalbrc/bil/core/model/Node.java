@@ -1,11 +1,14 @@
 package de.tomalbrc.bil.core.model;
 
 import de.tomalbrc.bil.file.bbmodel.BbElement;
+import de.tomalbrc.bil.util.Utils;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public record Node(
@@ -16,8 +19,17 @@ public record Node(
         @NotNull UUID uuid,
         @Nullable Identifier modelData,
         boolean headTag,
-        @Nullable BbElement displayDataElement
+        @Nullable BbElement displayDataElement,
+        @NotNull List<Node> children
 ) {
+    public void addChild(Node node) {
+        children.add(node);
+    }
+
+    public List<Node> children() {
+        return Collections.unmodifiableList(children);
+    }
+
     public enum NodeType {
         BONE,
         LOCATOR,
@@ -27,16 +39,17 @@ public record Node(
     }
 
     public static final class Transform {
-        private final Vector3f origin;
-        private final Quaternionf rotation;
+        private final Vector3fc origin;
+        private final Vector3fc rotation;
         private final float scale;
+
         private Matrix4f globalTransform;
 
-        public Transform(Vector3f origin, Quaternionf rotation, float scale) {
+        public Transform(Vector3f origin, Vector3f rotation, float scale) {
             this.origin = origin;
             this.rotation = rotation;
             this.scale = scale;
-            this.globalTransform = new Matrix4f().translate(origin).rotate(rotation);
+            this.globalTransform = new Matrix4f().translate(origin).rotate(Utils.createQuaternion(rotation));
         }
 
         public Transform mul(Transform other) {
@@ -53,7 +66,7 @@ public record Node(
             return origin;
         }
 
-        public Quaternionfc rotation() {
+        public Vector3fc rotation() {
             return rotation;
         }
 

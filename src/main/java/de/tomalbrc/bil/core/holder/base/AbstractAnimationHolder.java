@@ -57,9 +57,10 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         this.animationComponent = new AnimationComponent(model, this);
         this.variantComponent = new VariantComponent(model, this);
         this.locatorMap = new Object2ObjectOpenHashMap<>();
+
+        initializeElements();
     }
 
-    @Override
     protected final void initializeElements() {
         ObjectArrayList<Bone<?>> bones = new ObjectArrayList<>();
         this.setupElements(bones);
@@ -91,6 +92,24 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
             bone.resetLastPose(serverPlayer);
             bone.element().resetDataTracker(serverPlayer);
         }
+    }
+
+    public @Nullable Bone<?> getBone(String name) {
+        for (int i = 0; i < this.getBones().length; i++) {
+            var bone = this.getBones()[i];
+            if (bone.name().equals(name))
+                return bone;
+        }
+        return null;
+    }
+
+    public @Nullable Bone<?> getBone(Node name) {
+        for (int i = 0; i < this.getBones().length; i++) {
+            var bone = this.getBones()[i];
+            if (bone.node() == name)
+                return bone;
+        }
+        return null;
     }
 
     @Nullable
@@ -237,13 +256,12 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         if (this.scale != 1F) {
             display.element().setScale(serverPlayer, pose.scale().mul(this.scale));
             display.element().setTranslation(serverPlayer, pose.translation().mul(this.scale));
-        } else {
-            display.element().setScale(serverPlayer, pose.readOnlyScale());
-            display.element().setTranslation(serverPlayer, pose.readOnlyTranslation());
-        }
 
-        display.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
-        display.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
+            display.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
+            display.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
+        } else {
+            display.element().setTransformation(serverPlayer, pose.matrix());
+        }
 
         display.element().startInterpolationIfDirty(serverPlayer);
     }

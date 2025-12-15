@@ -3,7 +3,6 @@ package de.tomalbrc.bil.core.holder.base;
 import de.tomalbrc.bil.util.IChunkMap;
 import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -16,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class AbstractElementHolder extends ElementHolder {
     protected ServerGamePacketListenerImpl[] watchingPlayers;
-    protected boolean elementsInitialized;
     protected boolean isDataLoaded;
 
     @Deprecated(forRemoval = true)
@@ -29,22 +27,11 @@ public abstract class AbstractElementHolder extends ElementHolder {
         this.watchingPlayers = Utils.EMPTY_CONNECTION_ARRAY;
     }
 
-    abstract protected void initializeElements();
-
     abstract protected void onAsyncTick();
 
     abstract protected void onDataLoaded();
 
     abstract protected boolean shouldSkipTick();
-
-    @Override
-    public void setAttachment(@Nullable HolderAttachment attachment) {
-        if (attachment != null && !this.elementsInitialized) {
-            this.elementsInitialized = true;
-            this.initializeElements();
-        }
-        super.setAttachment(attachment);
-    }
 
     @Override
     public boolean startWatching(ServerGamePacketListenerImpl player) {

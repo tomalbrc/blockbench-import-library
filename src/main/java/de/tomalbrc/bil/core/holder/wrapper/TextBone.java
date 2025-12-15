@@ -13,15 +13,15 @@ public class TextBone extends Bone<PerPlayerTextDisplayElement> {
     private Integer backgroundColor;
     private boolean invisible;
 
-    protected TextBone(PerPlayerTextDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
-        super(element, node, defaultPose, isHead);
+    protected TextBone(PerPlayerTextDisplayElement element, Node node, Pose defaultPose, BoneTag tag) {
+        super(element, node, defaultPose, tag);
         this.text = element.getText();
         this.opacity = element.getTextOpacity();
         this.backgroundColor = element.getDataTracker().get(DisplayTrackedData.Text.BACKGROUND);
     }
 
-    public static TextBone of(PerPlayerTextDisplayElement element, Node node, Pose defaultPose, boolean isHead) {
-        return new TextBone(element, node, defaultPose, isHead);
+    public static TextBone of(PerPlayerTextDisplayElement element, Node node, Pose defaultPose, BoneTag tag) {
+        return new TextBone(element, node, defaultPose, tag);
     }
 
     public static TextBone of(PerPlayerTextDisplayElement element, @NotNull Node node, Pose defaultPose) {
@@ -35,7 +35,7 @@ public class TextBone extends Bone<PerPlayerTextDisplayElement> {
             current = current.parent();
         }
 
-        return new TextBone(element, node, defaultPose, head);
+        return new TextBone(element, node, defaultPose, head ? BoneTag.HEAD : BoneTag.NONE);
     }
 
     public void setInvisible(boolean invisible) {

@@ -57,7 +57,7 @@ public class BbResourcePackGenerator {
         }
     }
 
-    public static boolean isMultipleOf(float width, float height) {
+    public static boolean isMultipleOf(int width, int height) {
         return width > 0 && height % width == 0;
     }
 }

@@ -1,6 +1,7 @@
 package de.tomalbrc.bil.core.model;
 
 import com.google.gson.annotations.SerializedName;
+import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import org.joml.*;
 
@@ -24,15 +25,15 @@ public record Node(
 
     public static final class Transform {
         private final Vector3f origin;
-        private final Quaternionf rotation;
+        private final Vector3fc rotation;
         private final float scale;
         private Matrix4f globalTransform;
 
-        public Transform(Vector3f origin, Quaternionf rotation, float scale) {
+        public Transform(Vector3f origin, Vector3fc rotation, float scale) {
             this.origin = origin;
             this.rotation = rotation;
             this.scale = scale;
-            this.globalTransform = new Matrix4f().translate(origin).rotate(rotation);
+            this.globalTransform = new Matrix4f().translate(origin).rotate(Utils.createQuaternion(rotation));
         }
 
         public Transform mul(Transform other) {
@@ -49,7 +50,7 @@ public record Node(
             return origin;
         }
 
-        public Quaternionfc rotation() {
+        public Vector3fc rotation() {
             return rotation;
         }
 

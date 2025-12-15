@@ -23,6 +23,8 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
+import org.joml.Quaternionf;
+import org.joml.Vector3fc;
 
 import java.util.List;
 
@@ -92,5 +94,18 @@ public class Utils {
         }
 
         PacketPatcher.sendExtra(networkHandler, packet);
+    }
+
+
+    /**
+     * Creates a Quaternionf from euler angles
+     * @param eulerAngles
+     * @return
+     */
+    public static Quaternionf createQuaternion(Vector3fc eulerAngles) {
+        return new Quaternionf()
+                .rotateZ(Mth.DEG_TO_RAD * eulerAngles.z())
+                .rotateY(Mth.DEG_TO_RAD * eulerAngles.y())
+                .rotateX(Mth.DEG_TO_RAD * eulerAngles.x());
     }
 }

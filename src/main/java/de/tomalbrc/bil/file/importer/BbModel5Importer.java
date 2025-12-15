@@ -4,12 +4,12 @@ import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
 import de.tomalbrc.bil.file.bbmodel.*;
 import de.tomalbrc.bil.file.extra.BbModelUtils;
+import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
@@ -100,9 +100,8 @@ public class BbModel5Importer extends BbModelImporter {
                 }
 
                 Vector3f localPos = parentGroup != null ? group.origin.sub(parentGroup.origin, new Vector3f()) : new Vector3f(group.origin);
-                Quaternionf localRot = createQuaternion(group.rotation);
 
-                var tr = new Node.Transform(localPos.div(16), localRot, group.scale);
+                var tr = new Node.Transform(localPos.div(16), group.rotation, group.scale);
                 if (parentOutliner != null)
                     tr.mul(parent.transform());
                 else
@@ -129,7 +128,7 @@ public class BbModel5Importer extends BbModelImporter {
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
 
-            var locatorTransform = new Node.Transform(localPos2.div(16), createQuaternion(element.rotation), 1);
+            var locatorTransform = new Node.Transform(localPos2.div(16), element.rotation, 1);
             locatorTransform.mul(node.transform());
 
             Node locatorNode = new Node(Node.NodeType.LOCATOR, node, locatorTransform, element.name, element.uuid, null, false);
@@ -149,18 +148,20 @@ public class BbModel5Importer extends BbModelImporter {
                 BbAnimator animator = animation.animators != null ? animation.animators.get(node.uuid()) : null;
                 //requiresFrame |= animator != null;
 
-                Vector3fc origin = node.transform().origin();
-
                 var triple = animator == null ?
                         Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
                         Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
-                Quaternionf localRot = createQuaternion(triple.getMiddle()).mul(node.transform().rotation());
+                Vector3fc animRotation = triple.getMiddle();
+                Vector3fc baseRotation = node.transform().rotation();
+                Vector3fc origin = node.transform().origin();
+
+                Quaternionf localRot = Utils.createQuaternion(baseRotation.add(animRotation, new Vector3f()));
                 Vector3f localPos = triple.getLeft().div(16).add(origin);
 
                 matrix4f.translate(localPos);
-                matrix4f.rotate(localRot);
                 matrix4f.scale(triple.getRight());
+                matrix4f.rotate(localRot);
             }
 
             // TODO: check if frame is required?

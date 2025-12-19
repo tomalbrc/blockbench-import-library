@@ -10,9 +10,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.Item;
-import org.joml.Matrix4f;
-import org.joml.Vector2i;
-import org.joml.Vector3f;
+import org.joml.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,12 +33,12 @@ public class JSON {
 
     public static final GsonBuilder GENERIC_BUILDER = new GsonBuilder()
             // Reference equality
-            .registerTypeAdapter(UUID.class, new CachedUuidDeserializer())
+            .registerTypeHierarchyAdapter(UUID.class, new CachedUuidDeserializer())
             // Custom deserializers
-            .registerTypeAdapter(Matrix4f.class, new SimpleCodecDeserializer<>(ExtraCodecs.MATRIX4F))
-            .registerTypeAdapter(Vector3f.class, new SimpleCodecDeserializer<>(ExtraCodecs.VECTOR3F))
-            .registerTypeAdapter(Vector2i.class, new SimpleCodecDeserializer<>(VECTOR2I))
-            .registerTypeAdapter(Identifier.class, new SimpleCodecDeserializer<>(Identifier.CODEC))
-            .registerTypeAdapter(Item.class, new RegistryDeserializer<>(BuiltInRegistries.ITEM))
-            .registerTypeAdapter(SoundEvent.class, new RegistryDeserializer<>(BuiltInRegistries.SOUND_EVENT));
+            .registerTypeHierarchyAdapter(Matrix4fc.class, new SimpleCodecDeserializer<>(ExtraCodecs.MATRIX4F))
+            .registerTypeHierarchyAdapter(Vector3fc.class, new SimpleCodecDeserializer<>(ExtraCodecs.VECTOR3F))
+            .registerTypeHierarchyAdapter(Vector2ic.class, new SimpleCodecDeserializer<>(VECTOR2I))
+            .registerTypeHierarchyAdapter(Identifier.class, new SimpleCodecDeserializer<>(Identifier.CODEC))
+            .registerTypeHierarchyAdapter(Item.class, new RegistryDeserializer<>(BuiltInRegistries.ITEM))
+            .registerTypeHierarchyAdapter(SoundEvent.class, new RegistryDeserializer<>(BuiltInRegistries.SOUND_EVENT));
 }

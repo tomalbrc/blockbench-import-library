@@ -60,7 +60,7 @@ public interface AnimatedEntityHolder extends AnimatedHolder {
     int getCritParticleId();
 
     /**
-     * Adds an additional display element to the holder.
+     * Adds a display element to the holder.
      * This is needed to tell the holder to mount the display as a passenger on the display vehicle.
      */
     boolean addAdditionalDisplay(DisplayElement element);

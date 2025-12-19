@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 public class BIL implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static MolangCompiler COMPILER = MolangCompiler.create(MolangCompiler.DEFAULT_FLAGS, BIL.class.getClassLoader());
-    public static ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+    public static ExecutorService EXECUTOR = Executors.newWorkStealingPool();
     public static MinecraftServer SERVER;
 
     @Override

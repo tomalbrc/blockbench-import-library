@@ -181,7 +181,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(Node.NodeType.LOCATOR, outliner, null, parent, tr, null);
+            Node node = Node.of(element.uuid, Node.NodeType.LOCATOR, outliner, null, parent, tr, null);
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);
@@ -196,7 +196,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(Node.NodeType.TEXT, outliner, null, parent, tr, element);
+            Node node = Node.of(element.uuid, Node.NodeType.TEXT, outliner, null, parent, tr, element);
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);
@@ -211,7 +211,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(Node.NodeType.BLOCK, outliner, null, parent, tr, element);
+            Node node = Node.of(element.uuid, Node.NodeType.BLOCK, outliner, null, parent, tr, element);
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);
@@ -226,7 +226,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(Node.NodeType.ITEM, outliner, null, parent, tr, element);
+            Node node = Node.of(element.uuid, Node.NodeType.ITEM, outliner, null, parent, tr, element);
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);
@@ -238,7 +238,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
 
         for (var entry : nodeMap.entrySet()) {
             var bone = entry.getValue();
-            res.put(bone.uuid(), Pose.of(bone.transform().globalTransform().scale(bone.transform().scale(), new Matrix4f())));
+            res.put(bone.uuid(), Pose.of(bone.transform().globalTransform().scale(bone.transform().localScale(), new Matrix4f())));
         }
 
         return res;
@@ -270,24 +270,22 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 BbAnimator animator = animation.animators != null ? animation.animators.get(node.uuid()) : null;
                 //requiresFrame |= animator != null;
 
+                Vector3fc origin = node.transform().origin();
+
                 var triple = animator == null ?
                         Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
                         Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
-                Vector3fc animRotation = triple.getMiddle().mul(-1, -1, 1);
-                Vector3fc baseRotation = node.transform().rotation();
-                Vector3fc origin = node.transform().origin();
-
-                Quaternionf localRot = Utils.createQuaternion(baseRotation.add(animRotation, new Vector3f()));
-                Vector3f localPos = triple.getLeft().div(16).add(origin);
+                Quaternionf localRot = Utils.createQuaternion(triple.getMiddle().mul(-1, -1, 1).add(node.transform().rotation()));
+                Vector3f localPos = triple.getLeft().mul(-1, 1, 1).div(16).add(origin);
 
                 matrix4f.translate(localPos);
-                matrix4f.scale(triple.getRight());
                 matrix4f.rotate(localRot);
+                matrix4f.scale(triple.getRight());
             }
 
             // TODO: check if frame is required?
-            poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+            poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().localScale())));
         }
         return poses;
     }

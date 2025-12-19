@@ -26,6 +26,7 @@ import net.minecraft.world.entity.Pose;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
 
@@ -103,10 +104,17 @@ public class Utils {
      * @param eulerAngles
      * @return
      */
+    public static Quaternionf createQuaternion(Vector3fc eulerAngles) {
+        return new Quaternionf()
+                .rotateZ(Mth.DEG_TO_RAD * eulerAngles.z())
+                .rotateY(Mth.DEG_TO_RAD * eulerAngles.y())
+                .rotateX(Mth.DEG_TO_RAD * eulerAngles.x());
+    }
+
     public static Quaternionf createQuaternion(Vector3f eulerAngles) {
         return new Quaternionf()
-                .rotateZ(Mth.DEG_TO_RAD * eulerAngles.z)
-                .rotateY(Mth.DEG_TO_RAD * eulerAngles.y)
-                .rotateX(Mth.DEG_TO_RAD * eulerAngles.x);
+                .rotateZ(Mth.DEG_TO_RAD * eulerAngles.z())
+                .rotateY(Mth.DEG_TO_RAD * eulerAngles.y())
+                .rotateX(Mth.DEG_TO_RAD * eulerAngles.x());
     }
 }

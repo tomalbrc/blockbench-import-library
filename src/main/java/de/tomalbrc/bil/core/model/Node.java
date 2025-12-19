@@ -38,6 +38,13 @@ public record Node(
         return new Node(group.uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
     }
 
+    public static Node of(UUID uuid, NodeType type, BbGroup group, Identifier model, Node parent, Transform transform, BbElement displayDataElement) {
+        return new Node(uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
+    }
+    public static Node of(UUID uuid, NodeType type, BbOutliner group, Identifier model, Node parent, Transform transform, BbElement displayDataElement) {
+        return new Node(uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
+    }
+
     public enum NodeType {
         BONE,
         LOCATOR,

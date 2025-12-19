@@ -2,6 +2,7 @@ package de.tomalbrc.bil.file.bbmodel;
 
 import com.google.gson.annotations.SerializedName;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,8 +12,8 @@ public class BbOutliner {
 
     // old format, these are now fields in BbGroup for Blockbench 5+
     @Deprecated public String name = "";
-    @Deprecated public Vector3f origin = new Vector3f();
-    @Deprecated public Vector3f rotation = new Vector3f();
+    @Deprecated public Vector3fc origin = new Vector3f();
+    @Deprecated public Vector3fc rotation = new Vector3f();
     @Deprecated public boolean export;
     @Deprecated @SerializedName("mirror_uv") public boolean mirrorUv;
     @Deprecated public int autouv;

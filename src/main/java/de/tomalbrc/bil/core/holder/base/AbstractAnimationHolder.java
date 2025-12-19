@@ -128,24 +128,24 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
 
     @NotNull protected PerPlayerItemDisplayElement createItemDisplayElement(ItemStack item) {
         var element = new PerPlayerItemDisplayElement(item);
-        element.setInterpolationDuration(3);
-        element.setTeleportDuration(3);
+        element.setInterpolationDuration(2);
+        element.setTeleportDuration(2);
         element.setInvisible(true);
         return element;
     }
 
     @NotNull protected PerPlayerBlockDisplayElement createBlockDisplayElement(BlockState blockState) {
         var element = new PerPlayerBlockDisplayElement(blockState);
-        element.setInterpolationDuration(3);
-        element.setTeleportDuration(3);
+        element.setInterpolationDuration(2);
+        element.setTeleportDuration(2);
         element.setInvisible(true);
         return element;
     }
 
     @NotNull protected PerPlayerTextDisplayElement createTextDisplayElement(Component text) {
         var element = new PerPlayerTextDisplayElement(text);
-        element.setInterpolationDuration(3);
-        element.setTeleportDuration(3);
+        element.setInterpolationDuration(2);
+        element.setTeleportDuration(2);
         return element;
     }
 
@@ -256,12 +256,13 @@ public abstract class AbstractAnimationHolder extends AbstractElementHolder impl
         if (this.scale != 1F) {
             display.element().setScale(serverPlayer, pose.scale().mul(this.scale));
             display.element().setTranslation(serverPlayer, pose.translation().mul(this.scale));
-
-            display.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
-            display.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
         } else {
-            display.element().setTransformation(serverPlayer, pose.matrix());
+            display.element().setScale(serverPlayer, pose.readOnlyScale());
+            display.element().setTranslation(serverPlayer, pose.readOnlyTranslation());
         }
+
+        display.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
+        display.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
 
         display.element().startInterpolationIfDirty(serverPlayer);
     }

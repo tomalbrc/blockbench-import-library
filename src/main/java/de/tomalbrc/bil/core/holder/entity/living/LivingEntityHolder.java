@@ -70,28 +70,65 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         super.updateElement(serverPlayer, displayWrapper, pose);
     }
 
+    protected Vector3f getModelSpaceOrigin(Node node) {
+        return node.transform().globalTransform().getTranslation(new Vector3f());
+    }
+
+    @Nullable
+    public static Node findHeadNode(Node node) {
+        Node res = null;
+        Node current = node;
+        while (current != null) {
+            if (current.tag() == Node.NodeTag.HEAD) {
+                res = current;
+            }
+            current = current.parent();
+        }
+        return res;
+    }
+
     @Override
     protected void applyPose(ServerPlayer serverPlayer, Pose pose, DisplayWrapper<?> displayWrapper) {
-        Vector3f translation = pose.translation();
-        boolean isHead = displayWrapper.node().tag() == Node.NodeTag.HEAD;
+        Vector3f translation = new Vector3f(pose.translation());
+        Quaternionf leftRotation = new Quaternionf(pose.readOnlyLeftRotation());
+
+        Node node = displayWrapper.node();
+        boolean isHead = node.tag() == Node.NodeTag.HEAD;
+        boolean isHeadChild = node.tag() == Node.NodeTag.HEAD_CHILD;
         boolean isDead = this.parent.deathTime > 0;
 
-        if (isHead || isDead) {
-            Quaternionf bodyRotation = new Quaternionf();
-            if (isDead) {
-                bodyRotation.rotateZ(-this.deathAngle * Mth.HALF_PI);
-                translation.rotate(bodyRotation);
-            }
+        if (!isDead && (isHead || isHeadChild)) {
+            Node headNode = isHead ? node : findHeadNode(node);
 
-            if (isHead) {
-                bodyRotation.rotateY(Mth.DEG_TO_RAD * -Mth.rotLerp(0.5f, this.parent.yHeadRotO - this.parent.yBodyRotO, this.parent.yHeadRot - this.parent.yBodyRot));
-                bodyRotation.rotateX(Mth.DEG_TO_RAD * Mth.lerp(0.5f, this.parent.xRotO, this.parent.getXRot()));
-            }
+            if (headNode != null) {
+                Vector3f pivot = getModelSpaceOrigin(headNode);
 
-            displayWrapper.element().setLeftRotation(serverPlayer, bodyRotation.mul(pose.readOnlyLeftRotation()));
-        } else {
-            displayWrapper.element().setLeftRotation(serverPlayer, pose.readOnlyLeftRotation());
+                float yawDiff = this.parent.yHeadRot - this.parent.yBodyRot;
+                float yawDiffO = this.parent.yHeadRotO - this.parent.yBodyRotO;
+                float netYaw = Mth.rotLerp(0.5f, yawDiffO, yawDiff);
+                float netPitch = Mth.lerp(0.5f, this.parent.xRotO, this.parent.getXRot());
+
+                Quaternionf lookRotation = new Quaternionf()
+                        .rotateY(Mth.DEG_TO_RAD * -netYaw)
+                        .rotateX(Mth.DEG_TO_RAD * netPitch);
+
+                lookRotation.mul(leftRotation, leftRotation);
+
+                translation.sub(pivot).rotate(lookRotation).add(pivot);
+            }
         }
+
+        if (isDead) {
+            Quaternionf deathRotation = new Quaternionf();
+            deathRotation.rotateZ(-this.deathAngle * Mth.HALF_PI);
+            translation.rotate(deathRotation);
+            deathRotation.mul(leftRotation, leftRotation);
+        }
+
+        //float bodyYaw = lerp 0.5: this.parent.yBodyRot - bodyRot0;
+        //Quaternionf bodyRotation = new Quaternionf().rotateY(Mth.DEG_TO_RAD * -bodyYaw); // Minecraft Y is inverted for rotation usually
+        //translation.rotate(bodyRotation);
+        //bodyRotation.mul(leftRotation, leftRotation);
 
         if (this.entityScale != 1F) {
             translation.mul(this.entityScale);
@@ -100,9 +137,9 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
             displayWrapper.element().setScale(serverPlayer, pose.readOnlyScale());
         }
 
+        displayWrapper.element().setLeftRotation(serverPlayer, leftRotation);
         displayWrapper.element().setTranslation(serverPlayer, translation.sub(0, this.dimensions.height() - 0.01f, 0));
         displayWrapper.element().setRightRotation(serverPlayer, pose.readOnlyRightRotation());
-
         displayWrapper.element().startInterpolationIfDirty(serverPlayer);
     }
 

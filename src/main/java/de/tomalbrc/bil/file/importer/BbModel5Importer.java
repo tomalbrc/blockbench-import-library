@@ -14,11 +14,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -138,7 +136,7 @@ public class BbModel5Importer extends BbModelImporter {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node locatorNode = Node.of(Node.NodeType.LOCATOR, group, null, parent, tr, null);
+            Node locatorNode = Node.of(element.uuid, Node.NodeType.LOCATOR, group, null, parent, tr, null);
             nodeMap.put(element.uuid, locatorNode);
 
             parent.addChild(locatorNode);
@@ -157,7 +155,7 @@ public class BbModel5Importer extends BbModelImporter {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(Node.NodeType.TEXT, group, null, parent, tr, element);
+            Node node = Node.of(element.uuid, Node.NodeType.TEXT, group, null, parent, tr, element);
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);
@@ -176,7 +174,7 @@ public class BbModel5Importer extends BbModelImporter {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(Node.NodeType.BLOCK, group, null, parent, tr, element);
+            Node node = Node.of(element.uuid, Node.NodeType.BLOCK, group, null, parent, tr, element);
             nodeMap.put(element.uuid, node);
         }
     }
@@ -193,8 +191,7 @@ public class BbModel5Importer extends BbModelImporter {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-
-            Node node = Node.of(Node.NodeType.ITEM, group, null, parent, tr, element);
+            Node node = Node.of(element.uuid, Node.NodeType.ITEM, group, null, parent, tr, element);
             nodeMap.put(element.uuid, node);
         }
     }
@@ -211,24 +208,22 @@ public class BbModel5Importer extends BbModelImporter {
                 BbAnimator animator = animation.animators != null ? animation.animators.get(node.uuid()) : null;
                 //requiresFrame |= animator != null;
 
+                Vector3fc origin = node.transform().origin();
+
                 var triple = animator == null ?
                         Triple.of(new Vector3f(), new Vector3f(), new Vector3f(1.f)) :
                         Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
-                Vector3fc animRotation = triple.getMiddle();
-                Vector3fc baseRotation = node.transform().rotation();
-                Vector3fc origin = node.transform().origin();
-
-                Quaternionf localRot = Utils.createQuaternion(baseRotation.add(animRotation, new Vector3f()));
+                Quaternionf localRot = Utils.createQuaternion(triple.getMiddle().add(node.transform().rotation()));
                 Vector3f localPos = triple.getLeft().div(16).add(origin);
 
                 matrix4f.translate(localPos);
-                matrix4f.scale(triple.getRight());
                 matrix4f.rotate(localRot);
+                matrix4f.scale(triple.getRight());
             }
 
-            //if (requiresFrame)
-                poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().scale())));
+            // TODO: check if frame is required?
+            poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().localScale())));
         }
         return poses;
     }

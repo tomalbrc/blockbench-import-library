@@ -32,6 +32,7 @@ import java.util.List;
 
 public class Utils {
     public static final ServerGamePacketListenerImpl[] EMPTY_CONNECTION_ARRAY = new ServerGamePacketListenerImpl[0];
+    public static final Vector3fc ZERO_VEC3F = new Vector3f();
 
     public static Connection getConnection(ServerCommonPacketListenerImpl networkHandler) {
         return ((ServerCommonPacketListenerImplAccessor) networkHandler).getConnection();

@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
 import java.util.Optional;
@@ -70,8 +71,9 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         super.updateElement(serverPlayer, displayWrapper, pose);
     }
 
-    protected Vector3f getModelSpaceOrigin(Node node) {
-        return node.transform().globalTransform().getTranslation(new Vector3f());
+    protected Vector3fc getModelSpaceOrigin(ServerPlayer player, Node node) {
+        var bone = this.getBone(node);
+        return bone == null ? Utils.ZERO_VEC3F : bone.getLastPose(player).translation();
     }
 
     @Nullable
@@ -101,7 +103,7 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
             Node headNode = isHead ? node : findHeadNode(node);
 
             if (headNode != null) {
-                Vector3f pivot = getModelSpaceOrigin(headNode);
+                Vector3fc pivot = getModelSpaceOrigin(serverPlayer, headNode);
 
                 float yawDiff = this.parent.yHeadRot - this.parent.yBodyRot;
                 float yawDiffO = this.parent.yHeadRotO - this.parent.yBodyRotO;
@@ -124,11 +126,6 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
             translation.rotate(deathRotation);
             deathRotation.mul(leftRotation, leftRotation);
         }
-
-        //float bodyYaw = lerp 0.5: this.parent.yBodyRot - bodyRot0;
-        //Quaternionf bodyRotation = new Quaternionf().rotateY(Mth.DEG_TO_RAD * -bodyYaw); // Minecraft Y is inverted for rotation usually
-        //translation.rotate(bodyRotation);
-        //bodyRotation.mul(leftRotation, leftRotation);
 
         if (this.entityScale != 1F) {
             translation.mul(this.entityScale);

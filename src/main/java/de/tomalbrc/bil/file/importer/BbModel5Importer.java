@@ -11,12 +11,13 @@ import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
-import java.lang.Math;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -103,8 +104,6 @@ public class BbModel5Importer extends BbModelImporter {
                 var tr = new Transform(localPos.div(16), group.rotation, group.scale);
                 if (parentOutliner != null)
                     tr.mul(parent.transform());
-                else
-                    tr.mul(new Matrix4f().rotateY(Mth.PI));
 
                 Node node = Node.of(Node.NodeType.BONE, group, modelPath, parent, tr, null);
                 nodeMap.put(outliner.uuid, node);
@@ -200,7 +199,7 @@ public class BbModel5Importer extends BbModelImporter {
     protected Reference2ObjectOpenHashMap<UUID, Pose> poses(BbAnimation animation, Object2ObjectOpenHashMap<UUID, Node> nodeMap, MolangEnvironment environment, float time) throws MolangRuntimeException {
         Reference2ObjectOpenHashMap<UUID, Pose> poses = new Reference2ObjectOpenHashMap<>();
         for (var entry : nodeMap.entrySet()) {
-            Matrix4f matrix4f = new Matrix4f().rotateY(Mth.PI);
+            Matrix4f matrix4f = new Matrix4f();
             //boolean requiresFrame = time == 0;
             List<Node> nodePath = nodePath(entry.getValue());
 

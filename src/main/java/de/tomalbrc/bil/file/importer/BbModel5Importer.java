@@ -87,111 +87,146 @@ public class BbModel5Importer extends BbModelImporter {
         BbGroup parentGroup = BbModelUtils.getGroup(model, parentOutliner);
 
         for (BbOutliner.ChildEntry entry : children) {
-            if (entry.isNode()) {
-                BbOutliner outliner = entry.outliner;
-                Identifier modelPath = null;
+            if (!entry.isNode()) continue;
 
-                BbGroup group = BbModelUtils.getGroup(model, entry.outliner);
-                if (group == null)
-                    continue;
+            BbOutliner outliner = entry.outliner;
+            BbGroup group = BbModelUtils.getGroup(model, outliner);
+            if (group == null) continue;
 
-                if (outliner.hasModel() && group.export && !outliner.isHitbox()) {
-                    modelPath = this.generateModel(outliner);
-                }
-
-                Vector3f localPos = parentGroup != null ? group.origin.sub(parentGroup.origin, new Vector3f()) : new Vector3f(group.origin);
-
-                var tr = new Transform(localPos.div(16), group.rotation, group.scale);
-                if (parentOutliner != null)
-                    tr.mul(parent.transform());
-
-                Node node = Node.of(Node.NodeType.BONE, group, modelPath, parent, tr, null);
-                nodeMap.put(outliner.uuid, node);
-
-                if (parent != null)
-                    parent.addChild(node);
-
-                processLocators(nodeMap, outliner, node);
-                processTextDisplays(nodeMap, outliner, node);
-                processBlockDisplays(nodeMap, outliner, node);
-                processItemDisplays(nodeMap, outliner, node);
-
-                // children
-                createBones(node, outliner, outliner.children, nodeMap);
+            Identifier modelPath = null;
+            if (outliner.hasModel() && group.export && !outliner.isHitbox()) {
+                modelPath = this.generateModel(outliner);
             }
+
+            Vector3f localPos = parentGroup != null
+                    ? group.origin.sub(parentGroup.origin, new Vector3f())
+                    : new Vector3f(group.origin);
+
+            var tr = new Transform(localPos.div(16), group.rotation, group.scale);
+            if (parentOutliner != null) {
+                tr.mul(parent.transform());
+            }
+
+            Node node = Node.builder()
+                    .from(group)
+                    .type(Node.NodeType.BONE)
+                    .modelData(modelPath)
+                    .parent(parent)
+                    .transform(tr)
+                    .build();
+
+            nodeMap.put(outliner.uuid, node);
+
+            if (parent != null) {
+                parent.addChild(node);
+            }
+
+            processLocators(nodeMap, outliner, node);
+            processTextDisplays(nodeMap, outliner, node);
+            processBlockDisplays(nodeMap, outliner, node);
+            processItemDisplays(nodeMap, outliner, node);
+
+            createBones(node, outliner, outliner.children, nodeMap);
         }
     }
 
     @Override
     protected void processLocators(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
         List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.LOCATOR);
+
         for (BbElement element : locatorElements) {
             BbGroup group = BbModelUtils.getGroup(model, outliner);
-            if (group == null)
-                continue;
+            if (group == null) continue;
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
-
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node locatorNode = Node.of(element.uuid, Node.NodeType.LOCATOR, group, null, parent, tr, null);
-            nodeMap.put(element.uuid, locatorNode);
+            Node locatorNode = Node.builder()
+                    .name(element.name)
+                    .uuid(element.uuid)
+                    .type(Node.NodeType.LOCATOR)
+                    .parent(parent)
+                    .transform(tr)
+                    .build();
 
+            nodeMap.put(element.uuid, locatorNode);
             parent.addChild(locatorNode);
         }
     }
 
     protected void processTextDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
-        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.TEXT_DISPLAY);
-        for (BbElement element : locatorElements) {
+        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.TEXT_DISPLAY);
+
+        for (BbElement element : elements) {
             BbGroup group = BbModelUtils.getGroup(model, outliner);
-            if (group == null)
-                continue;
+            if (group == null) continue;
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
-
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(element.uuid, Node.NodeType.TEXT, group, null, parent, tr, element);
-            nodeMap.put(element.uuid, node);
+            Node node = Node.builder()
+                    .name(element.name)
+                    .uuid(element.uuid)
+                    .type(Node.NodeType.TEXT)
+                    .displayDataElement(element)
+                    .parent(parent)
+                    .transform(tr)
+                    .build();
 
+            nodeMap.put(element.uuid, node);
             parent.addChild(node);
         }
     }
 
     protected void processBlockDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
-        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.BLOCK_DISPLAY);
-        for (BbElement element : locatorElements) {
+        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.BLOCK_DISPLAY);
+
+        for (BbElement element : elements) {
             BbGroup group = BbModelUtils.getGroup(model, outliner);
-            if (group == null)
-                continue;
+            if (group == null) continue;
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
-
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(element.uuid, Node.NodeType.BLOCK, group, null, parent, tr, element);
+            Node node = Node.builder()
+                    .name(element.name)
+                    .uuid(element.uuid)
+                    .type(Node.NodeType.BLOCK)
+                    .displayDataElement(element)
+                    .parent(parent)
+                    .transform(tr)
+                    .build();
+
             nodeMap.put(element.uuid, node);
+            parent.addChild(node);
         }
     }
 
     protected void processItemDisplays(Object2ObjectOpenHashMap<UUID, Node> nodeMap, BbOutliner outliner, Node parent) {
-        List<BbElement> locatorElements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.ITEM_DISPLAY);
-        for (BbElement element : locatorElements) {
+        List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.ITEM_DISPLAY);
+
+        for (BbElement element : elements) {
             BbGroup group = BbModelUtils.getGroup(model, outliner);
-            if (group == null)
-                continue;
+            if (group == null) continue;
 
             Vector3f localPos2 = element.position.sub(group.origin, new Vector3f());
-
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(element.uuid, Node.NodeType.ITEM, group, null, parent, tr, element);
+            Node node = Node.builder()
+                    .name(element.name)
+                    .uuid(element.uuid)
+                    .type(Node.NodeType.ITEM)
+                    .displayDataElement(element)
+                    .parent(parent)
+                    .transform(tr)
+                    .build();
+
             nodeMap.put(element.uuid, node);
+            parent.addChild(node);
         }
     }
 

@@ -156,7 +156,14 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                 else
                     tr.mul(new Matrix4f().rotateY(Mth.PI));
 
-                Node node = Node.of(Node.NodeType.BONE, outliner, modelPath, parent, tr, null);
+                Node node = Node.builder()
+                        .from(outliner)
+                        .type(Node.NodeType.BONE)
+                        .modelData(modelPath)
+                        .parent(parent)
+                        .transform(tr)
+                        .build();
+
                 nodeMap.put(outliner.uuid, node);
 
                 if (parent != null)
@@ -181,7 +188,14 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(element.uuid, Node.NodeType.LOCATOR, outliner, null, parent, tr, null);
+            Node node = Node.builder()
+                    .name(element.name)
+                    .uuid(element.uuid)
+                    .type(Node.NodeType.LOCATOR)
+                    .parent(parent)
+                    .transform(tr)
+                    .build();
+
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);
@@ -196,7 +210,15 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(element.uuid, Node.NodeType.TEXT, outliner, null, parent, tr, element);
+            Node node = Node.builder()
+                    .name(element.name)
+                    .uuid(element.uuid)
+                    .type(Node.NodeType.TEXT)
+                    .parent(parent)
+                    .transform(tr)
+                    .displayDataElement(element)
+                    .build();
+
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);
@@ -211,7 +233,15 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(element.uuid, Node.NodeType.BLOCK, outliner, null, parent, tr, element);
+            Node node = Node.builder()
+                    .name(element.name)
+                    .uuid(element.uuid)
+                    .type(Node.NodeType.BLOCK)
+                    .parent(parent)
+                    .transform(tr)
+                    .displayDataElement(element)
+                    .build();
+
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);
@@ -226,7 +256,15 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             var tr = new Transform(localPos2.div(16), element.rotation, 1);
             tr.mul(parent.transform());
 
-            Node node = Node.of(element.uuid, Node.NodeType.ITEM, outliner, null, parent, tr, element);
+            Node node = Node.builder()
+                    .name(element.name)
+                    .uuid(element.uuid)
+                    .type(Node.NodeType.ITEM)
+                    .parent(parent)
+                    .transform(tr)
+                    .displayDataElement(element)
+                    .build();
+
             nodeMap.put(element.uuid, node);
 
             parent.addChild(node);

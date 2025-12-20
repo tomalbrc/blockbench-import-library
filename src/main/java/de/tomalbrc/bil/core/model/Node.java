@@ -12,71 +12,133 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public record Node(
-        @NotNull UUID uuid,
-        @NotNull NodeType type,
-        @NotNull NodeTag tag,
-        @Nullable Node parent,
-        @NotNull Transform transform,
-        @NotNull String name,
-        @Nullable Identifier modelData,
-        @Nullable BbElement displayDataElement,
-        @NotNull List<Node> children
-) {
+public record Node(@NotNull UUID uuid, @NotNull NodeType type, @NotNull NodeTag tag, @Nullable Node parent,
+                   @NotNull Transform transform, @NotNull String name, @Nullable Identifier modelData,
+                   @Nullable BbElement displayDataElement, @NotNull List<Node> children) {
     public void addChild(Node node) {
-        children.add(node);
+        this.children.add(node);
     }
 
+    @Override
     public List<Node> children() {
         return Collections.unmodifiableList(children);
     }
 
-    public static Node of(NodeType type, BbGroup group, Identifier model, Node parent, Transform transform, BbElement displayDataElement) {
-        return new Node(group.uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
-    }
-    public static Node of(NodeType type, BbOutliner group, Identifier model, Node parent, Transform transform, BbElement displayDataElement) {
-        return new Node(group.uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
+    @Override
+    public @NotNull String toString() {
+        return uuid.toString();
     }
 
-    public static Node of(UUID uuid, NodeType type, BbGroup group, Identifier model, Node parent, Transform transform, BbElement displayDataElement) {
-        return new Node(uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
+    public static Builder builder() {
+        return new Builder();
     }
-    public static Node of(UUID uuid, NodeType type, BbOutliner group, Identifier model, Node parent, Transform transform, BbElement displayDataElement) {
-        return new Node(uuid, type, parent != null && parent.tag.isHead() ? NodeTag.HEAD_CHILD : NodeTag.of(group.name), parent, transform, group.name, model, displayDataElement, new ArrayList<>());
-    }
+
+    // --- Inner Classes (Enums) ---
 
     public enum NodeType {
-        BONE,
-        LOCATOR,
-        ITEM,
-        BLOCK,
-        TEXT
+        BONE, LOCATOR, ITEM, BLOCK, TEXT
     }
 
     public enum NodeTag {
-        NONE,
-        HEAD,
-        HEAD_CHILD,
-        HITBOX,
-        SEAT,
-        DRIVER_SEAT;
+        NONE, HEAD, HEAD_CHILD, HITBOX, SEAT, DRIVER_SEAT;
 
         public static NodeTag of(String name) {
-            if (name.startsWith("head")) {
-                return HEAD;
-            } else if (name.startsWith("hitbox")) {
-                return HITBOX;
-            } else if (name.startsWith("seat")) {
-                return SEAT;
-            } else if (name.startsWith("driver")) {
-                return DRIVER_SEAT;
-            }
-
+            if (name == null) return NONE;
+            if (name.startsWith("head")) return HEAD;
+            if (name.startsWith("hitbox")) return HITBOX;
+            if (name.startsWith("seat")) return SEAT;
+            if (name.startsWith("driver")) return DRIVER_SEAT;
             return NONE;
         }
 
         public boolean isHead() {
             return this == HEAD || this == HEAD_CHILD;
+        }
+    }
+
+    public static class Builder {
+        private UUID uuid;
+        private NodeType type;
+        private NodeTag tag;
+        private Node parent;
+        private Transform transform;
+        private String name;
+        private Identifier modelData;
+        private BbElement displayDataElement;
+        private final List<Node> children = new ArrayList<>();
+
+        public Builder from(BbGroup group) {
+            this.uuid = group.uuid;
+            this.name = group.name;
+            return this;
+        }
+
+        public Builder from(BbOutliner outliner) {
+            this.uuid = outliner.uuid;
+            this.name = outliner.name;
+            return this;
+        }
+
+        public Builder uuid(UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
+
+        public Builder type(NodeType type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder tag(NodeTag tag) {
+            this.tag = tag;
+            return this;
+        }
+
+        public Builder parent(Node parent) {
+            this.parent = parent;
+            return this;
+        }
+
+        public Builder transform(Transform transform) {
+            this.transform = transform;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder modelData(Identifier modelData) {
+            this.modelData = modelData;
+            return this;
+        }
+
+        public Builder displayDataElement(BbElement displayDataElement) {
+            this.displayDataElement = displayDataElement;
+            return this;
+        }
+
+        public Builder child(Node child) {
+            this.children.add(child);
+            return this;
+        }
+
+        public Node build() {
+            if (uuid == null) throw new IllegalStateException("Node UUID is required");
+            if (type == null) throw new IllegalStateException("Node Type is required");
+            if (transform == null) throw new IllegalStateException("Node Transform is required");
+            if (name == null) throw new IllegalStateException("Node Name is required");
+
+            if (this.tag == null) {
+                if (parent != null && parent.tag().isHead()) {
+                    this.tag = NodeTag.HEAD_CHILD;
+                } else {
+                    this.tag = NodeTag.of(this.name);
+                }
+            }
+
+            return new Node(uuid, type, tag, parent, transform, name, modelData, displayDataElement, children);
         }
     }
 }

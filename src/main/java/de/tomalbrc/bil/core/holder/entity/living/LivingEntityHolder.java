@@ -51,9 +51,13 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
         this.hitboxInteraction.setSendPositionUpdates(false);
         this.addElement(this.hitboxInteraction);
 
-        this.collisionElement = CollisionElement.createWithRedirect(parent);
+        this.collisionElement = createCollisionElement(parent);
         this.collisionElement.setSendPositionUpdates(false);
         this.addElement(this.collisionElement);
+    }
+
+    protected CollisionElement createCollisionElement(T parent) {
+        return CollisionElement.createWithRedirect(parent);
     }
 
     @Override
@@ -73,7 +77,7 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
 
     protected Vector3fc getModelSpaceOrigin(ServerPlayer player, Node node) {
         var bone = this.getBone(node);
-        return bone == null ? Utils.ZERO_VEC3F : bone.getLastPose(player).translation();
+        return bone == null ? null : bone.getLastPose(player).translation();
     }
 
     @Nullable
@@ -104,6 +108,9 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
 
             if (headNode != null) {
                 Vector3fc pivot = getModelSpaceOrigin(serverPlayer, headNode);
+                if (pivot == null) {
+                    pivot = node.transform().globalTransform().getTranslation(new Vector3f());
+                }
 
                 float yawDiff = this.parent.yHeadRot - this.parent.yBodyRot;
                 float yawDiffO = this.parent.yHeadRotO - this.parent.yBodyRotO;

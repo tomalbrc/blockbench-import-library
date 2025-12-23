@@ -108,7 +108,9 @@ public class AnimationComponent extends ComponentBase implements Animator {
         UUID uuid = wrapper.node().uuid();
         Pose pose = null;
 
-        for (AnimationPlayer animationPlayer : this.animationPlayerList) {
+        for (int i = this.animationPlayerList.size() - 1; i >= 0; i--) {
+            AnimationPlayer animationPlayer = this.animationPlayerList.get(i);
+
             if (this.canAnimationAffect(animationPlayer, uuid)) {
                 if (animationPlayer.inResetState()) {
                     pose = wrapper.getDefaultPose();

@@ -145,12 +145,12 @@ public class AnimationComponent extends ComponentBase implements Animator {
         UUID nodeId = wrapper.node().uuid();
         PoseQueryResult queryResult = null;
 
-        for (int i = 0; i < this.animationPlayerList.size(); i++) {
+        for (int i = this.animationPlayerList.size() - 1; i >= 0; i--) {
             AnimationPlayer animationPlayer = this.animationPlayerList.get(i);
             var owned = animationPlayer.owner != null;
             if ((!owned || animationPlayer.owner == serverPlayer) && animationPlayer.affects(nodeId)) {
                 if (animationPlayer.inResetState()) {
-                    queryResult = new PoseQueryResult(wrapper.getDefaultPose(), animationPlayer.owner);
+                    queryResult = new PoseQueryResult(wrapper.getLastPose(animationPlayer.owner), animationPlayer.owner);
                 } else {
                     var animationPose = this.findAnimationPose(wrapper, animationPlayer, nodeId);
                     if (animationPose != null) {

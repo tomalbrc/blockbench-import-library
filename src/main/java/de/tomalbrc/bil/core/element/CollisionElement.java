@@ -36,10 +36,10 @@ public class CollisionElement extends GenericEntityElement {
     }
 
     public int getSize() {
-        return this.dataTracker.get(SlimeEntityAccessor.getSLIME_SIZE());
+        return this.dataTracker.get(SlimeEntityAccessor.getID_SIZE());
     }
 
     public void setSize(int size) {
-        this.dataTracker.set(SlimeEntityAccessor.getSLIME_SIZE(), size);
+        this.dataTracker.set(SlimeEntityAccessor.getID_SIZE(), size);
     }
 }

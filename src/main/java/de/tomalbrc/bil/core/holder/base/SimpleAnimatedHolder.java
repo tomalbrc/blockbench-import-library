@@ -7,7 +7,7 @@ import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.world.phys.Vec2;
 
 public class SimpleAnimatedHolder extends AbstractAnimationHolder {
-    protected SimpleAnimatedHolder(Model model) {
+    public SimpleAnimatedHolder(Model model) {
         super(model);
     }
 

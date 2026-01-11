@@ -5,8 +5,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import de.tomalbrc.bil.file.bbmodel.BbElement;
+import org.joml.Vector3f;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 public class ElementSerializer implements JsonSerializer<BbElement> {
     @Override
@@ -22,19 +24,15 @@ public class ElementSerializer implements JsonSerializer<BbElement> {
         if (src.shade != null && src.shade)
             obj.addProperty("shade", true);
 
-        boolean hasOrigin = src.origin.length() > 0;
-        boolean hasRotation = src.rotation != null && src.rotation.length() > 0.0001f;
-        if (hasOrigin || hasRotation) {
-            JsonObject rot = new JsonObject();
-            if (hasRotation) {
-                rot.addProperty("x", src.rotation.x());
-                rot.addProperty("y", src.rotation.y());
-                rot.addProperty("z", src.rotation.z());
-            }
+        Vector3f rotation = Objects.requireNonNullElse(src.rotation, new Vector3f());
+        Vector3f origin = Objects.requireNonNullElse(src.origin, new Vector3f());
 
-            rot.add("origin", context.serialize(src.origin));
-            obj.add("rotation", rot);
-        }
+        JsonObject rot = new JsonObject();
+        rot.addProperty("x", rotation.x());
+        rot.addProperty("y", rotation.y());
+        rot.addProperty("z", rotation.z());
+        rot.add("origin", context.serialize(origin));
+        obj.add("rotation", rot);
 
         return obj;
     }

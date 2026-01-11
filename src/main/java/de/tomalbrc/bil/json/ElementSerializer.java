@@ -51,7 +51,7 @@ public class ElementSerializer implements JsonSerializer<BbElement> {
         if (src.shade != null && src.shade)
             obj.addProperty("shade", true);
 
-        if (src.origin.length() > 0 || (src.rotation != null && src.rotation.length() > 0.0001f)) {
+        if ((src.rotation != null) && (src.origin.length() > 0 || src.rotation.length() > 0.0001f)) {
             JsonObject rot = new JsonObject();
             rot.addProperty("x", src.rotation.x());
             rot.addProperty("y", src.rotation.y());

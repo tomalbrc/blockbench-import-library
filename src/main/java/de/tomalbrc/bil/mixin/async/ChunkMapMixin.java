@@ -32,7 +32,7 @@ public class ChunkMapMixin implements IChunkMap {
         }
 
         this.bil$scheduledAsyncTicks = new ObjectArrayList<>(holders.size());
-        this.bil$asyncTickFuture = CompletableFuture.runAsync(() -> {
+        if (!EXECUTOR.isShutdown()) this.bil$asyncTickFuture = CompletableFuture.runAsync(() -> {
             for (AbstractElementHolder holder : holders) {
                 holder.asyncTick();
             }

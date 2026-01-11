@@ -17,14 +17,14 @@ import java.util.concurrent.Executors;
 public class BIL implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static MolangCompiler COMPILER = MolangCompiler.create(MolangCompiler.DEFAULT_FLAGS, BIL.class.getClassLoader());
-    public static ExecutorService EXECUTOR = Executors.newWorkStealingPool();
+    public static ExecutorService EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
     public static MinecraftServer SERVER;
 
     @Override
     public void onInitialize() {
         CommandRegistrationCallback.EVENT.register((dispatcher, context, selection) -> BILCommand.register(dispatcher));
         ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> SERVER = minecraftServer);
-        ServerLifecycleEvents.SERVER_STOPPING.register(x -> EXECUTOR.shutdown());
+        ServerLifecycleEvents.SERVER_STOPPING.register(x -> EXECUTOR.shutdownNow());
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(ResourcePackUtil::addAdditional);
     }
 }

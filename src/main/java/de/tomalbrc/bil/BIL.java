@@ -23,7 +23,10 @@ public class BIL implements ModInitializer {
     @Override
     public void onInitialize() {
         CommandRegistrationCallback.EVENT.register((dispatcher, context, selection) -> BILCommand.register(dispatcher));
-        ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> SERVER = minecraftServer);
+        ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> {
+            SERVER = minecraftServer;
+            EXECUTOR = Executors.newWorkStealingPool();
+        });
         ServerLifecycleEvents.SERVER_STOPPING.register(x -> EXECUTOR.shutdown());
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(ResourcePackUtil::addAdditional);
     }

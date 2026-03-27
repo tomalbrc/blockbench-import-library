@@ -4,10 +4,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import de.tomalbrc.bil.mixin.accessor.ServerCommonPacketListenerImplAccessor;
 import eu.pb4.polymer.core.impl.networking.PacketPatcher;
-import eu.pb4.polymer.networking.api.util.ServerDynamicPacket;
+import eu.pb4.polymer.virtualentity.api.data.EntityData;
+import eu.pb4.polymer.virtualentity.api.data.InteractionEntityData;
 import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
-import eu.pb4.polymer.virtualentity.api.tracker.EntityTrackedData;
-import eu.pb4.polymer.virtualentity.api.tracker.InteractionTrackedData;
 import io.netty.channel.ChannelFutureListener;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
@@ -62,14 +61,14 @@ public class Utils {
                 // We update the POSE in this packet, which makes the client refresh the interactions dimensions.
                 // We use this to move the passenger riding height of the interaction upwards.
                 new ClientboundSetEntityDataPacket(interaction.getEntityId(), List.of(
-                        SynchedEntityData.DataValue.create(InteractionTrackedData.HEIGHT, height),
-                        SynchedEntityData.DataValue.create(InteractionTrackedData.WIDTH, dimensions.width()),
-                        SynchedEntityData.DataValue.create(EntityTrackedData.POSE, Pose.STANDING)
+                        SynchedEntityData.DataValue.create(InteractionEntityData.HEIGHT, height),
+                        SynchedEntityData.DataValue.create(InteractionEntityData.WIDTH, dimensions.width()),
+                        SynchedEntityData.DataValue.create(EntityData.POSE, Pose.STANDING)
                 )),
                 // Afterward, we send another packet that only updates the bounding box height back to its original value, without updating its dimensions.
                 // This lets us turn the bounding box back into the correct size whilst keeping the raised passenger riding height.
                 new ClientboundSetEntityDataPacket(interaction.getEntityId(), List.of(
-                        SynchedEntityData.DataValue.create(InteractionTrackedData.HEIGHT, dimensions.height())
+                        SynchedEntityData.DataValue.create(InteractionEntityData.HEIGHT, dimensions.height())
                 ))
         );
     }
@@ -84,7 +83,7 @@ public class Utils {
      */
     public static void sendPacketNoFlush(ServerCommonPacketListenerImpl networkHandler, Packet<? extends ClientGamePacketListener> packet) {
         Packet<?> modifiedPacket = PacketPatcher.replace(networkHandler, packet);
-        if (modifiedPacket instanceof ServerDynamicPacket || PacketPatcher.prevent(networkHandler, modifiedPacket)) {
+        if (PacketPatcher.prevent(networkHandler, modifiedPacket)) {
             return;
         }
 

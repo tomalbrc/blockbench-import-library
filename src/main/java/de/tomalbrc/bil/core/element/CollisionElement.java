@@ -1,7 +1,7 @@
 package de.tomalbrc.bil.core.element;
 
+import eu.pb4.polymer.virtualentity.api.data.EntityData;
 import eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement;
-import eu.pb4.polymer.virtualentity.api.tracker.EntityTrackedData;
 import eu.pb4.polymer.virtualentity.mixin.SlimeEntityAccessor;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -11,9 +11,9 @@ public class CollisionElement extends GenericEntityElement {
     private InteractionHandler handler = InteractionHandler.EMPTY;
 
     public CollisionElement(InteractionHandler handler) {
-        this.dataTracker.set(EntityTrackedData.SILENT, true);
-        this.dataTracker.set(EntityTrackedData.NO_GRAVITY, true);
-        this.dataTracker.set(EntityTrackedData.FLAGS, (byte) ((1 << EntityTrackedData.INVISIBLE_FLAG_INDEX)));
+        this.syncedData.set(EntityData.SILENT, true);
+        this.syncedData.set(EntityData.NO_GRAVITY, true);
+        this.syncedData.set(EntityData.FLAGS, (byte) ((1 << EntityData.INVISIBLE_FLAG_INDEX)));
         this.setHandler(handler);
     }
 
@@ -36,10 +36,10 @@ public class CollisionElement extends GenericEntityElement {
     }
 
     public int getSize() {
-        return this.dataTracker.get(SlimeEntityAccessor.getID_SIZE());
+        return this.syncedData.get(SlimeEntityAccessor.getID_SIZE());
     }
 
     public void setSize(int size) {
-        this.dataTracker.set(SlimeEntityAccessor.getID_SIZE(), size);
+        this.syncedData.set(SlimeEntityAccessor.getID_SIZE(), size);
     }
 }

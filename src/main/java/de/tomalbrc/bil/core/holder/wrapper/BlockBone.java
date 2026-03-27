@@ -3,7 +3,7 @@ package de.tomalbrc.bil.core.holder.wrapper;
 import de.tomalbrc.bil.core.element.PerPlayerBlockDisplayElement;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +43,6 @@ public class BlockBone extends Bone<PerPlayerBlockDisplayElement> {
     }
 
     private void setTrackedBlock(BlockState block) {
-        this.element().getDataTracker().set(DisplayTrackedData.Block.BLOCK_STATE, block, true);
+        this.element().getSyncedData().set(DisplayEntityData.Block.BLOCK_STATE, block, true);
     }
 }

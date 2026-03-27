@@ -4,9 +4,9 @@ import com.mojang.math.MatrixUtil;
 import com.mojang.math.Transformation;
 import de.tomalbrc.bil.mixin.accessor.SimpleDataTrackerAccessor;
 import de.tomalbrc.bil.util.Utils;
-import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
-import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
+import eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData;
+import eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,7 +23,7 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
     Map<ServerPlayer, Data> playerDataTrackers();
 
     default void addDataTracker(ServerPlayer serverPlayer) {
-        playerDataTrackers().get(serverPlayer).setDataTracker(copyEntries((SimpleDataTracker) getDataTracker(), (SimpleDataTracker) createDataTracker()));
+        playerDataTrackers().get(serverPlayer).setDataTracker(copyEntries((SimpleSynchedEntityData) getSyncedData(), (SimpleSynchedEntityData) createSyncedData()));
     }
 
     default void resetDataTracker(ServerPlayer serverPlayer) {
@@ -32,105 +32,105 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
             map.setDataTracker(null);
     }
 
-    default DataTrackerLike dataTrackerOrDefault(ServerPlayer serverPlayer) {
+    default SynchedEntityDataLike dataTrackerOrDefault(ServerPlayer serverPlayer) {
         if (serverPlayer == null) {
-            return getDataTracker();
+            return getSyncedData();
         }
 
         var playerData = this.playerDataTrackers().get(serverPlayer);
         if (playerData == null || playerData.getDataTracker() == null) {
-            return getDataTracker();
+            return getSyncedData();
         }
         return playerData.getDataTracker();
     }
 
     default void setTransformation(ServerPlayer serverPlayer, Transformation transformation) {
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.TRANSLATION, transformation.getTranslation());
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.LEFT_ROTATION, transformation.getLeftRotation());
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.SCALE, transformation.getScale());
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.RIGHT_ROTATION, transformation.getRightRotation());
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TRANSLATION, transformation.translation());
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.LEFT_ROTATION, transformation.leftRotation());
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.SCALE, transformation.scale());
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.RIGHT_ROTATION, transformation.rightRotation());
     }
 
     default void setTransformation(ServerPlayer serverPlayer, Matrix4fc matrix) {
         float f = 1.0F / matrix.m33();
         Triple<Quaternionf, Vector3f, Quaternionf> triple = MatrixUtil.svdDecompose((new Matrix3f(matrix)).scale(f));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.TRANSLATION, matrix.getTranslation(new Vector3f()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.LEFT_ROTATION, new Quaternionf(triple.getLeft()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.SCALE, new Vector3f(triple.getMiddle()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.RIGHT_ROTATION, new Quaternionf(triple.getRight()));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TRANSLATION, matrix.getTranslation(new Vector3f()));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.LEFT_ROTATION, new Quaternionf(triple.getLeft()));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.SCALE, new Vector3f(triple.getMiddle()));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.RIGHT_ROTATION, new Quaternionf(triple.getRight()));
     }
 
     default void setTransformation(ServerPlayer serverPlayer, Matrix4x3f matrix) {
         Triple<Quaternionf, Vector3f, Quaternionf> triple = MatrixUtil.svdDecompose((new Matrix3f()).set(matrix));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.TRANSLATION, matrix.getTranslation(new Vector3f()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.LEFT_ROTATION, new Quaternionf(triple.getLeft()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.SCALE, new Vector3f(triple.getMiddle()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.RIGHT_ROTATION, new Quaternionf(triple.getRight()));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TRANSLATION, matrix.getTranslation(new Vector3f()));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.LEFT_ROTATION, new Quaternionf(triple.getLeft()));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.SCALE, new Vector3f(triple.getMiddle()));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.RIGHT_ROTATION, new Quaternionf(triple.getRight()));
     }
 
     default boolean isTransformationDirty(ServerPlayer serverPlayer) {
         var dataTracker = dataTrackerOrDefault(serverPlayer);
-        return dataTracker.isDirty(DisplayTrackedData.TRANSLATION) || dataTracker.isDirty(DisplayTrackedData.LEFT_ROTATION) || dataTracker.isDirty(DisplayTrackedData.SCALE) || dataTracker.isDirty(DisplayTrackedData.RIGHT_ROTATION);
+        return dataTracker.isDirty(DisplayEntityData.TRANSLATION) || dataTracker.isDirty(DisplayEntityData.LEFT_ROTATION) || dataTracker.isDirty(DisplayEntityData.SCALE) || dataTracker.isDirty(DisplayEntityData.RIGHT_ROTATION);
     }
 
     default void setTranslation(ServerPlayer serverPlayer, Vector3fc vector3f) {
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.TRANSLATION, new Vector3f(vector3f));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TRANSLATION, new Vector3f(vector3f));
     }
 
     default Vector3fc getTranslation(ServerPlayer serverPlayer) {
-        return this.dataTrackerOrDefault(serverPlayer).get(DisplayTrackedData.TRANSLATION);
+        return this.dataTrackerOrDefault(serverPlayer).get(DisplayEntityData.TRANSLATION);
     }
 
     default void setScale(ServerPlayer serverPlayer, Vector3fc vector3f) {
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.SCALE, new Vector3f(vector3f));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.SCALE, new Vector3f(vector3f));
     }
 
     default Vector3fc getScale(ServerPlayer serverPlayer) {
-        return this.dataTrackerOrDefault(serverPlayer).get(DisplayTrackedData.SCALE);
+        return this.dataTrackerOrDefault(serverPlayer).get(DisplayEntityData.SCALE);
     }
 
     default void setLeftRotation(ServerPlayer serverPlayer, Quaternionfc quaternion) {
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.LEFT_ROTATION, new Quaternionf(quaternion));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.LEFT_ROTATION, new Quaternionf(quaternion));
     }
 
     default Quaternionfc getLeftRotation(ServerPlayer serverPlayer) {
-        return this.dataTrackerOrDefault(serverPlayer).get(DisplayTrackedData.LEFT_ROTATION);
+        return this.dataTrackerOrDefault(serverPlayer).get(DisplayEntityData.LEFT_ROTATION);
     }
 
     default void setRightRotation(ServerPlayer serverPlayer, Quaternionfc quaternion) {
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.RIGHT_ROTATION, new Quaternionf(quaternion));
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.RIGHT_ROTATION, new Quaternionf(quaternion));
     }
 
     default Quaternionfc getRightRotation(ServerPlayer serverPlayer) {
-        return this.dataTrackerOrDefault(serverPlayer).get(DisplayTrackedData.RIGHT_ROTATION);
+        return this.dataTrackerOrDefault(serverPlayer).get(DisplayEntityData.RIGHT_ROTATION);
     }
 
     default Integer getInterpolationDuration(ServerPlayer serverPlayer) {
-        return this.dataTrackerOrDefault(serverPlayer).get(DisplayTrackedData.INTERPOLATION_DURATION);
+        return this.dataTrackerOrDefault(serverPlayer).get(DisplayEntityData.INTERPOLATION_DURATION);
     }
 
     default void setInterpolationDuration(ServerPlayer serverPlayer, int interpolationDuration) {
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.INTERPOLATION_DURATION, interpolationDuration);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.INTERPOLATION_DURATION, interpolationDuration);
     }
 
     default Integer getTeleportDuration(ServerPlayer serverPlayer) {
-        return this.dataTrackerOrDefault(serverPlayer).get(DisplayTrackedData.TELEPORTATION_DURATION);
+        return this.dataTrackerOrDefault(serverPlayer).get(DisplayEntityData.TELEPORTATION_DURATION);
     }
 
     default void setTeleportDuration(ServerPlayer serverPlayer, int interpolationDuration) {
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.TELEPORTATION_DURATION, interpolationDuration);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TELEPORTATION_DURATION, interpolationDuration);
     }
 
     default Integer getStartInterpolation(ServerPlayer serverPlayer) {
-        return this.dataTrackerOrDefault(serverPlayer).get(DisplayTrackedData.START_INTERPOLATION);
+        return this.dataTrackerOrDefault(serverPlayer).get(DisplayEntityData.START_INTERPOLATION);
     }
 
     default void startInterpolation(ServerPlayer serverPlayer) {
-        this.dataTrackerOrDefault(serverPlayer).setDirty(DisplayTrackedData.START_INTERPOLATION, true);
+        this.dataTrackerOrDefault(serverPlayer).setDirty(DisplayEntityData.START_INTERPOLATION, true);
     }
 
     default void setStartInterpolation(ServerPlayer serverPlayer, int startInterpolation) {
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayTrackedData.START_INTERPOLATION, startInterpolation, true);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.START_INTERPOLATION, startInterpolation, true);
     }
 
     default void startInterpolationIfDirty(ServerPlayer serverPlayer) {
@@ -150,7 +150,7 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
         if (holder == null)
             return;
 
-        var defaultDirty = this.getDataTracker().getDirtyEntries();
+        var defaultDirty = this.getSyncedData().getDirtyEntries();
         var arr = holder.getWatchingPlayers().toArray(Utils.EMPTY_CONNECTION_ARRAY);
         for (ServerGamePacketListenerImpl watchingPlayer : arr) {
             if (watchingPlayer != null) {
@@ -165,7 +165,7 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
     }
 
     class Data {
-        SimpleDataTracker dataTracker;
+        SimpleSynchedEntityData dataTracker;
         float yRot;
         float xRot;
         Vec3 pos;
@@ -192,7 +192,7 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
             return yRot;
         }
 
-        public SimpleDataTracker getDataTracker() {
+        public SimpleSynchedEntityData getDataTracker() {
             return dataTracker;
         }
 
@@ -200,7 +200,7 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
             return pos;
         }
 
-        public void setDataTracker(SimpleDataTracker dataTracker) {
+        public void setDataTracker(SimpleSynchedEntityData dataTracker) {
             this.dataTracker = dataTracker;
         }
 
@@ -217,8 +217,8 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
         }
     }
 
-    static SimpleDataTracker copyEntries(SimpleDataTracker from, SimpleDataTracker to) {
-        for (SimpleDataTracker.Entry entry : ((SimpleDataTrackerAccessor)from).getEntries()) {
+    static SimpleSynchedEntityData copyEntries(SimpleSynchedEntityData from, SimpleSynchedEntityData to) {
+        for (SimpleSynchedEntityData.Entry entry : ((SimpleDataTrackerAccessor)from).getEntries()) {
             if (!entry.isUnchanged())
                 to.set(entry.getData(), entry.get());
         }

@@ -8,7 +8,8 @@ import de.tomalbrc.bil.core.holder.wrapper.DisplayWrapper;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
-import eu.pb4.polymer.virtualentity.api.tracker.InteractionTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.InteractionEntityData;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -16,7 +17,6 @@ import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -60,7 +60,7 @@ public class ModelEntity extends Interaction implements AnimatedEntity {
 
     @Override
     public void modifyRawTrackedData(List<SynchedEntityData.DataValue<?>> data, ServerPlayer player, boolean initial) {
-        data.add(SynchedEntityData.DataValue.create(InteractionTrackedData.HEIGHT, 2f));
-        data.add(SynchedEntityData.DataValue.create(InteractionTrackedData.WIDTH, 2f));
+        data.add(SynchedEntityData.DataValue.create(InteractionEntityData.HEIGHT, 2f));
+        data.add(SynchedEntityData.DataValue.create(InteractionEntityData.WIDTH, 2f));
     }
 }

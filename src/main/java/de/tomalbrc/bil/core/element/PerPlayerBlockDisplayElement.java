@@ -1,8 +1,8 @@
 package de.tomalbrc.bil.core.element;
 
+import eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData;
+import eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
-import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,7 +42,7 @@ public class PerPlayerBlockDisplayElement extends BlockDisplayElement implements
     }
 
     @Override
-    public DataTrackerLike createDataTracker() {
-        return new SimpleDataTracker(this.getEntityType());
+    public SynchedEntityDataLike createSyncedData() {
+        return new SimpleSynchedEntityData(this.getEntityType());
     }
 }

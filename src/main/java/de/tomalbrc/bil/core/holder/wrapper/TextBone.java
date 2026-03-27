@@ -3,7 +3,7 @@ package de.tomalbrc.bil.core.holder.wrapper;
 import de.tomalbrc.bil.core.element.PerPlayerTextDisplayElement;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +17,7 @@ public class TextBone extends Bone<PerPlayerTextDisplayElement> {
         super(element, node, defaultPose);
         this.text = element.getText();
         this.opacity = element.getTextOpacity();
-        this.backgroundColor = element.getDataTracker().get(DisplayTrackedData.Text.BACKGROUND);
+        this.backgroundColor = element.getSyncedData().get(DisplayEntityData.Text.BACKGROUND);
     }
 
     public static TextBone of(PerPlayerTextDisplayElement element, @NotNull Node node, Pose defaultPose) {
@@ -50,14 +50,14 @@ public class TextBone extends Bone<PerPlayerTextDisplayElement> {
     }
 
     private void setTrackedBackground(int color) {
-        this.element().getDataTracker().set(DisplayTrackedData.Text.BACKGROUND, color, true);
+        this.element().getSyncedData().set(DisplayEntityData.Text.BACKGROUND, color, true);
     }
 
     private void setTrackedOpacity(byte opacity) {
-        this.element().getDataTracker().set(DisplayTrackedData.Text.TEXT_OPACITY, opacity, true);
+        this.element().getSyncedData().set(DisplayEntityData.Text.TEXT_OPACITY, opacity, true);
     }
 
     private void setTrackedText(Component text) {
-        this.element().getDataTracker().set(DisplayTrackedData.Text.TEXT, text, true);
+        this.element().getSyncedData().set(DisplayEntityData.Text.TEXT, text, true);
     }
 }

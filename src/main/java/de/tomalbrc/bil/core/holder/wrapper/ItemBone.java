@@ -3,7 +3,7 @@ package de.tomalbrc.bil.core.holder.wrapper;
 import de.tomalbrc.bil.core.element.PerPlayerItemDisplayElement;
 import de.tomalbrc.bil.core.model.Node;
 import de.tomalbrc.bil.core.model.Pose;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -53,6 +53,6 @@ public class ItemBone extends Bone<PerPlayerItemDisplayElement> {
     }
 
     protected void setTrackedItem(ItemStack item) {
-        this.element().getDataTracker().set(DisplayTrackedData.Item.ITEM, item, true);
+        this.element().getSyncedData().set(DisplayEntityData.Item.ITEM, item, true);
     }
 }

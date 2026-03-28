@@ -49,6 +49,10 @@ shadowJar {
     configurations = [project.configurations.shade]
 
     relocate "gg.moonflower", "de.tomalbrc.libs.molang"
+
+    dependencies {
+        exclude(dependency('org.ow2.asm:.*'))
+    }
 }
 
 build {

@@ -1,0 +1,14 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "LGPL-3.0-and-later"
+
+[[mods]]
+modId = "bil_neo"
+version = "${version}"
+displayName = "Blockbench Import Library"
+description = ""
+authors = "tomalbrc"
+logoFile = "assets/bil/icon.png"
+
+[[mixins]]
+config="bil.mixins.json"

@@ -40,11 +40,11 @@ public class LivingEntityHolderWithRideOffset<T extends LivingEntity & AnimatedE
     }
 
     @Override
-    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<ClientGamePacketListener>> consumer) {
+    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<? super ClientGamePacketListener>> consumer) {
         super.startWatchingExtraPackets(player, consumer);
 
         for (var packet : Utils.updateClientInteraction(this.rideInteraction, ZERO, this.getRideOffset())) {
-            consumer.accept((Packet<ClientGamePacketListener>) packet);
+            consumer.accept(packet);
         }
     }
 

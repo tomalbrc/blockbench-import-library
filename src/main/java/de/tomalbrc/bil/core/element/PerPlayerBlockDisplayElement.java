@@ -20,13 +20,13 @@ public class PerPlayerBlockDisplayElement extends BlockDisplayElement implements
     }
 
     @Override
-    public void startWatching(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> packetConsumer) {
+    public void startWatching(ServerPlayer player, Consumer<Packet<? super ClientGamePacketListener>> packetConsumer) {
         this.playerDataTracker.put(player, new Data());
         super.startWatching(player, packetConsumer);
     }
 
     @Override
-    public void stopWatching(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> packetConsumer) {
+    public void stopWatching(ServerPlayer player, Consumer<Packet<? super ClientGamePacketListener>> packetConsumer) {
         this.playerDataTracker.remove(player);
         super.stopWatching(player, packetConsumer);
     }

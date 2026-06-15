@@ -59,12 +59,12 @@ public abstract class EntityHolder<T extends Entity & AnimatedEntity> extends Ab
     }
 
     @Override
-    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<ClientGamePacketListener>> consumer) {
+    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<? super ClientGamePacketListener>> consumer) {
         super.startWatchingExtraPackets(player, consumer);
         this.sendDirectPassengers(consumer);
     }
 
-    public void sendDirectPassengers(Consumer<Packet<ClientGamePacketListener>> consumer) {
+    public void sendDirectPassengers(Consumer<Packet<? super ClientGamePacketListener>> consumer) {
         IntList passengers = new IntArrayList();
         this.addDirectPassengers(passengers);
 

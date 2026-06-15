@@ -1,9 +1,9 @@
 package de.tomalbrc.bil.api;
 
+import eu.pb4.polymer.common.impl.tweaker.PacketContext;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import eu.pb4.polymer.virtualentity.api.data.EntityData;
-import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;

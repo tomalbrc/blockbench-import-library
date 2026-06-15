@@ -16,10 +16,14 @@ import de.tomalbrc.bil.json.DataPointValueDeserializer;
 import de.tomalbrc.bil.json.JSON;
 import de.tomalbrc.bil.util.VersionCheck;
 import net.minecraft.resources.Identifier;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.jarcontents.JarResource;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.util.Optional;
 
 public class BbModelLoader implements ModelLoader {
     protected static Gson GSON = JSON.GENERIC_BUILDER
@@ -42,7 +46,7 @@ public class BbModelLoader implements ModelLoader {
     }
 
     @Override
-    public Model load(InputStream input, @NotNull String name) throws JsonParseException {
+    public Model load(InputStream input, @NotNull String name) {
         try (Reader reader = new InputStreamReader(input)) {
             BbModel model = GSON.fromJson(reader, BbModel.class);
 
@@ -60,13 +64,27 @@ public class BbModelLoader implements ModelLoader {
     }
 
     @Override
-    public Model loadResource(Identifier resourceLocation) throws IllegalArgumentException, JsonParseException {
-        String path = String.format("/model/%s/%s.bbmodel", resourceLocation.getNamespace(), resourceLocation.getPath());
-        InputStream input = BbModelLoader.class.getResourceAsStream(path);
-        if (input == null) {
-            throw new IllegalArgumentException("Model doesn't exist: " + path);
+    public Model loadResource(Identifier resourceLocation) {
+        String namespace = resourceLocation.getNamespace();
+        String filename = resourceLocation.getPath() + ".bbmodel";
+
+        InputStream input = null;
+        Optional<? extends ModContainer> container = ModList.get().getModContainerById(namespace);
+
+        Model loaded = null;
+        if (container.isPresent()) {
+            JarResource jarResource = container.get().getModInfo().getOwningFile().getFile().getContents().get("model/" + namespace + "/" + filename);
+            if (jarResource != null) {
+                try {
+                    input = jarResource.open();
+                    loaded = this.load(input, resourceLocation.getPath());
+                    input.close();
+                } catch (IOException exception) {
+                    throw new IllegalArgumentException("Failed to open model: " + filename, exception);
+                }
+            }
         }
 
-        return this.load(input, resourceLocation.getPath());
+        return loaded;
     }
 }

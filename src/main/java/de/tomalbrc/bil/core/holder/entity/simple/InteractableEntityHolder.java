@@ -34,11 +34,11 @@ public class InteractableEntityHolder<T extends Entity & AnimatedEntity> extends
     }
 
     @Override
-    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<ClientGamePacketListener>> consumer) {
+    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<? super ClientGamePacketListener>> consumer) {
         super.startWatchingExtraPackets(player, consumer);
 
         for (var packet : Utils.updateClientInteraction(this.hitboxInteraction, this.dimensions)) {
-            consumer.accept((Packet<ClientGamePacketListener>) packet);
+            consumer.accept(packet);
         }
 
         consumer.accept(new ClientboundSetPassengersPacket(this.parent));

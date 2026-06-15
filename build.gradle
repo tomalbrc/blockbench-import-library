@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
+    id 'org.relativitymc.neo-loom' version "1.16-SNAPSHOT"
     id 'com.gradleup.shadow' version '9.3.1'
     id 'maven-publish'
 }
@@ -17,6 +17,7 @@ configurations {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url 'https://maven.tomalbrc.de' }
     maven { url 'https://maven.nucleoid.xyz' }
@@ -26,18 +27,19 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    //implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API
-    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    //implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    forgeUserdev "net.neoforged:neoforge:${project.neo_version}:userdev"
 
     // Polymer
-    implementation("eu.pb4:polymer-core:${project.polymer_version}")
-    implementation("eu.pb4:polymer-networking:${project.polymer_version}")
-    implementation("eu.pb4:polymer-resource-pack:${project.polymer_version}")
-    implementation("eu.pb4:polymer-resource-pack-extras:${project.polymer_version}")
-    implementation("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
-    runtimeOnly("eu.pb4:polymer-autohost:${project.polymer_version}")
+    implementation("eu.pb4:polymer-core-neo:${project.polymer_version}")
+    implementation("eu.pb4:polymer-networking-neo:${project.polymer_version}")
+    implementation("eu.pb4:polymer-resource-pack-neo:${project.polymer_version}")
+    implementation("eu.pb4:polymer-resource-pack-extras-neo:${project.polymer_version}")
+    implementation("eu.pb4:polymer-virtual-entity-neo:${project.polymer_version}")
+    runtimeOnly("eu.pb4:polymer-autohost-neo:${project.polymer_version}")
 
     // Molang
     shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}")
@@ -65,7 +67,7 @@ processResources {
     inputs.property "loader_version", project.loader_version
     filteringCharset "UTF-8"
 
-    filesMatching("fabric.mod.json") {
+    filesMatching("META-INF/neoforge.mods.toml") {
         expand "version": project.version,
                 "minecraft_version": project.minecraft_version,
                 "loader_version": project.loader_version

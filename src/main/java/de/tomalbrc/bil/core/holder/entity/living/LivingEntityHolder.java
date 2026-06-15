@@ -148,7 +148,7 @@ public class LivingEntityHolder<T extends LivingEntity & AnimatedEntity> extends
     }
 
     @Override
-    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<@NotNull ClientGamePacketListener>> consumer) {
+    protected void startWatchingExtraPackets(ServerGamePacketListenerImpl player, Consumer<Packet<? super @NotNull  ClientGamePacketListener>> consumer) {
         super.startWatchingExtraPackets(player, consumer);
 
         for (var packet : Utils.updateClientInteraction(this.hitboxInteraction, this.dimensions)) {

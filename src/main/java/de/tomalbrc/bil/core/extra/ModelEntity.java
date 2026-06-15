@@ -9,7 +9,7 @@ import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.core.model.Pose;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import eu.pb4.polymer.virtualentity.api.data.InteractionEntityData;
-import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
+import eu.pb4.polymer.common.impl.tweaker.PacketContext;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;

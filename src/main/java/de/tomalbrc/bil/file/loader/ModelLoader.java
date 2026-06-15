@@ -1,6 +1,5 @@
 package de.tomalbrc.bil.file.loader;
 
-import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +14,7 @@ public interface ModelLoader {
         return id.toLowerCase();
     }
 
-    Model load(InputStream input, @NotNull String path) throws JsonParseException;
+    Model load(InputStream input, @NotNull String path);
 
-    Model loadResource(Identifier resourceLocation) throws IllegalArgumentException, JsonParseException;
+    Model loadResource(Identifier resourceLocation);
 }

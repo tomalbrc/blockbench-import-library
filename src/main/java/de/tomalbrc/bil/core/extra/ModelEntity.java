@@ -13,6 +13,7 @@ import eu.pb4.polymer.common.impl.tweaker.PacketContext;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -24,7 +25,7 @@ public class ModelEntity extends Interaction implements AnimatedEntity {
     private final EntityHolder<?> holder;
 
     public ModelEntity(Level level, Model model) {
-        super(EntityType.INTERACTION, level);
+        super(EntityTypes.INTERACTION, level);
         this.holder = new SimpleEntityHolder<>(this, model) {
             @Override
             public void updateElement(ServerPlayer serverPlayer, DisplayWrapper<?> display, @Nullable Pose pose) {
@@ -55,7 +56,7 @@ public class ModelEntity extends Interaction implements AnimatedEntity {
 
     @Override
     public EntityType<?> getPolymerEntityType(PacketContext context) {
-        return EntityType.INTERACTION;
+        return EntityTypes.INTERACTION;
     }
 
     @Override

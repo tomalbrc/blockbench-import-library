@@ -11,19 +11,12 @@ public record Pose(
         Matrix4fc matrix
 ) {
     public static Pose of(Matrix4f matrix4f) {
-        Matrix3f matrix3f = new Matrix3f(matrix4f);
-        Vector3f translation = matrix4f.getTranslation(new Vector3f());
+        Vector3f translation = new Vector3f();
+        Quaternionf leftRotation = new Quaternionf();
+        Vector3f scale = new Vector3f();
+        Quaternionf rightRotation = new Quaternionf();
 
-        float multiplier = 1.0F / matrix4f.m33();
-        if (multiplier != 1.0F) {
-            matrix3f.scale(multiplier);
-            translation.mul(multiplier);
-        }
-
-        var triple = MatrixUtil.svdDecompose(matrix3f);
-        Vector3f scale = triple.getMiddle();
-        Quaternionf leftRotation = triple.getLeft();
-        Quaternionf rightRotation = triple.getRight();
+        MatrixUtil.svdDecompose(matrix4f, translation, leftRotation, scale, rightRotation);
 
         return new Pose(translation, scale, leftRotation, rightRotation, matrix4f);
     }

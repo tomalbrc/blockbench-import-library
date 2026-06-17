@@ -1,5 +1,5 @@
 plugins {
-    id 'org.relativitymc.neo-loom' version "1.16-SNAPSHOT"
+    id 'org.relativitymc.neo-loom' version "1.17+"
     id 'com.gradleup.shadow' version '9.3.1'
     id 'maven-publish'
 }
@@ -43,7 +43,6 @@ dependencies {
 
     // Molang
     shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}")
-    implementation('me.lucko:fabric-permissions-api:0.7.0')
 }
 
 shadowJar {

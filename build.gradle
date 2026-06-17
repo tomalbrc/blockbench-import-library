@@ -123,5 +123,5 @@ tasks.register('publishCurseForge', net.darkhax.curseforgegradle.TaskPublishCurs
     mainFile.addEnvironment('Server')
 
     mainFile.addRequirement('fabric-api')
-    mainFile.addOptional('polymer')
+    mainFile.addRequirement('polymer')
 }

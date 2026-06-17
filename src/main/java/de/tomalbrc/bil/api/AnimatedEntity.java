@@ -8,6 +8,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public interface AnimatedEntity extends PolymerEntity {
 
     @Override
     default EntityType<?> getPolymerEntityType(PacketContext context) {
-        return EntityType.BLOCK_DISPLAY;
+        return EntityTypes.BLOCK_DISPLAY;
     }
 
     @Override

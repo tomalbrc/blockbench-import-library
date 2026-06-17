@@ -7,6 +7,7 @@ import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData;
 import eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike;
+import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
@@ -52,20 +53,31 @@ public interface PerPlayerTransformableElement extends PolymerDisplayElementLike
     }
 
     default void setTransformation(ServerPlayer serverPlayer, Matrix4fc matrix) {
-        float f = 1.0F / matrix.m33();
-        Triple<Quaternionf, Vector3f, Quaternionf> triple = MatrixUtil.svdDecompose((new Matrix3f(matrix)).scale(f));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TRANSLATION, matrix.getTranslation(new Vector3f()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.LEFT_ROTATION, new Quaternionf(triple.getLeft()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.SCALE, new Vector3f(triple.getMiddle()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.RIGHT_ROTATION, new Quaternionf(triple.getRight()));
+        Vector3f translation = new Vector3f();
+        Quaternionf leftRotation = new Quaternionf();
+        Vector3f scale = new Vector3f();
+        Quaternionf rightRotation = new Quaternionf();
+
+        MatrixUtil.svdDecompose(matrix, translation, leftRotation, scale, rightRotation);
+
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TRANSLATION, translation);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.LEFT_ROTATION, leftRotation);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.SCALE, scale);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.RIGHT_ROTATION, rightRotation);
     }
 
-    default void setTransformation(ServerPlayer serverPlayer, Matrix4x3f matrix) {
-        Triple<Quaternionf, Vector3f, Quaternionf> triple = MatrixUtil.svdDecompose((new Matrix3f()).set(matrix));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TRANSLATION, matrix.getTranslation(new Vector3f()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.LEFT_ROTATION, new Quaternionf(triple.getLeft()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.SCALE, new Vector3f(triple.getMiddle()));
-        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.RIGHT_ROTATION, new Quaternionf(triple.getRight()));
+    default void setTransformation(ServerPlayer serverPlayer, Matrix4x3fc matrix) {
+        Vector3f translation = new Vector3f();
+        Quaternionf leftRotation = new Quaternionf();
+        Vector3f scale = new Vector3f();
+        Quaternionf rightRotation = new Quaternionf();
+
+        MatrixUtil.svdDecompose(new Matrix4f(matrix), translation, leftRotation, scale, rightRotation);
+
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.TRANSLATION, translation);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.LEFT_ROTATION, leftRotation);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.SCALE, scale);
+        this.dataTrackerOrDefault(serverPlayer).set(DisplayEntityData.RIGHT_ROTATION, rightRotation);
     }
 
     default boolean isTransformationDirty(ServerPlayer serverPlayer) {

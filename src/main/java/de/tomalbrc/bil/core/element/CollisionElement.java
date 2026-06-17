@@ -6,6 +6,7 @@ import eu.pb4.polymer.virtualentity.mixin.SlimeEntityAccessor;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 
 public class CollisionElement extends GenericEntityElement {
     private InteractionHandler handler = InteractionHandler.EMPTY;
@@ -32,7 +33,7 @@ public class CollisionElement extends GenericEntityElement {
 
     @Override
     protected final EntityType<? extends Entity> getEntityType() {
-        return EntityType.SLIME;
+        return EntityTypes.SLIME;
     }
 
     public int getSize() {

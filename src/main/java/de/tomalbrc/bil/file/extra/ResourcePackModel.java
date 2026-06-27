@@ -3,9 +3,9 @@ package de.tomalbrc.bil.file.extra;
 import de.tomalbrc.bil.file.bbmodel.BbElement;
 import de.tomalbrc.bil.file.bbmodel.BbFace;
 import de.tomalbrc.bil.file.bbmodel.BbTexture;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.Identifier;
 import org.apache.commons.io.FilenameUtils;
 import org.joml.Vector3f;
@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class ResourcePackModel {
     public static ResourcePackModel.DisplayTransform DEFAULT_TRANSFORM = new ResourcePackModel.DisplayTransform(new Vector3f(0, 180, 0), null, null); // default BIL model transform
@@ -57,15 +58,15 @@ public class ResourcePackModel {
             return this;
         }
 
-        public Builder withTextures(Int2ObjectOpenHashMap<BbTexture> intTextureMap) {
+        public Builder withTextures(Object2ObjectOpenHashMap<?, BbTexture> intTextureMap) {
             this.textureMap = new Object2ObjectLinkedOpenHashMap<>();
             if (intTextureMap != null) {
-                for (var entry : intTextureMap.int2ObjectEntrySet()) {
+                for (var entry : intTextureMap.entrySet()) {
                     var str = FilenameUtils.getBaseName(entry.getValue().name.toLowerCase());
                     while (str.endsWith(".png")) { // remove all .png extensions if multiple
                         str = str.substring(0, str.length() - 4);
                     }
-                    this.textureMap.put(String.valueOf(entry.getIntKey()), Identifier.fromNamespaceAndPath("bil", "item/" + this.modelId + "/" + str));
+                    this.textureMap.put(String.valueOf(entry.getKey()), Identifier.fromNamespaceAndPath("bil", "item/" + this.modelId + "/" + str));
                 }
             }
             return this;
@@ -87,8 +88,8 @@ public class ResourcePackModel {
             if (this.elements != null)
                 for (BbElement element : this.elements) {
                     for (Map.Entry<String, BbFace> bbFaceEntry : element.faces.entrySet()) {
-                        String n = String.valueOf(bbFaceEntry.getValue().texture);
-                        optimizedTextureMap.put(n, this.textureMap.get(n));
+                        String id = String.valueOf(bbFaceEntry.getValue().texture.map(Object::toString, UUID::toString));
+                        optimizedTextureMap.put(id, this.textureMap.get(id));
                     }
                 }
             return new ResourcePackModel(this.parent, optimizedTextureMap, this.elements, this.transformMap);

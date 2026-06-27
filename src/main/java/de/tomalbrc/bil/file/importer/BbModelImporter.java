@@ -11,7 +11,6 @@ import de.tomalbrc.bil.util.command.CommandParser;
 import gg.moonflower.molangcompiler.api.MolangEnvironment;
 import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
@@ -441,8 +440,12 @@ public class BbModelImporter implements ModelImporter<BbModel> {
         return res;
     }
 
-    protected Int2ObjectOpenHashMap<BbTexture> makeDefaultTextureMap() {
-        Int2ObjectOpenHashMap<BbTexture> textureMap = new Int2ObjectOpenHashMap<>();
+    protected Object2ObjectOpenHashMap<?, BbTexture> makeDefaultTextureMap() {
+        return makeDefaultIntTextureMap();
+    }
+
+    protected Object2ObjectOpenHashMap<Integer, BbTexture> makeDefaultIntTextureMap() {
+        Object2ObjectOpenHashMap<Integer, BbTexture> textureMap = new Object2ObjectOpenHashMap<>();
         ObjectArrayList<BbTexture> textures = model.textures;
         for (int i = 0, texturesSize = textures.size(); i < texturesSize; i++) {
             BbTexture texture = textures.get(i);

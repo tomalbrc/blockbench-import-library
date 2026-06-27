@@ -10,7 +10,7 @@ import de.tomalbrc.bil.file.extra.ResourcePackModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.command.CommandParser;
 import de.tomalbrc.bil.util.command.ParsedCommand;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.resources.Identifier;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class AjModelImporter extends BbModelImporter implements ModelImporter<BbModel> {
+public class AjModelImporter extends BbModel5Importer implements ModelImporter<BbModel> {
     public AjModelImporter(BbModel model) {
         super(model);
     }
@@ -58,9 +58,9 @@ public class AjModelImporter extends BbModelImporter implements ModelImporter<Bb
                     if (!outliner.isHitbox() && affected) {
                         List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE_MODEL);
 
-                        Int2ObjectOpenHashMap<BbTexture> textureMap = new Int2ObjectOpenHashMap<>();
+                        Object2ObjectOpenHashMap<Integer, BbTexture> textureMap = new Object2ObjectOpenHashMap<>();
                         if (variant.textureMap() == null || variant.textureMap().isEmpty()) {
-                            textureMap = makeDefaultTextureMap();
+                            textureMap = makeDefaultIntTextureMap();
                         } else {
                             for (BbTexture e : model.textures) {
                                 BbTexture newMapped = variant.textureMap().containsKey(e.uuid) ? BbModelUtils.getTexture(model, variant.textureMap().get(e.uuid)) : e;

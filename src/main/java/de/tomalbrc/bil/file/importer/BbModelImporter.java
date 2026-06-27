@@ -42,7 +42,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             BbFace face = entry.getValue();
             for (int i = 0; i < face.uv.size(); i++) {
                 Vector2i textureResolution = null;
-                var texture = textures.get(face.texture);
+                var texture = textures.get(face.texture.left().orElseThrow());
                 if (texture.uvHeight != 0 && texture.uvWidth != 0)
                     textureResolution = new Vector2i(texture.uvWidth, texture.uvHeight);
 
@@ -315,7 +315,7 @@ public class BbModelImporter implements ModelImporter<BbModel> {
                         Sampler.sample(animator.keyframes, model.animationVariablePlaceholders, environment, time);
 
                 Quaternionf localRot = Utils.createQuaternion(triple.getMiddle().mul(-1, -1, 1).add(node.transform().rotation()));
-                Vector3f localPos = triple.getLeft().mul(-1, 1, 1).div(16).add(origin);
+                Vector3f localPos = triple.getLeft().mul(flipAnimationX() ? -1 : 1, 1, 1).div(16).add(origin);
 
                 matrix4f.translate(localPos);
                 matrix4f.rotate(localRot);
@@ -326,6 +326,10 @@ public class BbModelImporter implements ModelImporter<BbModel> {
             poses.put(entry.getKey(), Pose.of(matrix4f.scale(entry.getValue().transform().localScale())));
         }
         return poses;
+    }
+
+    protected boolean flipAnimationX() {
+        return true;
     }
 
     @Nullable

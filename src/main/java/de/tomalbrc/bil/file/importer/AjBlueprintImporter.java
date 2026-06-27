@@ -8,6 +8,7 @@ import de.tomalbrc.bil.file.extra.BbModelUtils;
 import de.tomalbrc.bil.file.extra.BbResourcePackGenerator;
 import de.tomalbrc.bil.file.extra.ResourcePackModel;
 import de.tomalbrc.bil.json.CachedUuidDeserializer;
+import de.tomalbrc.bil.util.VersionCheck;
 import de.tomalbrc.bil.util.command.CommandParser;
 import de.tomalbrc.bil.util.command.ParsedCommand;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -116,18 +117,25 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
         UUID effectsUUID = CachedUuidDeserializer.get("effects");
         if (effectsUUID != null && anim.animators != null && anim.animators.containsKey(effectsUUID) && anim.animators.get(effectsUUID).type == BbAnimator.Type.EFFECT) {
             BbAnimator animator = anim.animators.get(effectsUUID);
-            if (animator.keyframes != null) for (BbKeyframe kf : animator.keyframes) {
-                float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
-                if (difference == t && kf.channel == BbKeyframe.Channel.COMMANDS) {
-                    var script = kf.dataPoints.getFirst().get("commands").getStringValue();
-                    if (!script.isEmpty()) {
-                        ParsedCommand[] cmds = CommandParser.parse(kf.dataPoints.getFirst().get("commands").getStringValue());
-                        ParsedCommand[] cond = kf.dataPoints.getFirst().containsKey("execute_condition") ? CommandParser.parse(kf.dataPoints.getFirst().get("execute_condition").getStringValue()) : null;
-                        return new Frame.Commands(cmds, cond);
+            if (animator.keyframes != null) {
+                for (BbKeyframe kf : animator.keyframes) {
+                    float difference = Mth.ceil(kf.time / 0.05f) * 0.05f; // snap value to 50ms increments
+                    if (difference == t && kf.channel == BbKeyframe.Channel.COMMANDS) {
+                        var script = kf.dataPoints.getFirst().get("commands").getStringValue();
+                        if (!script.isEmpty()) {
+                            ParsedCommand[] cmds = CommandParser.parse(kf.dataPoints.getFirst().get("commands").getStringValue());
+                            ParsedCommand[] cond = kf.dataPoints.getFirst().containsKey("execute_condition") ? CommandParser.parse(kf.dataPoints.getFirst().get("execute_condition").getStringValue()) : null;
+                            return new Frame.Commands(cmds, cond);
+                        }
                     }
                 }
             }
         }
         return null;
+    }
+
+    @Override
+    protected boolean flipAnimationX() {
+        return !VersionCheck.isAtLeastVersion(model.meta.formatVersion, "1.10.1");
     }
 }

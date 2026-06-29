@@ -42,7 +42,7 @@ dependencies {
 
     // Molang
     shade("gg.moonflower:molang-compiler:${project.molang_compiler_version}")
-    implementation('me.lucko:fabric-permissions-api:0.7.0')
+    implementation include('me.lucko:fabric-permissions-api:0.7.0')
 }
 
 shadowJar {

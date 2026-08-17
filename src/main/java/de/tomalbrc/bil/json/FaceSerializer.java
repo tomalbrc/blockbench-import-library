@@ -7,7 +7,6 @@ import com.google.gson.JsonSerializer;
 import de.tomalbrc.bil.file.bbmodel.BbFace;
 
 import java.lang.reflect.Type;
-import java.util.UUID;
 
 public class FaceSerializer implements JsonSerializer<BbFace> {
     @Override
@@ -15,7 +14,7 @@ public class FaceSerializer implements JsonSerializer<BbFace> {
                                  JsonSerializationContext context) {
 
         JsonObject obj = new JsonObject();
-        obj.addProperty("texture", src.texture.map(i -> String.format("#%d", i), UUID::toString));
+        obj.addProperty("texture", String.format("#%d", src.texture));
         if (src.cullface != null) obj.addProperty("cullface", src.cullface);
         obj.addProperty("tintindex", src.tintindex);
         if (src.rotation != 0) obj.addProperty("rotation", src.rotation);

@@ -11,8 +11,7 @@ import de.tomalbrc.bil.json.CachedUuidDeserializer;
 import de.tomalbrc.bil.util.VersionCheck;
 import de.tomalbrc.bil.util.command.CommandParser;
 import de.tomalbrc.bil.util.command.ParsedCommand;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.resources.Identifier;
@@ -68,13 +67,13 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
                     if (!outliner.isHitbox() && affected) {
                         List<BbElement> elements = BbModelUtils.elementsForOutliner(model, outliner, BbElement.ElementType.CUBE_MODEL);
 
-                        Object2ObjectOpenHashMap<UUID, BbTexture> textureMap = new Object2ObjectOpenHashMap<>();
+                        Int2ObjectOpenHashMap<BbTexture> textureMap = new Int2ObjectOpenHashMap<>();
                         if (variant.textureMap() == null || variant.textureMap().isEmpty()) {
-                            textureMap = makeDefaultUuidTextureMap();
+                            textureMap = makeDefaultTextureMap();
                         } else {
                             for (BbTexture e : model.textures) {
                                 BbTexture newMapped = variant.textureMap().containsKey(e.uuid) ? BbModelUtils.getTexture(model, variant.textureMap().get(e.uuid)) : e;
-                                textureMap.putIfAbsent(e.uuid, newMapped);
+                                textureMap.putIfAbsent(e.id, newMapped);
                             }
                         }
 
@@ -138,19 +137,5 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
     @Override
     protected boolean flipAnimationX() {
         return !VersionCheck.isAtLeastVersion(model.meta.formatVersion, "1.10.1");
-    }
-
-    @Override
-    protected Object2ObjectOpenHashMap<?, BbTexture> makeDefaultTextureMap() {
-        return VersionCheck.isAtLeastVersion(model.meta.formatVersion, "1.10.1") ? makeDefaultUuidTextureMap() : super.makeDefaultTextureMap();
-    }
-
-    protected Object2ObjectOpenHashMap<UUID, BbTexture> makeDefaultUuidTextureMap() {
-        Object2ObjectOpenHashMap<UUID, BbTexture> textureMap = new Object2ObjectOpenHashMap<>();
-        ObjectArrayList<BbTexture> textures = model.textures;
-        for (BbTexture texture : textures) {
-            textureMap.put(texture.uuid, texture);
-        }
-        return textureMap;
     }
 }

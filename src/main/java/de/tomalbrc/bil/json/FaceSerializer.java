@@ -14,7 +14,7 @@ public class FaceSerializer implements JsonSerializer<BbFace> {
                                  JsonSerializationContext context) {
 
         JsonObject obj = new JsonObject();
-        obj.addProperty("texture", String.format("#%d", src.texture));
+        obj.addProperty("texture", String.format("#%s", src.texture));
         if (src.cullface != null) obj.addProperty("cullface", src.cullface);
         obj.addProperty("tintindex", src.tintindex);
         if (src.rotation != 0) obj.addProperty("rotation", src.rotation);

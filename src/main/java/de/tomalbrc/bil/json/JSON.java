@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import de.tomalbrc.bil.file.bbmodel.BbFace;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
@@ -34,6 +35,8 @@ public class JSON {
     public static final GsonBuilder GENERIC_BUILDER = new GsonBuilder()
             // Reference equality
             .registerTypeHierarchyAdapter(UUID.class, new CachedUuidDeserializer())
+            // texture id for multi version ajblueprint support
+            .registerTypeHierarchyAdapter(BbFace.TextureId.class, new BbFace.TextureId.Deserializer())
             // Custom deserializers
             .registerTypeHierarchyAdapter(Matrix4fc.class, new SimpleCodecDeserializer<>(ExtraCodecs.MATRIX4F))
             .registerTypeHierarchyAdapter(Vector3fc.class, new SimpleCodecDeserializer<>(ExtraCodecs.VECTOR3F))

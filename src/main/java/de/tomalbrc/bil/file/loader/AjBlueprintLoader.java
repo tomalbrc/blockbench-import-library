@@ -3,7 +3,10 @@ package de.tomalbrc.bil.file.loader;
 import com.google.gson.JsonParseException;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
+import de.tomalbrc.bil.file.importer.AjBlueprint5Importer;
 import de.tomalbrc.bil.file.importer.AjBlueprintImporter;
+import de.tomalbrc.bil.file.importer.BbModel5Importer;
+import de.tomalbrc.bil.util.VersionCheck;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +21,9 @@ public class AjBlueprintLoader extends BbModelLoader {
             if (name != null && !name.isEmpty()) model.modelIdentifier = name;
             if (model.modelIdentifier == null) model.modelIdentifier = model.name;
             model.modelIdentifier = ModelLoader.normalizedModelId(model.modelIdentifier);
+
+            if (VersionCheck.isAtLeastVersion(model.meta.formatVersion, "1.10.1"))
+                return new AjBlueprint5Importer(model).importModel();
 
             return new AjBlueprintImporter(model).importModel();
         } catch (Throwable throwable) {

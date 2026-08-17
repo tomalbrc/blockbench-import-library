@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class AjBlueprintImporter extends AjModelImporter implements ModelImporter<BbModel> {
-    public AjBlueprintImporter(BbModel model) {
+public class AjBlueprint5Importer extends BbModel5Importer implements ModelImporter<BbModel> {
+    public AjBlueprint5Importer(BbModel model) {
         super(model);
     }
 

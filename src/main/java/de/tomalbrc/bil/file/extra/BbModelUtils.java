@@ -76,15 +76,19 @@ public class BbModelUtils {
     }
 
     public static BbGroup getGroup(BbModel model, BbOutliner outliner) {
-        if (outliner != null) for (BbGroup entry : model.groups) {
-            if (entry.uuid.equals(outliner.uuid)) return entry;
+        if (outliner != null && model.groups != null) {
+            for (BbGroup entry : model.groups) {
+                if (entry.uuid.equals(outliner.uuid)) return entry;
+            }
         }
         return outliner == null ? null : new BbGroup(outliner.uuid);
     }
 
     public static BbGroup getGroup(BbModel model, BbOutliner.ChildEntry outliner) {
-        if (outliner != null) for (BbGroup entry : model.groups) {
-            if (entry.uuid.equals(outliner.uuid)) return entry;
+        if (outliner != null && model.groups != null) {
+            for (BbGroup entry : model.groups) {
+                if (entry.uuid.equals(outliner.uuid)) return entry;
+            }
         }
         return outliner == null ? null : new BbGroup(outliner.uuid);
     }

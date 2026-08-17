@@ -142,7 +142,7 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
 
     @Override
     protected Object2ObjectOpenHashMap<?, BbTexture> makeDefaultTextureMap() {
-        return makeDefaultUuidTextureMap();
+        return VersionCheck.isAtLeastVersion(model.meta.formatVersion, "1.10.1") ? makeDefaultUuidTextureMap() : super.makeDefaultTextureMap();
     }
 
     protected Object2ObjectOpenHashMap<UUID, BbTexture> makeDefaultUuidTextureMap() {

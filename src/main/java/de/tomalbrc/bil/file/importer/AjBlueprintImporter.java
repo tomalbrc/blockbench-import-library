@@ -151,9 +151,4 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
         }
         return null;
     }
-
-    @Override
-    protected boolean flipAnimationX() {
-        return !VersionCheck.isAtLeastVersion(model.meta.formatVersion, "1.10.1");
-    }
 }

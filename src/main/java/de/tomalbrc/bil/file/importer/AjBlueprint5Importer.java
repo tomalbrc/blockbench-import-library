@@ -154,6 +154,6 @@ public class AjBlueprint5Importer extends BbModel5Importer implements ModelImpor
 
     @Override
     protected boolean flipAnimationX() {
-        return !VersionCheck.isAtLeastVersion(model.meta.formatVersion, "1.10.1");
+        return false;
     }
 }

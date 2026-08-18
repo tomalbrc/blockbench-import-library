@@ -29,23 +29,6 @@ public class AjBlueprintImporter extends AjModelImporter implements ModelImporte
     }
 
     @Override
-    protected void postProcess(BbModel model) {
-        for (BbElement element : model.elements) {
-            for (Map.Entry<String, BbFace> entry : element.faces.entrySet()) {
-                if (entry.getValue().texture.hasId()) {
-                    continue;
-                }
-
-                var tex = model.textures.stream().filter(x -> entry.getValue().texture.matches(x)).findFirst().orElse(null);
-                if (tex != null)
-                    entry.getValue().texture.setId(tex.id);
-            }
-        }
-
-        super.postProcess(model);
-    }
-
-    @Override
     protected void rescaleUV(Vector2i globalResolution, List<BbTexture> textures, BbElement element) {
         for (var entry : element.faces.entrySet()) {
             // re-map uv based on texture size

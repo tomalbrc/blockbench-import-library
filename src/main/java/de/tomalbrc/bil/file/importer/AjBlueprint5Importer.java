@@ -32,7 +32,7 @@ public class AjBlueprint5Importer extends BbModel5Importer implements ModelImpor
     protected void postProcess(BbModel model) {
         for (BbElement element : model.elements) {
             for (Map.Entry<String, BbFace> entry : element.faces.entrySet()) {
-                if (entry.getValue().texture.hasId()) {
+                if (entry.getValue().texture == null || entry.getValue().texture.hasId()) {
                     continue;
                 }
 

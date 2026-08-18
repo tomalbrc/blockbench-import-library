@@ -5,7 +5,6 @@ import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.bbmodel.BbModel;
 import de.tomalbrc.bil.file.importer.AjBlueprint5Importer;
 import de.tomalbrc.bil.file.importer.AjBlueprintImporter;
-import de.tomalbrc.bil.file.importer.BbModel5Importer;
 import de.tomalbrc.bil.util.VersionCheck;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;

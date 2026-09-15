@@ -9,6 +9,8 @@ import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
+import javax.naming.Name;
+
 @Deprecated(forRemoval = true)
 public class PositionedHolder extends AbstractAnimationHolder {
     public PositionedHolder(ServerLevel level, Vec3 pos, Model model) {
@@ -26,15 +28,12 @@ public class PositionedHolder extends AbstractAnimationHolder {
 
     @Override
     public CommandSourceStack createCommandSourceStack() {
-        String name = String.format("PositionedHolder[%.1f, %.1f, %.1f]", this.getPos().x, this.getPos().y, this.getPos().z);
         return new CommandSourceStack(
                 this.getLevel().getServer(),
                 this.getPos(),
                 Vec2.ZERO,
                 this.getLevel(),
                 PermissionSet.ALL_PERMISSIONS,
-                name,
-                Component.literal(name),
                 this.getLevel().getServer(),
                 null
         );

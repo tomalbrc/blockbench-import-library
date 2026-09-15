@@ -13,15 +13,12 @@ public class SimpleAnimatedHolder extends AbstractAnimationHolder {
 
     @Override
     public CommandSourceStack createCommandSourceStack() {
-        String name = String.format("SimpleAnimatedHolder[%.1f, %.1f, %.1f]", this.getPos().x, this.getPos().y, this.getPos().z);
         return new CommandSourceStack(
                 this.getLevel().getServer(),
                 this.getPos(),
                 Vec2.ZERO,
                 this.getLevel(),
                 PermissionSet.ALL_PERMISSIONS,
-                name,
-                Component.literal(name),
                 this.getLevel().getServer(),
                 null
         );

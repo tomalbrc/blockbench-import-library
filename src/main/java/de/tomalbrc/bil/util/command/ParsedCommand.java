@@ -25,7 +25,7 @@ public class ParsedCommand {
     public int execute(CommandDispatcher<CommandSourceStack> dispatcher, CommandSourceStack source) {
         if (this.parsed == null) {
             var parsingSource = new CommandSourceStack(
-                    CommandSource.NULL, Vec3.ZERO, Vec2.ZERO, source.getLevel(), PermissionSet.ALL_PERMISSIONS, "", CommonComponents.EMPTY, source.getServer(), null
+                    CommandSource.NULL, Vec3.ZERO, Vec2.ZERO, source.getLevel(), PermissionSet.ALL_PERMISSIONS, source.getServer(), null
             );
             this.parsed = dispatcher.parse(this.command, parsingSource);
 

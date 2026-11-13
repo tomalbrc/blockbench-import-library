@@ -31,14 +31,18 @@ public class AjBlueprint5Importer extends BbModel5Importer implements ModelImpor
     @Override
     protected void postProcess(BbModel model) {
         for (BbElement element : model.elements) {
-            for (Map.Entry<String, BbFace> entry : element.faces.entrySet()) {
-                if (entry.getValue().texture == null || entry.getValue().texture.hasId()) {
-                    continue;
+            if (element.faces != null) {
+
+                for (Map.Entry<String, BbFace> entry : element.faces.entrySet()) {
+                    if (entry.getValue().texture == null || entry.getValue().texture.hasId()) {
+                        continue;
+                    }
+
+                    var tex = model.textures.stream().filter(x -> entry.getValue().texture.matches(x)).findFirst().orElse(null);
+                    if (tex != null)
+                        entry.getValue().texture.setId(tex.id);
                 }
 
-                var tex = model.textures.stream().filter(x -> entry.getValue().texture.matches(x)).findFirst().orElse(null);
-                if (tex != null)
-                    entry.getValue().texture.setId(tex.id);
             }
         }
 

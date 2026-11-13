@@ -1,5 +1,6 @@
 package de.tomalbrc.bil.core.holder.base;
 
+import com.google.common.collect.ImmutableList;
 import de.tomalbrc.bil.util.IChunkMap;
 import de.tomalbrc.bil.util.Utils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -7,6 +8,8 @@ import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 
 /**
  * Base class for all holder that handles Polymer's ElementHolder specific logic.
@@ -69,7 +72,7 @@ public abstract class AbstractElementHolder extends ElementHolder {
     public final void asyncTick() {
         this.onAsyncTick();
 
-        for (VirtualElement element : this.getElements()) {
+        for (VirtualElement element : new ArrayList<>(this.getElements())) {
             element.tick();
         }
     }
